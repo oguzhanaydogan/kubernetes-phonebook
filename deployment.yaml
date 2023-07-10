@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phonebook-deployment
+  labels:
+    app: phonebook
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: phonebook
+  template:
+    metadata:
+      labels:
+        app: phonebook
+    spec:
+      containers:
+      - name: phonebook
+        image: coyhub.azurecr.io/web-server
+        ports:
+        - containerPort: 80
