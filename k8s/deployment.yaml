@@ -20,7 +20,3 @@ spec:
         image: coyhub.azurecr.io/web-server
         ports:
         - containerPort: 80
-
-
-
-        
