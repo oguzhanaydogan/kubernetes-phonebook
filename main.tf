@@ -195,6 +195,64 @@ module "azapi_resources" {
   for_each = var.azapi_resources
   type = each.value.type
   name = each.key
-  parent_id = module.mssql_databases[each.value.parent].id
-  body = each.value.body
+  parent_id = module.mssql_databases["phonebook_us"].id
+  schema_validation_enabled = each.value.schema_validation_enabled
+  body = {
+    properties = {
+      conflictResolutionPolicy = "HubWin"
+      hubDatabasePassword = "Test1234."
+      hubDatabaseUserName = "azureuser"
+      interval = 60
+      # schema = {
+      #   masterSyncMemberName = "string"
+      #   tables = [
+      #     {
+      #       columns = [
+      #         {
+      #           dataSize = "string"
+      #           dataType = "string"
+      #           quotedName = "string"
+      #         }
+      #       ]
+      #       quotedName = "string"
+      #     }
+      #   ]
+      # }
+      syncDatabaseId = "${module.mssql_databases["phonebook_us"].id}"
+      usePrivateLinkConnection = false
+    }
+    # sku = {
+    #   capacity = int
+    #   family = "string"
+    #   name = "string"
+    #   size = "string"
+    #   tier = "string"
+    # }
+  }
+}
+
+module "arm_template_deployments" {
+  source = "./modules/ARMTemplateDeployment"
+  for_each = var.arm_template_deployments
+  name = each.key
+  resource_group_name = module.resource_groups[each.value.resource_group].name
+  deployment_mode = each.value.deployment_mode
+  parameters_content = each.value.parameters_content
+  template_content = {
+    "type": "Microsoft.Sql/servers/databases/syncGroups/syncMembers",
+    "apiVersion": "2022-05-01-preview",
+    "name": "db-sync-group-member-eu",
+    "properties": {
+      "databaseName": "phonebook",
+      "databaseType": "AzureSqlDatabase",
+      "userName": "azureuser"
+      "password": "Test1234.",
+      "serverName": "coyhub-db-eu",
+      "sqlServerDatabaseId": "${module.mssql_databases["phonebook_eu"].id}",
+      "syncAgentId": "string",
+      "syncDirection": "Bidirectional",
+      "syncMemberAzureDatabaseResourceId": "string",
+      "usePrivateLinkConnection": false
+    }
+  }
 }

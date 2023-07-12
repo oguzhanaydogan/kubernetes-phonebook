@@ -271,7 +271,7 @@ linux_virtual_machines = {
     storage_os_disk_create_option                           = "FromImage"
     storage_os_disk_managed_disk_type                       = "Standard_LRS"
     admin_username                                          = "azureuser"
-    custom_data                                             = "/modules/VirtualMachine/agent.sh"
+    custom_data                                             = "modules/VirtualMachine/agent.sh"
     os_profile_linux_config_disable_password_authentication = true
     ip_configuration_name                                   = "testconfiguration1"
     ip_configuration_subnet                                 = "vnet_agent_subnet_agent"
@@ -333,6 +333,7 @@ mssql_databases = {
     read_scale                  = false
     zone_redundant              = false
   }
+
   phonebook_eu = {
     name                        = "phonebook"
     server                      = "coyhub-db-eu"
@@ -348,8 +349,18 @@ mssql_databases = {
 }
 
 azapi_resources = {
-    db-sync-group = {
-        type = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
-        parent = "phonebook_us"
-    }
+  db-sync-group = {
+    type = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
+    parent = "coyhub-db-us"
+    syncDatabase = "phonebook_us"
+    schema_validation_enabled = false
+  }
+}
+
+arm_template_deployments = {
+  db-sync-group-member-eu = {
+    resource_group = "rg-eastus"
+    deployment_mode = "Incremental"
+    parameters_content = ""
+  }
 }
