@@ -361,6 +361,5 @@ arm_template_deployments = {
   db-sync-group-member-eu = {
     resource_group = "rg-eastus"
     deployment_mode = "Incremental"
-    parameters_content = ""
   }
 }

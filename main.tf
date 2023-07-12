@@ -237,22 +237,29 @@ module "arm_template_deployments" {
   name = each.key
   resource_group_name = module.resource_groups[each.value.resource_group].name
   deployment_mode = each.value.deployment_mode
-  parameters_content = each.value.parameters_content
-  template_content = {
-    "type": "Microsoft.Sql/servers/databases/syncGroups/syncMembers",
-    "apiVersion": "2022-05-01-preview",
-    "name": "db-sync-group-member-eu",
-    "properties": {
-      "databaseName": "phonebook",
-      "databaseType": "AzureSqlDatabase",
-      "userName": "azureuser"
-      "password": "Test1234.",
-      "serverName": "coyhub-db-eu",
-      "sqlServerDatabaseId": "${module.mssql_databases["phonebook_eu"].id}",
-      "syncAgentId": "string",
-      "syncDirection": "Bidirectional",
-      "syncMemberAzureDatabaseResourceId": "string",
-      "usePrivateLinkConnection": false
-    }
+  template_content = <<TEMPLATE
+  {
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "variables": {},
+    "resources": [
+      {
+        "type": "Microsoft.Sql/servers/databases/syncGroups/syncMembers",
+        "apiVersion": "2022-05-01-preview",
+        "name": "db-sync-group/db-sync-group-member-eu",
+        "properties": {
+          "databaseName": "phonebook",
+          "databaseType": "AzureSqlDatabase",
+          "userName": "azureuser",
+          "password": "Test1234.",
+          "serverName": "coyhub-db-eu",
+          "syncDirection": "Bidirectional",
+          "syncMemberAzureDatabaseResourceId": "${module.mssql_databases["phonebook_eu"].id}",
+          "usePrivateLinkConnection": false
+        }
+      }
+    ]
   }
+  TEMPLATE
 }

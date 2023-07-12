@@ -45,4 +45,5 @@ variable "mssql_databases" {
 variable "azapi_resources" {
 }
 
-
+variable "arm_template_deployments" {
+}
