@@ -195,5 +195,6 @@ module "azapi_resources" {
   for_each = var.azapi_resources
   type = each.value.type
   name = each.key
-  parent_id = module.mssql_databases[each.value.parent].id  
+  parent_id = module.mssql_databases[each.value.parent].id
+  body = each.value.body
 }
