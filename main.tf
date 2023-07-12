@@ -247,7 +247,7 @@ module "arm_template_deployments" {
       {
         "type": "Microsoft.Sql/servers/databases/syncGroups/syncMembers",
         "apiVersion": "2022-05-01-preview",
-        "name": "db-sync-group/db-sync-group-member-eu",
+        "name": "coyhub-db-us/phonebook/db-sync-group/db-sync-group-member-eu",
         "properties": {
           "databaseName": "phonebook",
           "databaseType": "AzureSqlDatabase",
