@@ -347,3 +347,48 @@ mssql_databases = {
     zone_redundant              = false
   }
 }
+
+load_balancers = {
+    phonebook-lb = {
+        resource_group = 
+        frontend_ip_configuration_name = 
+        frontend_ip_configuration_public_ip_address_id = 
+        lb_backend_address_pool_loadbalancer_id = 
+        lb_backend_address_pool_name = 
+        lb_nat_pool_name = 
+        lb_nat_pool_loadbalancer_id = 
+        lb_nat_pool_protocol = 
+        lb_nat_pool_rontend_port_start = 
+        lb_nat_pool_frontend_port_end = 
+        lb_nat_pool_backend_port = 
+        lb_nat_pool_frontend_ip_configuration_name = 
+        lb_probe_loadbalancer_id = 
+        lb_probe_name = 
+        lb_probe_protocol = 
+        lb_probe_request_path = 
+        lb_probe_port = 
+    }
+}
+
+linux_virtual_machine_scale_sets = {
+    app-vmss = {
+        ssh_key_rg = "ssh-key"
+        ssh_key_name = "azure"
+        shared_image_name = "myimage"
+        shared_image_gallery_name = "mygallery"
+        shared_image_resource_group_name = "ssh-key"
+        resource_group = "rg-westeurope"
+        sku                 = "Standard_F2"
+        instances           = 2
+        admin_username      = "azureuser"
+        os_disk_storage_account_type = "Standard_LRS"
+        os_disk_caching             = "ReadWrite"
+        network_interface_name    = "example"
+        network_interface_primary = true
+        ip_configuration_name      = "internal"
+        ip_configuration_primary   = true
+        ip_configuration_subnet = "subnet-app"
+        ip_configuration_load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.main.id]
+        ip_configuration_load_balancer_inbound_nat_rules_ids    = [azurerm_lb_nat_pool.main.id]
+    }
+}

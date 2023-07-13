@@ -1,3 +1,8 @@
+data "azurerm_ssh_public_key" "ssh_public_key" {
+  resource_group_name = var.ssh_key_rg
+  name                = var.ssh_key_name
+}
+
 resource "azurerm_virtual_machine" "vm1" {
   name                  = var.vm_name
   location              = var.location
@@ -52,11 +57,6 @@ resource "azurerm_network_interface" "main" {
     private_ip_address_allocation = var.ip_configuration_private_ip_address_allocation
     public_ip_address_id          = var.ip_configuration_public_ip_assigned ? var.ip_configuration_public_ip_address_id : null
   }
-}
-
-data "azurerm_ssh_public_key" "ssh_public_key" {
-  resource_group_name = var.ssh_key_rg
-  name                = var.ssh_key_name
 }
 
 resource "azurerm_network_interface_security_group_association" "nic1" {

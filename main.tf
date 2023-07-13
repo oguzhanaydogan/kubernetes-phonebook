@@ -273,3 +273,51 @@ module "azapi_update_phonebook_sync_group" {
     }
   }
 }
+
+module "load_balancers" {
+  source = "./modules/LoadBalancer"
+  for_each = var.load_balancers
+  name = each.key
+  location = module.resource_groups[each.value.resource_group].location
+  resource_group_name = module.resource_groups[each.value.resource_group].name
+  frontend_ip_configuration_name = each.value.frontend_ip_configuration_name
+  frontend_ip_configuration_public_ip_address_id = each.value.frontend_ip_configuration_public_ip_address_id
+  lb_backend_address_pool_loadbalancer_id = each.value.lb_backend_address_pool_loadbalancer_id
+  lb_backend_address_pool_name = each.value.lb_backend_address_pool_name
+  lb_nat_pool_name = each.value.lb_nat_pool_name
+  lb_nat_pool_loadbalancer_id = each.value.lb_nat_pool_loadbalancer_id
+  lb_nat_pool_protocol = each.value.lb_nat_pool_protocol
+  lb_nat_pool_rontend_port_start = each.value.lb_nat_pool_rontend_port_start
+  lb_nat_pool_frontend_port_end = each.value.lb_nat_pool_frontend_port_end
+  lb_nat_pool_backend_port = each.value.lb_nat_pool_backend_port
+  lb_nat_pool_frontend_ip_configuration_name = each.value.lb_nat_pool_frontend_ip_configuration_name
+  lb_probe_loadbalancer_id = each.value.lb_probe_loadbalancer_id
+  lb_probe_name = each.value.lb_probe_name
+  lb_probe_protocol = each.value.lb_probe_protocol
+  lb_probe_request_path = each.value.lb_probe_request_path
+  lb_probe_port = each.value.lb_probe_port
+}
+
+module "linux_virtual_machine_scale_sets" {
+  source = "./modules/VirtualMachineScaleSet"
+  for_each = var.linux_virtual_machine_scale_sets
+  ssh_key_rg = each.value.ssh_key_rg
+  ssh_key_name = each.value.ssh_key_name
+  shared_image_name = each.value.shared_image_name
+  shared_image_gallery_name = each.value.shared_image_gallery_name
+  shared_image_resource_group_name = each.value.shared_image_resource_group_name
+  name = each.key
+  resource_group_name = module.resource_groups[each.value.resource_group].name
+  location = module.resource_groups[each.value.resource_group].location
+  sku = each.value.sku
+  instances = each.value.instances
+  admin_username = each.value.admin_username
+  os_disk_caching = each.value.os_disk_caching
+  network_interface_name = each.value.network_interface_name
+  network_interface_primary = each.value.network_interface_primary
+  ip_configuration_name = each.value.ip_configuration_name
+  ip_configuration_primary = each.value.ip_configuration_primary
+  ip_configuration_subnet_id = module.subnets[each.value.ip_configuration_subnet].id
+  ip_configuration_load_balancer_backend_address_pool_ids = each.value.ip_configuration_load_balancer_backend_address_pool_ids
+  ip_configuration_load_balancer_inbound_nat_rules_ids = each.value.ip_configuration_load_balancer_inbound_nat_rules_ids
+}
