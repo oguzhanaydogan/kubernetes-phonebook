@@ -281,21 +281,36 @@ module "load_balancers" {
   location = module.resource_groups[each.value.resource_group].location
   resource_group_name = module.resource_groups[each.value.resource_group].name
   frontend_ip_configuration_name = each.value.frontend_ip_configuration_name
-  frontend_ip_configuration_public_ip_address_id = each.value.frontend_ip_configuration_public_ip_address_id
-  lb_backend_address_pool_loadbalancer_id = each.value.lb_backend_address_pool_loadbalancer_id
+  frontend_ip_configuration_subnet_id = module.subnets[each.value.frontend_ip_configuration_subnet].id
   lb_backend_address_pool_name = each.value.lb_backend_address_pool_name
   lb_nat_pool_name = each.value.lb_nat_pool_name
-  lb_nat_pool_loadbalancer_id = each.value.lb_nat_pool_loadbalancer_id
   lb_nat_pool_protocol = each.value.lb_nat_pool_protocol
-  lb_nat_pool_rontend_port_start = each.value.lb_nat_pool_rontend_port_start
+  lb_nat_pool_frontend_port_start = each.value.lb_nat_pool_rontend_port_start
   lb_nat_pool_frontend_port_end = each.value.lb_nat_pool_frontend_port_end
   lb_nat_pool_backend_port = each.value.lb_nat_pool_backend_port
-  lb_nat_pool_frontend_ip_configuration_name = each.value.lb_nat_pool_frontend_ip_configuration_name
-  lb_probe_loadbalancer_id = each.value.lb_probe_loadbalancer_id
   lb_probe_name = each.value.lb_probe_name
   lb_probe_protocol = each.value.lb_probe_protocol
-  lb_probe_request_path = each.value.lb_probe_request_path
   lb_probe_port = each.value.lb_probe_port
+}
+
+data "azurerm_client_config" "current" { 
+}
+
+module "private_link_services" {
+  source = "./modules/PrivateLinkService"
+  for_each = var.private_link_services
+  link_name = each.key
+  resource_group_name = module.resource_groups[each.value.resource_group].name
+  location = module.resource_groups[each.value.resource_group].location
+  auto_approval_subscription_ids = [data.azurerm_client_config.current.subscription_id]
+  load_balancer_frontend_ip_configuration_ids = [module.load_balancers[each.value.load_balancer].frontend_ip_configuration.0.id]
+  nat_ip_configurations = {
+    for nat_ip_config in each.value.nat_ip_configurations : nat_ip_config.name => {
+        name = nat_ip_config.name
+        primary = nat_ip_config.primary
+        subnet_id = module.subnets[nat_ip_config.subnet].id
+    }
+  }
 }
 
 module "linux_virtual_machine_scale_sets" {
@@ -306,6 +321,7 @@ module "linux_virtual_machine_scale_sets" {
   shared_image_name = each.value.shared_image_name
   shared_image_gallery_name = each.value.shared_image_gallery_name
   shared_image_resource_group_name = each.value.shared_image_resource_group_name
+  depends_on = [ module.load_balancers.* ]
   name = each.key
   resource_group_name = module.resource_groups[each.value.resource_group].name
   location = module.resource_groups[each.value.resource_group].location
@@ -318,6 +334,6 @@ module "linux_virtual_machine_scale_sets" {
   ip_configuration_name = each.value.ip_configuration_name
   ip_configuration_primary = each.value.ip_configuration_primary
   ip_configuration_subnet_id = module.subnets[each.value.ip_configuration_subnet].id
-  ip_configuration_load_balancer_backend_address_pool_ids = each.value.ip_configuration_load_balancer_backend_address_pool_ids
-  ip_configuration_load_balancer_inbound_nat_rules_ids = each.value.ip_configuration_load_balancer_inbound_nat_rules_ids
+  ip_configuration_load_balancer_backend_address_pool_ids = [module.load_balancers[each.value.ip_configuration_load_balancer].backend_address_pool_ids]
+  ip_configuration_load_balancer_inbound_nat_pool_ids = [module.load_balancers[each.value.ip_configuration_load_balancer].inbound_nat_pool_ids]
 }

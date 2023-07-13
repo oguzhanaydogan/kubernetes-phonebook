@@ -55,5 +55,5 @@ variable "ip_configuration_subnet_id" {
 variable "ip_configuration_load_balancer_backend_address_pool_ids" {
 }
 
-variable "ip_configuration_load_balancer_inbound_nat_rules_ids" {
+variable "ip_configuration_load_balancer_inbound_nat_pool_ids" {
 }

@@ -41,7 +41,13 @@ resource "azurerm_linux_virtual_machine_scale_set" "example" {
       primary   = var.ip_configuration_primary
       subnet_id = var.ip_configuration_subnet_id
       load_balancer_backend_address_pool_ids = var.ip_configuration_load_balancer_backend_address_pool_ids
-      load_balancer_inbound_nat_rules_ids    = var.ip_configuration_load_balancer_inbound_nat_rules_ids
+      load_balancer_inbound_nat_rules_ids    = var.ip_configuration_load_balancer_inbound_nat_pool_ids
     }
+  }
+  rolling_upgrade_policy {
+    max_batch_instance_percent              = 21
+    max_unhealthy_instance_percent          = 22
+    max_unhealthy_upgraded_instance_percent = 23
+    pause_time_between_batches              = "PT30S"
   }
 }

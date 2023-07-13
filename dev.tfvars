@@ -111,6 +111,15 @@ subnets = {
     delegation_name  = ""
   }
 
+  vnet_app_eu_subnet_lb = {
+    name             = "subnet-lb"
+    resource_group   = "rg-westeurope"
+    virtual_network  = "vnet-app-eu"
+    address_prefixes = ["10.11.1.0/24"]
+    delegation       = false
+    delegation_name  = ""
+  }
+
   vnet_db_eu_subnet_db = {
     name             = "subnet-db"
     resource_group   = "rg-westeurope"
@@ -350,24 +359,33 @@ mssql_databases = {
 
 load_balancers = {
     phonebook-lb = {
-        resource_group = 
-        frontend_ip_configuration_name = 
-        frontend_ip_configuration_public_ip_address_id = 
-        lb_backend_address_pool_loadbalancer_id = 
-        lb_backend_address_pool_name = 
-        lb_nat_pool_name = 
-        lb_nat_pool_loadbalancer_id = 
-        lb_nat_pool_protocol = 
-        lb_nat_pool_rontend_port_start = 
-        lb_nat_pool_frontend_port_end = 
-        lb_nat_pool_backend_port = 
-        lb_nat_pool_frontend_ip_configuration_name = 
-        lb_probe_loadbalancer_id = 
-        lb_probe_name = 
-        lb_probe_protocol = 
-        lb_probe_request_path = 
-        lb_probe_port = 
+        resource_group = "rg-westeurope"
+        frontend_ip_configuration_name = "internal"
+        frontend_ip_configuration_subnet = "vnet_app_eu_subnet_lb"
+        lb_backend_address_pool_name = "backend-pool"
+        lb_nat_pool_name =  "nat-pool"
+        lb_nat_pool_protocol = "Tcp"
+        lb_nat_pool_frontend_port_start = "80"
+        lb_nat_pool_frontend_port_end = "90"
+        lb_nat_pool_backend_port =  "8080"
+        lb_probe_name = "probe-http"
+        lb_probe_protocol = "Tcp"
+        lb_probe_port = "80"
     }
+}
+
+private_link_services = {
+  phonebook-lb-pls = {
+    resource_group = "rg-westeurope"
+    load_balancer = "phonebook-lb"
+    nat_ip_configurations = [
+      {
+        subnet = "vnet_app_eu_subnet_lb"
+        name = "primary"
+        primary = true
+      } 
+    ]
+  }
 }
 
 linux_virtual_machine_scale_sets = {
@@ -387,8 +405,7 @@ linux_virtual_machine_scale_sets = {
         network_interface_primary = true
         ip_configuration_name      = "internal"
         ip_configuration_primary   = true
-        ip_configuration_subnet = "subnet-app"
-        ip_configuration_load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.main.id]
-        ip_configuration_load_balancer_inbound_nat_rules_ids    = [azurerm_lb_nat_pool.main.id]
+        ip_configuration_subnet = "vnet_app_eu_subnet_app"
+        ip_configuration_load_balancer = "phonebook-lb"
     }
 }

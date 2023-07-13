@@ -42,8 +42,11 @@ variable "mssql_servers" {
 variable "mssql_databases" {
 }
 
-variable "linux_virtual_machine_scale_sets" {
+variable "load_balancers" {
 }
 
-variable "load_balancers" {
+variable "private_link_services" {
+}
+
+variable "linux_virtual_machine_scale_sets" {
 }
