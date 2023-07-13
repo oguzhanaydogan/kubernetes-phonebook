@@ -45,6 +45,7 @@ subnets = {
     address_prefixes = ["10.0.0.0/26"]
     delegation       = false
     delegation_name  = ""
+    private_link_service_network_policies_enabled = true
   }
 
   vnet_hub_subnet_firewall_management = {
@@ -54,6 +55,7 @@ subnets = {
     address_prefixes = ["10.0.1.0/26"]
     delegation       = false
     delegation_name  = ""
+    private_link_service_network_policies_enabled = true
   }
 
   vnet_app_subnet_app = {
@@ -63,6 +65,7 @@ subnets = {
     address_prefixes = ["10.1.0.0/24"]
     delegation       = false
     delegation_name  = ""
+    private_link_service_network_policies_enabled = true
   }
 
   vnet_app_subnet_bastion = {
@@ -72,6 +75,7 @@ subnets = {
     address_prefixes = ["10.1.1.0/24"]
     delegation       = false
     delegation_name  = ""
+    private_link_service_network_policies_enabled = true
   }
 
   vnet_acr_subnet_acr = {
@@ -81,6 +85,7 @@ subnets = {
     address_prefixes = ["10.2.0.0/24"]
     delegation       = false
     delegation_name  = ""
+    private_link_service_network_policies_enabled = true
   }
 
   vnet_db_subnet_db = {
@@ -90,6 +95,7 @@ subnets = {
     address_prefixes = ["10.3.0.0/24"]
     delegation       = false
     delegation_name  = ""
+    private_link_service_network_policies_enabled = true
   }
 
   vnet_agent_subnet_agent = {
@@ -99,6 +105,7 @@ subnets = {
     address_prefixes = ["10.4.0.0/24"]
     delegation       = false
     delegation_name  = ""
+    private_link_service_network_policies_enabled = true
   }
 
   #WEST EUROPE
@@ -109,6 +116,7 @@ subnets = {
     address_prefixes = ["10.11.0.0/24"]
     delegation       = false
     delegation_name  = ""
+    private_link_service_network_policies_enabled = true
   }
 
   vnet_app_eu_subnet_lb = {
@@ -118,6 +126,17 @@ subnets = {
     address_prefixes = ["10.11.1.0/24"]
     delegation       = false
     delegation_name  = ""
+    private_link_service_network_policies_enabled = true
+  }
+
+  vnet_app_eu_subnet_lb_pls = {
+    name             = "subnet-lb-pls"
+    resource_group   = "rg-westeurope"
+    virtual_network  = "vnet-app-eu"
+    address_prefixes = ["10.11.2.0/24"]
+    delegation       = false
+    delegation_name  = ""
+    private_link_service_network_policies_enabled = false
   }
 
   vnet_db_eu_subnet_db = {
@@ -127,6 +146,7 @@ subnets = {
     address_prefixes = ["10.12.0.0/24"]
     delegation       = false
     delegation_name  = ""
+    private_link_service_network_policies_enabled = true
   }
 }
 
@@ -360,6 +380,7 @@ mssql_databases = {
 load_balancers = {
     phonebook-lb = {
         resource_group = "rg-westeurope"
+        sku = "Standard"
         frontend_ip_configuration_name = "internal"
         frontend_ip_configuration_subnet = "vnet_app_eu_subnet_lb"
         lb_backend_address_pool_name = "backend-pool"
@@ -371,6 +392,7 @@ load_balancers = {
         lb_probe_name = "probe-http"
         lb_probe_protocol = "Tcp"
         lb_probe_port = "80"
+        lb_rule_name = "rule-http"
     }
 }
 
@@ -380,7 +402,7 @@ private_link_services = {
     load_balancer = "phonebook-lb"
     nat_ip_configurations = [
       {
-        subnet = "vnet_app_eu_subnet_lb"
+        subnet = "vnet_app_eu_subnet_lb_pls"
         name = "primary"
         primary = true
       } 
@@ -392,13 +414,14 @@ linux_virtual_machine_scale_sets = {
     app-vmss = {
         ssh_key_rg = "ssh-key"
         ssh_key_name = "azure"
-        shared_image_name = "myimage"
+        shared_image_name = "vm-image-definition"
         shared_image_gallery_name = "mygallery"
-        shared_image_resource_group_name = "ssh-key"
+        shared_image_resource_group_name = "rg-westeurope"
         resource_group = "rg-westeurope"
-        sku                 = "Standard_F2"
+        sku                 = "Standard_B1s"
         instances           = 2
         admin_username      = "azureuser"
+        load_balancer = "phonebook-lb"
         os_disk_storage_account_type = "Standard_LRS"
         os_disk_caching             = "ReadWrite"
         network_interface_name    = "example"

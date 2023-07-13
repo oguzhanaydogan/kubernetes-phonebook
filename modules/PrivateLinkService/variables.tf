@@ -15,3 +15,6 @@ variable "load_balancer_frontend_ip_configuration_ids" {
 
 variable "nat_ip_configurations" {
 }
+
+variable "visibility_subscription_ids" {
+}

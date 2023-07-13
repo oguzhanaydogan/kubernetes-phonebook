@@ -31,6 +31,9 @@ variable "instances" {
 variable "admin_username" {
 }
 
+variable "health_probe_id" {
+}
+
 variable "os_disk_storage_account_type" {
 }
 

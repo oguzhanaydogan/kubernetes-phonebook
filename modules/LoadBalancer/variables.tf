@@ -40,3 +40,8 @@ variable "lb_probe_protocol" {
 variable "lb_probe_port" {
 }
 
+variable "lb_rule_name" {
+}
+
+variable "sku" {
+}
