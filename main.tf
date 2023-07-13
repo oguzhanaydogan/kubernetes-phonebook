@@ -190,53 +190,29 @@ module "mssql_databases" {
   zone_redundant              = each.value.zone_redundant
 }
 
-module "azapi_resources" {
+module "azapi_create_phonebook_sync_group" {
   source = "./modules/AzApi"
-  for_each = var.azapi_resources
-  type = each.value.type
-  name = each.key
+  name = "phonebook-sync-group"
+  type = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
   parent_id = module.mssql_databases["phonebook_us"].id
-  schema_validation_enabled = each.value.schema_validation_enabled
   body = {
     properties = {
       conflictResolutionPolicy = "HubWin"
       hubDatabasePassword = "Test1234."
       hubDatabaseUserName = "azureuser"
       interval = 60
-      # schema = {
-      #   masterSyncMemberName = "string"
-      #   tables = [
-      #     {
-      #       columns = [
-      #         {
-      #           dataSize = "string"
-      #           dataType = "string"
-      #           quotedName = "string"
-      #         }
-      #       ]
-      #       quotedName = "string"
-      #     }
-      #   ]
-      # }
       syncDatabaseId = "${module.mssql_databases["phonebook_us"].id}"
       usePrivateLinkConnection = false
     }
-    # sku = {
-    #   capacity = int
-    #   family = "string"
-    #   name = "string"
-    #   size = "string"
-    #   tier = "string"
-    # }
   }
 }
 
-module "arm_template_deployments" {
+module "arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu" {
   source = "./modules/ARMTemplateDeployment"
-  for_each = var.arm_template_deployments
-  name = each.key
-  resource_group_name = module.resource_groups[each.value.resource_group].name
-  deployment_mode = each.value.deployment_mode
+  name = "create-phonebook-sync-group-member-phonebook-eu"
+  resource_group_name = module.resource_groups["rg-eastus"].name
+  deployment_mode = "Incremental"
+  depends_on = [ module.azapi_create_phonebook_sync_group ]
   template_content = <<TEMPLATE
   {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
@@ -247,13 +223,13 @@ module "arm_template_deployments" {
       {
         "type": "Microsoft.Sql/servers/databases/syncGroups/syncMembers",
         "apiVersion": "2022-05-01-preview",
-        "name": "coyhub-db-us/phonebook/db-sync-group/db-sync-group-member-eu",
+        "name": "coyhub-db-us/phonebook/phonebook-sync-group/coyhub-db-eu",
         "properties": {
           "databaseName": "phonebook",
           "databaseType": "AzureSqlDatabase",
           "userName": "azureuser",
           "password": "Test1234.",
-          "serverName": "coyhub-db-eu",
+          "serverName": "coyhub-db-eu.database.windows.net",
           "syncDirection": "Bidirectional",
           "syncMemberAzureDatabaseResourceId": "${module.mssql_databases["phonebook_eu"].id}",
           "usePrivateLinkConnection": false
@@ -262,4 +238,38 @@ module "arm_template_deployments" {
     ]
   }
   TEMPLATE
+}
+
+module "azapi_update_phonebook_sync_group" {
+  source = "./modules/AzApiUpdate"
+  type = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
+  resource_id = "/subscriptions/14528ad0-4c9e-48a9-8ed0-111c1034b033/resourceGroups/rg-eastus/providers/Microsoft.Sql/servers/coyhub-db-us/databases/phonebook/syncGroups/phonebook-sync-group"
+  depends_on = [
+    module.azapi_create_phonebook_sync_group,
+    module.arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu
+  ]
+  body = {
+    properties = {
+      schema = {
+        masterSyncMemberName = "phonebook"
+        tables = [
+          {
+            quotedName = "dbo.phonebook"
+            columns = [
+              {
+                dataSize = "100"
+                dataType = "varchar"
+                quotedName = "name"
+              },
+              {
+                dataSize = "100"
+                dataType = "varchar"
+                quotedName = "number"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
 }

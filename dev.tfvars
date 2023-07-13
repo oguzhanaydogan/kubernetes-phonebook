@@ -347,19 +347,3 @@ mssql_databases = {
     zone_redundant              = false
   }
 }
-
-azapi_resources = {
-  db-sync-group = {
-    type = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
-    parent = "coyhub-db-us"
-    syncDatabase = "phonebook_us"
-    schema_validation_enabled = false
-  }
-}
-
-arm_template_deployments = {
-  db-sync-group-member-eu = {
-    resource_group = "rg-eastus"
-    deployment_mode = "Incremental"
-  }
-}
