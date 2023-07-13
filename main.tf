@@ -293,9 +293,6 @@ module "load_balancers" {
   lb_probe_port = each.value.lb_probe_port
 }
 
-data "azurerm_client_config" "current" { 
-}
-
 module "private_link_services" {
   source = "./modules/PrivateLinkService"
   for_each = var.private_link_services
@@ -321,13 +318,14 @@ module "linux_virtual_machine_scale_sets" {
   shared_image_name = each.value.shared_image_name
   shared_image_gallery_name = each.value.shared_image_gallery_name
   shared_image_resource_group_name = each.value.shared_image_resource_group_name
-  depends_on = [ module.load_balancers.* ]
+  depends_on = [ module.load_balancers ]
   name = each.key
   resource_group_name = module.resource_groups[each.value.resource_group].name
   location = module.resource_groups[each.value.resource_group].location
   sku = each.value.sku
   instances = each.value.instances
   admin_username = each.value.admin_username
+  os_disk_storage_account_type = each.value.os_disk_storage_account_type
   os_disk_caching = each.value.os_disk_caching
   network_interface_name = each.value.network_interface_name
   network_interface_primary = each.value.network_interface_primary
