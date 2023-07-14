@@ -32,13 +32,13 @@ resource "azurerm_linux_virtual_machine_scale_set" "example" {
   network_interface {
     name    = var.network_interface_name
     primary = var.network_interface_primary
+    network_security_group_id = var.network_security_group_id
 
     ip_configuration {
       name      = var.ip_configuration_name
       primary   = var.ip_configuration_primary
       subnet_id = var.ip_configuration_subnet_id
       load_balancer_backend_address_pool_ids = var.ip_configuration_load_balancer_backend_address_pool_ids
-      load_balancer_inbound_nat_rules_ids    = var.ip_configuration_load_balancer_inbound_nat_pool_ids
     }
   }
   rolling_upgrade_policy {
@@ -48,70 +48,3 @@ resource "azurerm_linux_virtual_machine_scale_set" "example" {
     pause_time_between_batches              = "PT0S"
   }
 }
-
-# resource "azurerm_virtual_machine_scale_set" "example" {
-#   name                = var.name
-#   location            = var.location
-#   resource_group_name = var.resource_group_name
-#   upgrade_policy_mode  = "Rolling"
-#   health_probe_id = var.health_probe_id
-  
-#   rolling_upgrade_policy {
-#     max_batch_instance_percent              = 20
-#     max_unhealthy_instance_percent          = 20
-#     max_unhealthy_upgraded_instance_percent = 5
-#     pause_time_between_batches              = "PT0S"
-#   }
-
-#   # required when using rolling upgrade policy
-#   sku {
-#     name     = "Standard_B1S"
-#     tier     = "Standard"
-#     capacity = 2
-#   }
-
-#   storage_profile_image_reference {
-#     id = var.source_image_id
-#   }
-
-#   storage_profile_os_disk {
-#     name              = ""
-#     caching           = "ReadWrite"
-#     create_option     = "FromImage"
-#     managed_disk_type = "Standard_LRS"
-#   }
-
-#   storage_profile_data_disk {
-#     lun           = 0
-#     caching       = "ReadWrite"
-#     create_option = "Empty"
-#     disk_size_gb  = 10
-#   }
-
-#   os_profile {
-#     computer_name_prefix = "testvm"
-#     admin_username       = "azureuser"
-#   }
-
-#   os_profile_linux_config {
-#     disable_password_authentication = true
-
-#     ssh_keys {
-#       path     = "/home/myadmin/.ssh/authorized_keys"
-#       key_data = file("~/.ssh/demo_key.pub")
-#     }
-#   }
-
-#   network_profile {
-#     name    = "terraformnetworkprofile"
-#     primary = true
-
-#     ip_configuration {
-#       name                                   = "TestIPConfiguration"
-#       primary                                = true
-#       subnet_id                              = azurerm_subnet.example.id
-#       load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.bpepool.id]
-#       load_balancer_inbound_nat_rules_ids    = [azurerm_lb_nat_pool.lbnatpool.id]
-#     }
-#   }
-# }

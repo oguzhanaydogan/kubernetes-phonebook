@@ -40,14 +40,14 @@ module "virtual_networks" {
 }
 
 module "subnets" {
-  source               = "./modules/Subnet"
-  for_each             = var.subnets
-  subnet_name          = each.value.name
-  address_prefixes     = each.value.address_prefixes
-  resource_group_name  = module.resource_groups[each.value.resource_group].name
-  virtual_network_name = module.virtual_networks[each.value.virtual_network].name
-  delegation           = each.value.delegation
-  delegation_name      = each.value.delegation_name
+  source                                        = "./modules/Subnet"
+  for_each                                      = var.subnets
+  subnet_name                                   = each.value.name
+  address_prefixes                              = each.value.address_prefixes
+  resource_group_name                           = module.resource_groups[each.value.resource_group].name
+  virtual_network_name                          = module.virtual_networks[each.value.virtual_network].name
+  delegation                                    = each.value.delegation
+  delegation_name                               = each.value.delegation_name
   private_link_service_network_policies_enabled = each.value.private_link_service_network_policies_enabled
 }
 
@@ -192,29 +192,29 @@ module "mssql_databases" {
 }
 
 module "azapi_create_phonebook_sync_group" {
-  source = "./modules/AzApi"
-  name = "phonebook-sync-group"
-  type = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
+  source    = "./modules/AzApi"
+  name      = "phonebook-sync-group"
+  type      = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
   parent_id = module.mssql_databases["phonebook_us"].id
   body = {
     properties = {
       conflictResolutionPolicy = "HubWin"
-      hubDatabasePassword = "Test1234."
-      hubDatabaseUserName = "azureuser"
-      interval = 60
-      syncDatabaseId = "${module.mssql_databases["phonebook_us"].id}"
+      hubDatabasePassword      = "Test1234."
+      hubDatabaseUserName      = "azureuser"
+      interval                 = 60
+      syncDatabaseId           = "${module.mssql_databases["phonebook_us"].id}"
       usePrivateLinkConnection = false
     }
   }
 }
 
 module "arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu" {
-  source = "./modules/ARMTemplateDeployment"
-  name = "create-phonebook-sync-group-member-phonebook-eu"
+  source              = "./modules/ARMTemplateDeployment"
+  name                = "create-phonebook-sync-group-member-phonebook-eu"
   resource_group_name = module.resource_groups["rg-eastus"].name
-  deployment_mode = "Incremental"
-  depends_on = [ module.azapi_create_phonebook_sync_group ]
-  template_content = <<TEMPLATE
+  deployment_mode     = "Incremental"
+  depends_on          = [module.azapi_create_phonebook_sync_group]
+  template_content    = <<TEMPLATE
   {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
@@ -241,102 +241,113 @@ module "arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu"
   TEMPLATE
 }
 
-module "azapi_update_phonebook_sync_group" {
-  source = "./modules/AzApiUpdate"
-  type = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
-  resource_id = "/subscriptions/14528ad0-4c9e-48a9-8ed0-111c1034b033/resourceGroups/rg-eastus/providers/Microsoft.Sql/servers/coyhub-db-us/databases/phonebook/syncGroups/phonebook-sync-group"
-  depends_on = [
-    module.azapi_create_phonebook_sync_group,
-    module.arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu
-  ]
-  body = {
-    properties = {
-      schema = {
-        masterSyncMemberName = "phonebook"
-        tables = [
-          {
-            quotedName = "dbo.phonebook"
-            columns = [
-              {
-                dataSize = "100"
-                dataType = "varchar"
-                quotedName = "name"
-              },
-              {
-                dataSize = "100"
-                dataType = "varchar"
-                quotedName = "number"
-              }
-            ]
-          }
-        ]
-      }
-    }
-  }
-}
+# module "azapi_update_phonebook_sync_group" {
+#   source      = "./modules/AzApiUpdate"
+#   type        = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
+#   resource_id = "/subscriptions/14528ad0-4c9e-48a9-8ed0-111c1034b033/resourceGroups/rg-eastus/providers/Microsoft.Sql/servers/coyhub-db-us/databases/phonebook/syncGroups/phonebook-sync-group"
+#   depends_on = [
+#     module.azapi_create_phonebook_sync_group,
+#     module.arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu
+#   ]
+#   body = {
+#     properties = {
+#       schema = {
+#         masterSyncMemberName = "phonebook"
+#         tables = [
+#           {
+#             quotedName = "dbo.phonebook"
+#             columns = [
+#               {
+#                 dataSize   = "100"
+#                 dataType   = "varchar"
+#                 quotedName = "name"
+#               },
+#               {
+#                 dataSize   = "100"
+#                 dataType   = "varchar"
+#                 quotedName = "number"
+#               }
+#             ]
+#           }
+#         ]
+#       }
+#     }
+#   }
+# }
 
 module "load_balancers" {
-  source = "./modules/LoadBalancer"
-  for_each = var.load_balancers
-  name = each.key
-  location = module.resource_groups[each.value.resource_group].location
-  resource_group_name = module.resource_groups[each.value.resource_group].name
-  sku = each.value.sku
-  frontend_ip_configuration_name = each.value.frontend_ip_configuration_name
+  source                              = "./modules/LoadBalancer"
+  for_each                            = var.load_balancers
+  name                                = each.key
+  location                            = module.resource_groups[each.value.resource_group].location
+  resource_group_name                 = module.resource_groups[each.value.resource_group].name
+  sku                                 = each.value.sku
+  frontend_ip_configuration_name      = each.value.frontend_ip_configuration_name
   frontend_ip_configuration_subnet_id = module.subnets[each.value.frontend_ip_configuration_subnet].id
-  lb_backend_address_pool_name = each.value.lb_backend_address_pool_name
-  lb_nat_pool_name = each.value.lb_nat_pool_name
-  lb_nat_pool_protocol = each.value.lb_nat_pool_protocol
-  lb_nat_pool_frontend_port_start = each.value.lb_nat_pool_frontend_port_start
-  lb_nat_pool_frontend_port_end = each.value.lb_nat_pool_frontend_port_end
-  lb_nat_pool_backend_port = each.value.lb_nat_pool_backend_port
-  lb_probe_name = each.value.lb_probe_name
+  lb_backend_address_pool_name        = each.value.lb_backend_address_pool_name
+  # lb_nat_pool_name                    = each.value.lb_nat_pool_name
+  # lb_nat_pool_protocol                = each.value.lb_nat_pool_protocol
+  # lb_nat_pool_frontend_port_start     = each.value.lb_nat_pool_frontend_port_start
+  # lb_nat_pool_frontend_port_end       = each.value.lb_nat_pool_frontend_port_end
+  # lb_nat_pool_backend_port            = each.value.lb_nat_pool_backend_port
+  lb_probe_name     = each.value.lb_probe_name
   lb_probe_protocol = each.value.lb_probe_protocol
-  lb_probe_port = each.value.lb_probe_port
-  lb_rule_name = each.value.lb_rule_name
+  lb_probe_port     = each.value.lb_probe_port
+  lb_rule_name      = each.value.lb_rule_name
 }
 
 module "private_link_services" {
-  source = "./modules/PrivateLinkService"
-  for_each = var.private_link_services
-  link_name = each.key
-  resource_group_name = module.resource_groups[each.value.resource_group].name
-  location = module.resource_groups[each.value.resource_group].location
-  auto_approval_subscription_ids = [data.azurerm_client_config.current.subscription_id]
-  visibility_subscription_ids = [data.azurerm_client_config.current.subscription_id]
+  source                                      = "./modules/PrivateLinkService"
+  for_each                                    = var.private_link_services
+  link_name                                   = each.key
+  resource_group_name                         = module.resource_groups[each.value.resource_group].name
+  location                                    = module.resource_groups[each.value.resource_group].location
+  auto_approval_subscription_ids              = [data.azurerm_client_config.current.subscription_id]
+  visibility_subscription_ids                 = [data.azurerm_client_config.current.subscription_id]
   load_balancer_frontend_ip_configuration_ids = [module.load_balancers[each.value.load_balancer].frontend_ip_configuration_id]
   nat_ip_configurations = {
     for nat_ip_config in each.value.nat_ip_configurations : nat_ip_config.name => {
-        name = nat_ip_config.name
-        primary = nat_ip_config.primary
-        subnet_id = module.subnets[nat_ip_config.subnet].id
+      name      = nat_ip_config.name
+      primary   = nat_ip_config.primary
+      subnet_id = module.subnets[nat_ip_config.subnet].id
     }
   }
 }
 
 module "linux_virtual_machine_scale_sets" {
-  source = "./modules/VirtualMachineScaleSet"
-  for_each = var.linux_virtual_machine_scale_sets
-  ssh_key_rg = each.value.ssh_key_rg
-  ssh_key_name = each.value.ssh_key_name
-  shared_image_name = each.value.shared_image_name
-  shared_image_gallery_name = each.value.shared_image_gallery_name
-  shared_image_resource_group_name = each.value.shared_image_resource_group_name
-  depends_on = [ module.load_balancers ]
+  source                                                  = "./modules/VirtualMachineScaleSet"
+  for_each                                                = var.linux_virtual_machine_scale_sets
+  ssh_key_rg                                              = each.value.ssh_key_rg
+  ssh_key_name                                            = each.value.ssh_key_name
+  shared_image_name                                       = each.value.shared_image_name
+  shared_image_gallery_name                               = each.value.shared_image_gallery_name
+  shared_image_resource_group_name                        = each.value.shared_image_resource_group_name
+  depends_on                                              = [module.load_balancers]
+  name                                                    = each.key
+  resource_group_name                                     = module.resource_groups[each.value.resource_group].name
+  location                                                = module.resource_groups[each.value.resource_group].location
+  sku                                                     = each.value.sku
+  instances                                               = each.value.instances
+  admin_username                                          = each.value.admin_username
+  health_probe_id                                         = module.load_balancers[each.value.load_balancer].health_probe_id
+  os_disk_storage_account_type                            = each.value.os_disk_storage_account_type
+  os_disk_caching                                         = each.value.os_disk_caching
+  network_interface_name                                  = each.value.network_interface_name
+  network_interface_primary                               = each.value.network_interface_primary
+  network_security_group_id                               = module.network_security_groups[each.value.network_security_group].id
+  ip_configuration_name                                   = each.value.ip_configuration_name
+  ip_configuration_primary                                = each.value.ip_configuration_primary
+  ip_configuration_subnet_id                              = module.subnets[each.value.ip_configuration_subnet].id
+  ip_configuration_load_balancer_backend_address_pool_ids = [module.load_balancers[each.value.ip_configuration_load_balancer].backend_address_pool_ids]
+}
+
+module "bastion_hosts" {
+  source = "./modules/BastionHost"
+  for_each = var.bastion_hosts
   name = each.key
   resource_group_name = module.resource_groups[each.value.resource_group].name
   location = module.resource_groups[each.value.resource_group].location
-  sku = each.value.sku
-  instances = each.value.instances
-  admin_username = each.value.admin_username
-  health_probe_id = module.load_balancers[each.value.load_balancer].health_probe_id
-  os_disk_storage_account_type = each.value.os_disk_storage_account_type
-  os_disk_caching = each.value.os_disk_caching
-  network_interface_name = each.value.network_interface_name
-  network_interface_primary = each.value.network_interface_primary
-  ip_configuration_name = each.value.ip_configuration_name
-  ip_configuration_primary = each.value.ip_configuration_primary
-  ip_configuration_subnet_id = module.subnets[each.value.ip_configuration_subnet].id
-  ip_configuration_load_balancer_backend_address_pool_ids = [module.load_balancers[each.value.ip_configuration_load_balancer].backend_address_pool_ids]
-  ip_configuration_load_balancer_inbound_nat_pool_ids = [module.load_balancers[each.value.ip_configuration_load_balancer].inbound_nat_pool_ids]
+  subnet_id = module.subnets[each.value.subnet].id
+  public_ip_address_id = module.public_ip_addresses[each.value.public_ip_address].id
+
 }

@@ -46,6 +46,9 @@ variable "network_interface_name" {
 variable "network_interface_primary" {
 }
 
+variable "network_security_group_id" {
+}
+
 variable "ip_configuration_name" {
 }
 
@@ -56,7 +59,4 @@ variable "ip_configuration_subnet_id" {
 }
 
 variable "ip_configuration_load_balancer_backend_address_pool_ids" {
-}
-
-variable "ip_configuration_load_balancer_inbound_nat_pool_ids" {
 }

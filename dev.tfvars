@@ -39,113 +39,113 @@ virtual_networks = {
 subnets = {
   #EAST US
   vnet_hub_subnet_firewall = {
-    name             = "AzureFirewallSubnet"
-    resource_group   = "rg-eastus"
-    virtual_network  = "vnet-hub"
-    address_prefixes = ["10.0.0.0/26"]
-    delegation       = false
-    delegation_name  = ""
+    name                                          = "AzureFirewallSubnet"
+    resource_group                                = "rg-eastus"
+    virtual_network                               = "vnet-hub"
+    address_prefixes                              = ["10.0.0.0/26"]
+    delegation                                    = false
+    delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
 
   vnet_hub_subnet_firewall_management = {
-    name             = "AzureFirewallSubnetManagement"
-    resource_group   = "rg-eastus"
-    virtual_network  = "vnet-hub"
-    address_prefixes = ["10.0.1.0/26"]
-    delegation       = false
-    delegation_name  = ""
+    name                                          = "AzureFirewallSubnetManagement"
+    resource_group                                = "rg-eastus"
+    virtual_network                               = "vnet-hub"
+    address_prefixes                              = ["10.0.1.0/26"]
+    delegation                                    = false
+    delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
 
   vnet_app_subnet_app = {
-    name             = "subnet-app"
-    resource_group   = "rg-eastus"
-    virtual_network  = "vnet-app"
-    address_prefixes = ["10.1.0.0/24"]
-    delegation       = false
-    delegation_name  = ""
-    private_link_service_network_policies_enabled = true
-  }
-
-  vnet_app_subnet_bastion = {
-    name             = "AzureBastionSubnet"
-    resource_group   = "rg-eastus"
-    virtual_network  = "vnet-app"
-    address_prefixes = ["10.1.1.0/24"]
-    delegation       = false
-    delegation_name  = ""
+    name                                          = "subnet-app"
+    resource_group                                = "rg-eastus"
+    virtual_network                               = "vnet-app"
+    address_prefixes                              = ["10.1.0.0/24"]
+    delegation                                    = false
+    delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
 
   vnet_acr_subnet_acr = {
-    name             = "subnet-acr"
-    resource_group   = "rg-eastus"
-    virtual_network  = "vnet-acr"
-    address_prefixes = ["10.2.0.0/24"]
-    delegation       = false
-    delegation_name  = ""
+    name                                          = "subnet-acr"
+    resource_group                                = "rg-eastus"
+    virtual_network                               = "vnet-acr"
+    address_prefixes                              = ["10.2.0.0/24"]
+    delegation                                    = false
+    delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
 
   vnet_db_subnet_db = {
-    name             = "subnet-db"
-    resource_group   = "rg-eastus"
-    virtual_network  = "vnet-db"
-    address_prefixes = ["10.3.0.0/24"]
-    delegation       = false
-    delegation_name  = ""
+    name                                          = "subnet-db"
+    resource_group                                = "rg-eastus"
+    virtual_network                               = "vnet-db"
+    address_prefixes                              = ["10.3.0.0/24"]
+    delegation                                    = false
+    delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
 
   vnet_agent_subnet_agent = {
-    name             = "subnet-agent"
-    resource_group   = "rg-eastus"
-    virtual_network  = "vnet-agent"
-    address_prefixes = ["10.4.0.0/24"]
-    delegation       = false
-    delegation_name  = ""
+    name                                          = "subnet-agent"
+    resource_group                                = "rg-eastus"
+    virtual_network                               = "vnet-agent"
+    address_prefixes                              = ["10.4.0.0/24"]
+    delegation                                    = false
+    delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
 
   #WEST EUROPE
   vnet_app_eu_subnet_app = {
-    name             = "subnet-app"
-    resource_group   = "rg-westeurope"
-    virtual_network  = "vnet-app-eu"
-    address_prefixes = ["10.11.0.0/24"]
-    delegation       = false
-    delegation_name  = ""
+    name                                          = "subnet-app"
+    resource_group                                = "rg-westeurope"
+    virtual_network                               = "vnet-app-eu"
+    address_prefixes                              = ["10.11.0.0/24"]
+    delegation                                    = false
+    delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
 
   vnet_app_eu_subnet_lb = {
-    name             = "subnet-lb"
-    resource_group   = "rg-westeurope"
-    virtual_network  = "vnet-app-eu"
-    address_prefixes = ["10.11.1.0/24"]
-    delegation       = false
-    delegation_name  = ""
+    name                                          = "subnet-lb"
+    resource_group                                = "rg-westeurope"
+    virtual_network                               = "vnet-app-eu"
+    address_prefixes                              = ["10.11.1.0/24"]
+    delegation                                    = false
+    delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
 
   vnet_app_eu_subnet_lb_pls = {
-    name             = "subnet-lb-pls"
-    resource_group   = "rg-westeurope"
-    virtual_network  = "vnet-app-eu"
-    address_prefixes = ["10.11.2.0/24"]
-    delegation       = false
-    delegation_name  = ""
+    name                                          = "subnet-lb-pls"
+    resource_group                                = "rg-westeurope"
+    virtual_network                               = "vnet-app-eu"
+    address_prefixes                              = ["10.11.2.0/24"]
+    delegation                                    = false
+    delegation_name                               = ""
     private_link_service_network_policies_enabled = false
   }
 
+  vnet_app_eu_subnet_bastion = {
+    name                                          = "AzureBastionSubnet"
+    resource_group                                = "rg-westeurope"
+    virtual_network                               = "vnet-app-eu"
+    address_prefixes                              = ["10.11.3.0/24"]
+    delegation                                    = false
+    delegation_name                               = ""
+    private_link_service_network_policies_enabled = true
+  }
+
   vnet_db_eu_subnet_db = {
-    name             = "subnet-db"
-    resource_group   = "rg-westeurope"
-    virtual_network  = "vnet-db-eu"
-    address_prefixes = ["10.12.0.0/24"]
-    delegation       = false
-    delegation_name  = ""
+    name                                          = "subnet-db"
+    resource_group                                = "rg-westeurope"
+    virtual_network                               = "vnet-db-eu"
+    address_prefixes                              = ["10.12.0.0/24"]
+    delegation                                    = false
+    delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
 }
@@ -263,6 +263,11 @@ public_ip_addresses = {
     sku               = "Standard"
     resource_group    = "rg-eastus"
   }
+  public-ip-bastion-eu = {
+    allocation_method = "Static"
+    sku               = "Standard"
+    resource_group    = "rg-westeurope"
+  }
 }
 
 network_security_groups = {
@@ -277,6 +282,33 @@ network_security_groups = {
         protocol                   = "Tcp"
         source_port_range          = "*"
         destination_port_range     = "22"
+        source_address_prefix      = "*"
+        destination_address_prefix = "*"
+      }
+    }
+  }
+  nsg-ssh-and-http = {
+    resource_group = "rg-westeurope"
+    security_rules = {
+      allowssh = {
+        name                       = "AllowSSH"
+        priority                   = 100
+        direction                  = "Inbound"
+        access                     = "Allow"
+        protocol                   = "Tcp"
+        source_port_range          = "*"
+        destination_port_range     = "22"
+        source_address_prefix      = "*"
+        destination_address_prefix = "*"
+      }
+      allowhttp = {
+        name                       = "AllowHTTP"
+        priority                   = 110
+        direction                  = "Inbound"
+        access                     = "Allow"
+        protocol                   = "Tcp"
+        source_port_range          = "*"
+        destination_port_range     = "80"
         source_address_prefix      = "*"
         destination_address_prefix = "*"
       }
@@ -378,57 +410,61 @@ mssql_databases = {
 }
 
 load_balancers = {
-    phonebook-lb = {
-        resource_group = "rg-westeurope"
-        sku = "Standard"
-        frontend_ip_configuration_name = "internal"
-        frontend_ip_configuration_subnet = "vnet_app_eu_subnet_lb"
-        lb_backend_address_pool_name = "backend-pool"
-        lb_nat_pool_name =  "nat-pool"
-        lb_nat_pool_protocol = "Tcp"
-        lb_nat_pool_frontend_port_start = "80"
-        lb_nat_pool_frontend_port_end = "90"
-        lb_nat_pool_backend_port =  "8080"
-        lb_probe_name = "probe-http"
-        lb_probe_protocol = "Tcp"
-        lb_probe_port = "80"
-        lb_rule_name = "rule-http"
-    }
+  phonebook-lb = {
+    resource_group                   = "rg-westeurope"
+    sku                              = "Standard"
+    frontend_ip_configuration_name   = "internal"
+    frontend_ip_configuration_subnet = "vnet_app_eu_subnet_lb"
+    lb_backend_address_pool_name     = "backend-pool"
+    lb_probe_name                    = "probe-http"
+    lb_probe_protocol                = "Tcp"
+    lb_probe_port                    = "80"
+    lb_rule_name                     = "rule-http"
+  }
 }
 
 private_link_services = {
   phonebook-lb-pls = {
     resource_group = "rg-westeurope"
-    load_balancer = "phonebook-lb"
+    load_balancer  = "phonebook-lb"
     nat_ip_configurations = [
       {
-        subnet = "vnet_app_eu_subnet_lb_pls"
-        name = "primary"
+        subnet  = "vnet_app_eu_subnet_lb_pls"
+        name    = "primary"
         primary = true
-      } 
+      }
     ]
   }
 }
 
 linux_virtual_machine_scale_sets = {
-    app-vmss = {
-        ssh_key_rg = "ssh-key"
-        ssh_key_name = "azure"
-        shared_image_name = "vm-image-definition"
-        shared_image_gallery_name = "mygallery"
-        shared_image_resource_group_name = "rg-westeurope"
-        resource_group = "rg-westeurope"
-        sku                 = "Standard_B1s"
-        instances           = 2
-        admin_username      = "azureuser"
-        load_balancer = "phonebook-lb"
-        os_disk_storage_account_type = "Standard_LRS"
-        os_disk_caching             = "ReadWrite"
-        network_interface_name    = "example"
-        network_interface_primary = true
-        ip_configuration_name      = "internal"
-        ip_configuration_primary   = true
-        ip_configuration_subnet = "vnet_app_eu_subnet_app"
-        ip_configuration_load_balancer = "phonebook-lb"
-    }
+  app-vmss = {
+    ssh_key_rg                       = "ssh-key"
+    ssh_key_name                     = "azure"
+    shared_image_name                = "myimagedefinitongen"
+    shared_image_gallery_name        = "mygallery"
+    shared_image_resource_group_name = "ssh-key"
+    resource_group                   = "rg-westeurope"
+    sku                              = "Standard_B1s"
+    instances                        = 2
+    admin_username                   = "azureuser"
+    load_balancer                    = "phonebook-lb"
+    os_disk_storage_account_type     = "Standard_LRS"
+    os_disk_caching                  = "ReadWrite"
+    network_interface_name           = "example"
+    network_interface_primary        = true
+    network_security_group           = "nsg-ssh-and-http"
+    ip_configuration_name            = "internal"
+    ip_configuration_primary         = true
+    ip_configuration_subnet          = "vnet_app_eu_subnet_app"
+    ip_configuration_load_balancer   = "phonebook-lb"
+  }
+}
+
+bastion_hosts = {
+  bastion-eu = {
+    resource_group = "rg-westeurope"
+    subnet = "vnet_app_eu_subnet_bastion"
+    public_ip_address = "public-ip-bastion-eu"
+  }
 }
