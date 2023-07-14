@@ -474,9 +474,11 @@ private_dns_zones = {
     name = "privatelink.database.windows.net"
     resource_group = "rg-westeurope"
   }
-  # db_us = {
-  #   name = "privatelink.database.windows.net"
-  #   resource_group = "rg-eastus"
-  # }
 }
 
+private_dns_zones_virtual_network_links = {
+  zone-db-to-vnet-db-eu = {
+    private_dns_zone = "db_eu"
+    
+  }
+}

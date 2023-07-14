@@ -350,9 +350,14 @@ module "private_dns_zones" {
   source = "./modules/PrivateDnsZone"
   for_each = var.private_dns_zones
   name = each.value.name
-  resource_group_name = module.resource_group[each.value.resource_group].name
+  resource_group_name = module.resource_groups[each.value.resource_group].name
 }
 
-module "name" {
-  
+module "private_dns_zones_virtual_network_links" {
+  source = "./modules/PrivateDnsZoneVirtualNetworkLink"
+  for_each = var.private_dns_zones_virtual_network_links
+  name  = each.key
+  private_dns_zone_name = module.private_dns_zones[each.value.private_dns_zone].name
+  resource_group_name = module.resource_groups[each.value.resource_group].name
+  virtual_network_id = module.virtual_networks[each.value.virtual_network].id
 }
