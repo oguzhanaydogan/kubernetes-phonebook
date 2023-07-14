@@ -187,8 +187,8 @@ vnet_peerings = {
     resource_group         = "rg-westeurope"
   }
   dbeu-appeu = {
-    virtual_network        = "vnet-app-eu"
-    remote_virtual_network = "vnet-db"
+    virtual_network        = "vnet-db-eu"
+    remote_virtual_network = "vnet-app-eu"
     resource_group         = "rg-westeurope"
   }
 }
@@ -468,3 +468,15 @@ bastion_hosts = {
     public_ip_address = "public-ip-bastion-eu"
   }
 }
+
+private_dns_zones = {
+  db_eu = {
+    name = "privatelink.database.windows.net"
+    resource_group = "rg-westeurope"
+  }
+  # db_us = {
+  #   name = "privatelink.database.windows.net"
+  #   resource_group = "rg-eastus"
+  # }
+}
+

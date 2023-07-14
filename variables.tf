@@ -53,3 +53,6 @@ variable "linux_virtual_machine_scale_sets" {
 
 variable "bastion_hosts" {
 }
+
+variable "private_dns_zones" {
+}

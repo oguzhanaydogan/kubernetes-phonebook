@@ -285,11 +285,6 @@ module "load_balancers" {
   frontend_ip_configuration_name      = each.value.frontend_ip_configuration_name
   frontend_ip_configuration_subnet_id = module.subnets[each.value.frontend_ip_configuration_subnet].id
   lb_backend_address_pool_name        = each.value.lb_backend_address_pool_name
-  # lb_nat_pool_name                    = each.value.lb_nat_pool_name
-  # lb_nat_pool_protocol                = each.value.lb_nat_pool_protocol
-  # lb_nat_pool_frontend_port_start     = each.value.lb_nat_pool_frontend_port_start
-  # lb_nat_pool_frontend_port_end       = each.value.lb_nat_pool_frontend_port_end
-  # lb_nat_pool_backend_port            = each.value.lb_nat_pool_backend_port
   lb_probe_name     = each.value.lb_probe_name
   lb_probe_protocol = each.value.lb_probe_protocol
   lb_probe_port     = each.value.lb_probe_port
@@ -349,5 +344,15 @@ module "bastion_hosts" {
   location = module.resource_groups[each.value.resource_group].location
   subnet_id = module.subnets[each.value.subnet].id
   public_ip_address_id = module.public_ip_addresses[each.value.public_ip_address].id
+}
 
+module "private_dns_zones" {
+  source = "./modules/PrivateDnsZone"
+  for_each = var.private_dns_zones
+  name = each.value.name
+  resource_group_name = module.resource_group[each.value.resource_group].name
+}
+
+module "name" {
+  
 }
