@@ -64,95 +64,89 @@ resource "azurerm_cdn_frontdoor_origin" "example" {
 }
 
 resource "azurerm_cdn_frontdoor_route" "example" {
-	name                          = "example-route"
-	cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.example.id
-	cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.example.id
-	cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.example.id]
-	cdn_frontdoor_rule_set_ids    = [azurerm_cdn_frontdoor_rule_set.example.id]
-	enabled                       = true
+	for_each = var.routes
+	name                          = each.value.name
+	cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.example[each.value.cdn_frontdoor_endpoint].id
+	cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.example[each.value.cdn_frontdoor_origin_group].id
+	cdn_frontdoor_origin_ids      = [
+		for origin in each.value.cdn_frontdoor_origins : azurerm_cdn_frontdoor_origin.example[origin].id
+	]
+	# cdn_frontdoor_rule_set_ids    = [azurerm_cdn_frontdoor_rule_set.example.id]
+	enabled                       = each.value.enabled
 
-	forwarding_protocol    = "HttpsOnly"
-	https_redirect_enabled = true
-	patterns_to_match      = ["/*"]
-	supported_protocols    = ["Http", "Https"]
+	forwarding_protocol    = each.value.forwarding_protocol
+	https_redirect_enabled = each.value.https_redirect_enabled
+	patterns_to_match      = each.value.patterns_to_match
+	supported_protocols    = each.value.supported_protocols
 
-	cdn_frontdoor_custom_domain_ids = [azurerm_cdn_frontdoor_custom_domain.contoso.id, azurerm_cdn_frontdoor_custom_domain.fabrikam.id]
-	link_to_default_domain          = false
-
-	cache {
-	query_string_caching_behavior = "IgnoreSpecifiedQueryStrings"
-	query_strings                 = ["account", "settings"]
-	compression_enabled           = true
-	content_types_to_compress     = ["text/html", "text/javascript", "text/xml"]
-	}
 }
 
-resource "azurerm_cdn_frontdoor_rule_set" "example" {
-	name                     = "exampleruleset"
-	cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.example.id
-}
+# resource "azurerm_cdn_frontdoor_rule_set" "example" {
+# 	name                     = "exampleruleset"
+# 	cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.example.id
+# }
 
-resource "azurerm_cdn_frontdoor_rule" "example" {
-	depends_on = [azurerm_cdn_frontdoor_origin_group.example, azurerm_cdn_frontdoor_origin.example]
+# resource "azurerm_cdn_frontdoor_rule" "example" {
+# 	depends_on = [azurerm_cdn_frontdoor_origin_group.example, azurerm_cdn_frontdoor_origin.example]
 
-	name                      = "examplerule"
-	cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.example.id
-	order                     = 1
-	behavior_on_match         = "Continue"
+# 	name                      = "examplerule"
+# 	cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.example.id
+# 	order                     = 1
+# 	behavior_on_match         = "Continue"
 
-	actions {
-	route_configuration_override_action {
-		cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.example.id
-		forwarding_protocol           = "HttpsOnly"
-		query_string_caching_behavior = "IncludeSpecifiedQueryStrings"
-		query_string_parameters       = ["foo", "clientIp={client_ip}"]
-		compression_enabled           = true
-		cache_behavior                = "OverrideIfOriginMissing"
-		cache_duration                = "365.23:59:59"
-	}
+# 	actions {
+# 	route_configuration_override_action {
+# 		cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.example.id
+# 		forwarding_protocol           = "HttpsOnly"
+# 		query_string_caching_behavior = "IncludeSpecifiedQueryStrings"
+# 		query_string_parameters       = ["foo", "clientIp={client_ip}"]
+# 		compression_enabled           = true
+# 		cache_behavior                = "OverrideIfOriginMissing"
+# 		cache_duration                = "365.23:59:59"
+# 	}
 
-	url_redirect_action {
-		redirect_type        = "PermanentRedirect"
-		redirect_protocol    = "MatchRequest"
-		query_string         = "clientIp={client_ip}"
-		destination_path     = "/exampleredirection"
-		destination_hostname = "contoso.com"
-		destination_fragment = "UrlRedirect"
-	}
-	}
+# 	url_redirect_action {
+# 		redirect_type        = "PermanentRedirect"
+# 		redirect_protocol    = "MatchRequest"
+# 		query_string         = "clientIp={client_ip}"
+# 		destination_path     = "/exampleredirection"
+# 		destination_hostname = "contoso.com"
+# 		destination_fragment = "UrlRedirect"
+# 	}
+# 	}
 
-	conditions {
-	host_name_condition {
-		operator         = "Equal"
-		negate_condition = false
-		match_values     = ["www.contoso.com", "images.contoso.com", "video.contoso.com"]
-		transforms       = ["Lowercase", "Trim"]
-	}
+# 	conditions {
+# 	host_name_condition {
+# 		operator         = "Equal"
+# 		negate_condition = false
+# 		match_values     = ["www.contoso.com", "images.contoso.com", "video.contoso.com"]
+# 		transforms       = ["Lowercase", "Trim"]
+# 	}
 
-	is_device_condition {
-		operator         = "Equal"
-		negate_condition = false
-		match_values     = ["Mobile"]
-	}
+# 	is_device_condition {
+# 		operator         = "Equal"
+# 		negate_condition = false
+# 		match_values     = ["Mobile"]
+# 	}
 
-	post_args_condition {
-		post_args_name = "customerName"
-		operator       = "BeginsWith"
-		match_values   = ["J", "K"]
-		transforms     = ["Uppercase"]
-	}
+# 	post_args_condition {
+# 		post_args_name = "customerName"
+# 		operator       = "BeginsWith"
+# 		match_values   = ["J", "K"]
+# 		transforms     = ["Uppercase"]
+# 	}
 
-	request_method_condition {
-		operator         = "Equal"
-		negate_condition = false
-		match_values     = ["DELETE"]
-	}
+# 	request_method_condition {
+# 		operator         = "Equal"
+# 		negate_condition = false
+# 		match_values     = ["DELETE"]
+# 	}
 
-	url_filename_condition {
-		operator         = "Equal"
-		negate_condition = false
-		match_values     = ["media.mp4"]
-		transforms       = ["Lowercase", "RemoveNulls", "Trim"]
-	}
-	}
-}
+# 	url_filename_condition {
+# 		operator         = "Equal"
+# 		negate_condition = false
+# 		match_values     = ["media.mp4"]
+# 		transforms       = ["Lowercase", "RemoveNulls", "Trim"]
+#  	}
+#  	}
+#  }

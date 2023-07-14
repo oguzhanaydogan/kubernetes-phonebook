@@ -386,4 +386,5 @@ module "front_doors" {
   endpoints = each.value.endpoints
   origin_groups = each.value.origin_groups
   origins = each.value.origins
+  routes = each.value.routes
 }

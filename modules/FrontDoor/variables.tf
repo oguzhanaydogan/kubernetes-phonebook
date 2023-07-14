@@ -12,3 +12,6 @@ variable "origin_groups" {
 
 variable "origins" {
 }
+
+variable "routes" {  
+}
