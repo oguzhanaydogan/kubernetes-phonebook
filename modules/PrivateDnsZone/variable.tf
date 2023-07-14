@@ -1,6 +1,6 @@
 variable "name" {
 }
 
-variable "resourcegroup" {
+variable "resource_group_name" {
 }
 

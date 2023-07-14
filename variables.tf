@@ -56,3 +56,9 @@ variable "bastion_hosts" {
 
 variable "private_dns_zones" {
 }
+
+variable "private_dns_zones_virtual_network_links" {
+}
+
+variable "private_endpoints" {
+}

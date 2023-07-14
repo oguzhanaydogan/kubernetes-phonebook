@@ -47,7 +47,6 @@ subnets = {
     delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
-
   vnet_hub_subnet_firewall_management = {
     name                                          = "AzureFirewallSubnetManagement"
     resource_group                                = "rg-eastus"
@@ -57,7 +56,6 @@ subnets = {
     delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
-
   vnet_app_subnet_app = {
     name                                          = "subnet-app"
     resource_group                                = "rg-eastus"
@@ -67,7 +65,6 @@ subnets = {
     delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
-
   vnet_acr_subnet_acr = {
     name                                          = "subnet-acr"
     resource_group                                = "rg-eastus"
@@ -77,7 +74,6 @@ subnets = {
     delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
-
   vnet_db_subnet_db = {
     name                                          = "subnet-db"
     resource_group                                = "rg-eastus"
@@ -87,7 +83,15 @@ subnets = {
     delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
-
+  vnet_db_subnet_db_pep = {
+    name                                          = "subnet-db-pep"
+    resource_group                                = "rg-eastus"
+    virtual_network                               = "vnet-db"
+    address_prefixes                              = ["10.3.1.0/24"]
+    delegation                                    = false
+    delegation_name                               = ""
+    private_link_service_network_policies_enabled = true
+  }
   vnet_agent_subnet_agent = {
     name                                          = "subnet-agent"
     resource_group                                = "rg-eastus"
@@ -108,7 +112,6 @@ subnets = {
     delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
-
   vnet_app_eu_subnet_lb = {
     name                                          = "subnet-lb"
     resource_group                                = "rg-westeurope"
@@ -118,7 +121,6 @@ subnets = {
     delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
-
   vnet_app_eu_subnet_lb_pls = {
     name                                          = "subnet-lb-pls"
     resource_group                                = "rg-westeurope"
@@ -128,7 +130,6 @@ subnets = {
     delegation_name                               = ""
     private_link_service_network_policies_enabled = false
   }
-
   vnet_app_eu_subnet_bastion = {
     name                                          = "AzureBastionSubnet"
     resource_group                                = "rg-westeurope"
@@ -138,12 +139,20 @@ subnets = {
     delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
-
   vnet_db_eu_subnet_db = {
     name                                          = "subnet-db"
     resource_group                                = "rg-westeurope"
     virtual_network                               = "vnet-db-eu"
     address_prefixes                              = ["10.12.0.0/24"]
+    delegation                                    = false
+    delegation_name                               = ""
+    private_link_service_network_policies_enabled = true
+  }
+  vnet_db_eu_subnet_db_pep = {
+    name                                          = "subnet-db-pep"
+    resource_group                                = "rg-westeurope"
+    virtual_network                               = "vnet-db-eu"
+    address_prefixes                              = ["10.12.1.0/24"]
     delegation                                    = false
     delegation_name                               = ""
     private_link_service_network_policies_enabled = true
@@ -180,6 +189,16 @@ vnet_peerings = {
     virtual_network        = "vnet-hub"
     remote_virtual_network = "vnet-acr"
     resource_group         = "rg-eastus"
+  }
+  db-dbeu = {
+    virtual_network        = "vnet-db"
+    remote_virtual_network = "vnet-db-eu"
+    resource_group         = "rg-eastus"
+  }
+  dbeu-db = {
+    virtual_network        = "vnet-db-eu"
+    remote_virtual_network = "vnet-db"
+    resource_group         = "rg-westeurope"
   }
   appeu-dbeu = {
     virtual_network        = "vnet-app-eu"
@@ -463,22 +482,57 @@ linux_virtual_machine_scale_sets = {
 
 bastion_hosts = {
   bastion-eu = {
-    resource_group = "rg-westeurope"
-    subnet = "vnet_app_eu_subnet_bastion"
+    resource_group    = "rg-westeurope"
+    subnet            = "vnet_app_eu_subnet_bastion"
     public_ip_address = "public-ip-bastion-eu"
   }
 }
 
 private_dns_zones = {
-  db_eu = {
-    name = "privatelink.database.windows.net"
-    resource_group = "rg-westeurope"
+  db = {
+    name           = "privatelink.database.windows.net"
+    resource_group = "rg-eastus"
   }
 }
 
 private_dns_zones_virtual_network_links = {
+  zone-db-to-vnet-db = {
+    resource_group   = "rg-eastus"
+    private_dns_zone = "db"
+    virtual_network  = "vnet-db"
+  }
   zone-db-to-vnet-db-eu = {
-    private_dns_zone = "db_eu"
-    
+    resource_group   = "rg-eastus"
+    private_dns_zone = "db"
+    virtual_network  = "vnet-db-eu"
+  }
+  zone-db-to-vnet-app = {
+    resource_group   = "rg-eastus"
+    private_dns_zone = "db"
+    virtual_network  = "vnet-app"
+  }
+  zone-db-to-vnet-app-eu = {
+    resource_group   = "rg-eastus"
+    private_dns_zone = "db"
+    virtual_network  = "vnet-app-eu"
+  }
+}
+
+private_endpoints = {
+  pep_db = {
+    resource_group       = "rg-eastus"
+    attached_resource    = "coyhub-db-us"
+    is_manual_connection = false
+    subnet               = "vnet_db_subnet_db_pep"
+    private_dns_zones    = ["db"]
+    subresource_names    = ["sqlServer"]
+  }
+  pep_db_eu = {
+    resource_group       = "rg-westeurope"
+    attached_resource    = "coyhub-db-eu"
+    is_manual_connection = false
+    subnet               = "vnet_db_eu_subnet_db_pep"
+    private_dns_zones    = ["db"]
+    subresource_names    = ["sqlServer"]
   }
 }

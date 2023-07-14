@@ -285,10 +285,10 @@ module "load_balancers" {
   frontend_ip_configuration_name      = each.value.frontend_ip_configuration_name
   frontend_ip_configuration_subnet_id = module.subnets[each.value.frontend_ip_configuration_subnet].id
   lb_backend_address_pool_name        = each.value.lb_backend_address_pool_name
-  lb_probe_name     = each.value.lb_probe_name
-  lb_probe_protocol = each.value.lb_probe_protocol
-  lb_probe_port     = each.value.lb_probe_port
-  lb_rule_name      = each.value.lb_rule_name
+  lb_probe_name                       = each.value.lb_probe_name
+  lb_probe_protocol                   = each.value.lb_probe_protocol
+  lb_probe_port                       = each.value.lb_probe_port
+  lb_rule_name                        = each.value.lb_rule_name
 }
 
 module "private_link_services" {
@@ -337,27 +337,43 @@ module "linux_virtual_machine_scale_sets" {
 }
 
 module "bastion_hosts" {
-  source = "./modules/BastionHost"
-  for_each = var.bastion_hosts
-  name = each.key
-  resource_group_name = module.resource_groups[each.value.resource_group].name
-  location = module.resource_groups[each.value.resource_group].location
-  subnet_id = module.subnets[each.value.subnet].id
+  source               = "./modules/BastionHost"
+  for_each             = var.bastion_hosts
+  name                 = each.key
+  resource_group_name  = module.resource_groups[each.value.resource_group].name
+  location             = module.resource_groups[each.value.resource_group].location
+  subnet_id            = module.subnets[each.value.subnet].id
   public_ip_address_id = module.public_ip_addresses[each.value.public_ip_address].id
 }
 
 module "private_dns_zones" {
-  source = "./modules/PrivateDnsZone"
-  for_each = var.private_dns_zones
-  name = each.value.name
+  source              = "./modules/PrivateDnsZone"
+  for_each            = var.private_dns_zones
+  name                = each.value.name
   resource_group_name = module.resource_groups[each.value.resource_group].name
 }
 
 module "private_dns_zones_virtual_network_links" {
-  source = "./modules/PrivateDnsZoneVirtualNetworkLink"
-  for_each = var.private_dns_zones_virtual_network_links
-  name  = each.key
+  source                = "./modules/PrivateDnsZoneVirtualNetworkLink"
+  for_each              = var.private_dns_zones_virtual_network_links
+  name                  = each.key
+  resource_group_name   = module.resource_groups[each.value.resource_group].name
   private_dns_zone_name = module.private_dns_zones[each.value.private_dns_zone].name
-  resource_group_name = module.resource_groups[each.value.resource_group].name
-  virtual_network_id = module.virtual_networks[each.value.virtual_network].id
+  virtual_network_id    = module.virtual_networks[each.value.virtual_network].id
+}
+
+module "private_endpoints" {
+  source                 = "./modules/PrivateEndpoint"
+  for_each               = var.private_endpoints
+  resource_group_name    = module.resource_groups[each.value.resource_group].name
+  location               = module.resource_groups[each.value.resource_group].location
+  attached_resource_name = each.value.attached_resource
+  attached_resource_id   = local.resources[each.value.attached_resource].id
+  is_manual_connection   = each.value.is_manual_connection
+  subnet_id              = module.subnets[each.value.subnet].id
+  private_dns_zone_ids = [
+    for private_dns_zone in each.value.private_dns_zones :
+    module.private_dns_zones[private_dns_zone].id
+  ]
+  subresource_names = each.value.subresource_names
 }
