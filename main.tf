@@ -377,3 +377,13 @@ module "private_endpoints" {
   ]
   subresource_names = each.value.subresource_names
 }
+
+module "front_doors" {
+  source = "./modules/FrontDoor"
+  for_each = var.front_doors
+  name = each.value.name
+  resource_group_name = module.resource_groups[each.value.resource_group].name
+  endpoints = each.value.endpoints
+  origin_groups = each.value.origin_groups
+  origins = each.value.origins
+}

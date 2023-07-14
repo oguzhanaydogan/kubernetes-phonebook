@@ -130,6 +130,15 @@ subnets = {
     delegation_name                               = ""
     private_link_service_network_policies_enabled = false
   }
+  vnet_app_eu_subnet_lb_pls_pep = {
+    name                                          = "subnet-lb-pls-pep"
+    resource_group                                = "rg-westeurope"
+    virtual_network                               = "vnet-app-eu"
+    address_prefixes                              = ["10.11.4.0/24"]
+    delegation                                    = false
+    delegation_name                               = ""
+    private_link_service_network_policies_enabled = true
+  }
   vnet_app_eu_subnet_bastion = {
     name                                          = "AzureBastionSubnet"
     resource_group                                = "rg-westeurope"
@@ -534,5 +543,76 @@ private_endpoints = {
     subnet               = "vnet_db_eu_subnet_db_pep"
     private_dns_zones    = ["db"]
     subresource_names    = ["sqlServer"]
+  }
+}
+
+front_doors = {
+  front_door_1 = {
+    name = "front-door-1"
+    resource_group = "rg-eastus"
+    endpoints = ["phonebook"]
+    origin_groups = [
+      {
+        name = "phonebook-origin-group"
+        session_affinity_enabled = false
+        restore_traffic_time_to_healed_or_new_endpoint_in_minutes = 10
+        health_probes = {
+          health_probe_http = {
+            interval_in_seconds = 240
+            path                = "/healthProbe"
+            protocol            = "Http"
+            request_type        = "GET"
+          }
+        }
+        load_balancing = {
+          additional_latency_in_milliseconds = 0
+          sample_size                        = 16
+          successful_samples_required        = 3
+        }
+      }
+    ]
+    origins = {
+      phonebook-eu = {
+        name                          = "phonebook-eu"
+        cdn_frontdoor_origin_group = "phonebook-origin-group"
+        enabled                       = true
+        certificate_name_check_enabled = false
+        host_name          = "10.11.4.4"
+        http_port          = 80
+        https_port         = 443
+        priority           = 1
+        weight             = 500
+        private_link = {
+          request_message = "Gimme gimme"
+          location =
+          private_link_target_id =
+        }
+      }
+    }
+    routes = {
+      phonebook-route = {
+        name                          = "route"
+        cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.example.id
+        cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.example.id
+        cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.example.id]
+        cdn_frontdoor_rule_set_ids    = [azurerm_cdn_frontdoor_rule_set.example.id]
+        enabled                       = true
+
+        forwarding_protocol    = "HttpsOnly"
+        https_redirect_enabled = true
+        patterns_to_match      = ["/*"]
+        supported_protocols    = ["Http", "Https"]
+
+        cdn_frontdoor_custom_domain_ids = [azurerm_cdn_frontdoor_custom_domain.contoso.id, azurerm_cdn_frontdoor_custom_domain.fabrikam.id]
+        link_to_default_domain          = false
+
+        cache {
+        query_string_caching_behavior = "IgnoreSpecifiedQueryStrings"
+        query_strings                 = ["account", "settings"]
+        compression_enabled           = true
+        content_types_to_compress     = ["text/html", "text/javascript", "text/xml"]
+        }
+      }
+    }
   }
 }
