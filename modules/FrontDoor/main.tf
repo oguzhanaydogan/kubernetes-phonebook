@@ -100,7 +100,7 @@ resource "azurerm_cdn_frontdoor_route" "example" {
 
 # 	name                      = each.value.name
 # 	cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.example[each.value.rule_set].id
-# 	order                     = (each.key + 1) * 10
+# 	order                     = each.key + 1
 
 # 	conditions {
 # 		dynamic "request_scheme_condition" {

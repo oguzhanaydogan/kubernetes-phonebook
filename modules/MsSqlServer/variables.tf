@@ -12,3 +12,7 @@ variable "administrator_login" {
 
 variable "administrator_login_password" {
 }
+
+variable "tags" {
+  
+}

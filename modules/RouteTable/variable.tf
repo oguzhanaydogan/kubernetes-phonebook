@@ -7,11 +7,8 @@ variable "resource_group_name" {
 variable "location" {
 }
 
-# variable "route_table_associations" {  
-# }
-
-variable "route" {
+variable "routes" {
 }
 
-# variable "subnet_id" {
-# }
+variable "subnet_associations" {  
+}

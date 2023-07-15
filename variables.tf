@@ -15,9 +15,6 @@ variable "vnet_peerings" {
 variable "route_tables" {
 }
 
-variable "route_table_associations" {
-}
-
 variable "acrs" {
 }
 
@@ -55,9 +52,6 @@ variable "bastion_hosts" {
 }
 
 variable "private_dns_zones" {
-}
-
-variable "private_dns_zones_virtual_network_links" {
 }
 
 variable "private_endpoints" {

@@ -62,18 +62,13 @@ module "vnet_peerings" {
 
 module "route_tables" {
   source              = "./modules/RouteTable"
+  depends_on = [module.subnets]
   for_each            = var.route_tables
   resource_group_name = module.resource_groups[each.value.resource_group].name
   location            = module.resource_groups[each.value.resource_group].location
   name                = each.key
-  route               = each.value.routes
-}
-
-module "route_table_associations" {
-  source         = "./modules/RouteTableAssociation"
-  for_each       = var.route_table_associations
-  route_table_id = module.route_tables[each.key].id
-  subnet_id      = module.subnets[each.value].id
+  routes              = each.value.routes
+  subnet_associations = each.value.subnet_associations
 }
 
 module "acrs" {
@@ -174,6 +169,7 @@ module "mssql_servers" {
   location                     = module.resource_groups[each.value.resource_group].location
   administrator_login          = each.value.administrator_login
   administrator_login_password = module.key_vault_secrets[each.value.admin_password_secret].value
+  tags                         = each.value.tags
 }
 
 module "mssql_databases" {
@@ -347,19 +343,11 @@ module "bastion_hosts" {
 }
 
 module "private_dns_zones" {
-  source              = "./modules/PrivateDnsZone"
-  for_each            = var.private_dns_zones
-  name                = each.value.name
-  resource_group_name = module.resource_groups[each.value.resource_group].name
-}
-
-module "private_dns_zones_virtual_network_links" {
-  source                = "./modules/PrivateDnsZoneVirtualNetworkLink"
-  for_each              = var.private_dns_zones_virtual_network_links
-  name                  = each.key
+  source                = "./modules/PrivateDnsZone"
+  for_each              = var.private_dns_zones
+  name                  = each.value.name
   resource_group_name   = module.resource_groups[each.value.resource_group].name
-  private_dns_zone_name = module.private_dns_zones[each.value.private_dns_zone].name
-  virtual_network_id    = module.virtual_networks[each.value.virtual_network].id
+  virtual_network_links = each.value.virtual_network_links
 }
 
 module "private_endpoints" {
@@ -367,8 +355,9 @@ module "private_endpoints" {
   for_each               = var.private_endpoints
   resource_group_name    = module.resource_groups[each.value.resource_group].name
   location               = module.resource_groups[each.value.resource_group].location
+  attached_resource_type = each.value.attached_resource_type
+  attached_resource_required_tags = each.value.attached_resource_required_tags
   attached_resource_name = each.value.attached_resource
-  attached_resource_id   = local.resources[each.value.attached_resource].id
   is_manual_connection   = each.value.is_manual_connection
   subnet_id              = module.subnets[each.value.subnet].id
   private_dns_zone_ids = [

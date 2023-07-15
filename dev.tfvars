@@ -236,6 +236,13 @@ route_tables = {
         next_hop_in_ip_address = "10.0.0.4"
       }
     }
+    subnet_associations = {
+      vnet_app_subnet_app = {
+        subnet_name       = "subnet-app"
+        resource_group_name = "rg-eastus"
+        virtual_network_name = "vnet-app"
+      }
+    }
   }
   route-table-subnet-db = {
     resource_group = "rg-eastus"
@@ -244,6 +251,13 @@ route_tables = {
         address_prefix         = "10.1.0.0/24"
         next_hop_type          = "VirtualAppliance"
         next_hop_in_ip_address = "10.0.0.4"
+      }
+    }
+    subnet_associations = {
+      vnet_db_subnet_db = {
+        subnet_name       = "subnet-db"
+        resource_group_name = "rg-eastus"
+        virtual_network_name = "vnet-db"
       }
     }
   }
@@ -256,13 +270,14 @@ route_tables = {
         next_hop_in_ip_address = "10.4.0.4"
       }
     }
+    subnet_associations = {
+      vnet_acr_subnet_acr = {
+        subnet_name       = "subnet-acr"
+        resource_group_name = "rg-eastus"
+        virtual_network_name = "vnet-acr"
+      }
+    }
   }
-}
-
-route_table_associations = {
-  route-table-subnet-app = "vnet_app_subnet_app"
-  route-table-subnet-acr = "vnet_acr_subnet_acr"
-  route-table-subnet-db  = "vnet_db_subnet_db"
 }
 
 acrs = {
@@ -401,11 +416,17 @@ mssql_servers = {
     resource_group        = "rg-eastus"
     administrator_login   = "azureuser"
     admin_password_secret = "key_vault_secret_mssql_password"
+    tags                  = {
+      name = "coyhub-db-us"
+    }
   }
   coyhub-db-eu = {
     resource_group        = "rg-westeurope"
     administrator_login   = "azureuser"
     admin_password_secret = "key_vault_secret_mssql_password"
+    tags                  = {
+      name = "coyhub-db-eu"
+    }
   }
 }
 
@@ -501,35 +522,42 @@ private_dns_zones = {
   db = {
     name           = "privatelink.database.windows.net"
     resource_group = "rg-eastus"
-  }
-}
-
-private_dns_zones_virtual_network_links = {
-  zone-db-to-vnet-db = {
-    resource_group   = "rg-eastus"
-    private_dns_zone = "db"
-    virtual_network  = "vnet-db"
-  }
-  zone-db-to-vnet-db-eu = {
-    resource_group   = "rg-eastus"
-    private_dns_zone = "db"
-    virtual_network  = "vnet-db-eu"
-  }
-  zone-db-to-vnet-app = {
-    resource_group   = "rg-eastus"
-    private_dns_zone = "db"
-    virtual_network  = "vnet-app"
-  }
-  zone-db-to-vnet-app-eu = {
-    resource_group   = "rg-eastus"
-    private_dns_zone = "db"
-    virtual_network  = "vnet-app-eu"
+    virtual_network_links = {
+      zone_db_to_vnet_db = {
+        virtual_network_name = "vnet-db"
+        virtual_network_resource_group_name = "rg-eastus"
+        link_name = "zone-db-to-vnet-db"
+        dns_zone_resource_group_name = "rg-eastus"
+      }
+      zone_db_to_vnet_db_eu = {
+        virtual_network_name = "vnet-db-eu"
+        virtual_network_resource_group_name = "rg-westeurope"
+        link_name = "zone-db-to-vnet-db-eu"
+        dns_zone_resource_group_name = "rg-eastus"
+      }
+      zone_db_to_vnet_app = {
+        virtual_network_name = "vnet-app"
+        virtual_network_resource_group_name = "rg-eastus"
+        link_name = "zone-db-to-vnet-app"
+        dns_zone_resource_group_name = "rg-eastus"
+      }
+      zone_db_to_vnet_app_eu = {
+        virtual_network_name = "vnet-app-eu"
+        virtual_network_resource_group_name = "rg-westeurope"
+        link_name = "zone-db-to-vnet-app-eu"
+        dns_zone_resource_group_name = "rg-eastus"
+      }
+    }
   }
 }
 
 private_endpoints = {
   pep_db = {
     resource_group       = "rg-eastus"
+    attached_resource_type = "Microsoft.Sql/servers"
+    attached_resource_required_tags = {
+      name = "coyhub-db-us"
+    }
     attached_resource    = "coyhub-db-us"
     is_manual_connection = false
     subnet               = "vnet_db_subnet_db_pep"
@@ -538,6 +566,10 @@ private_endpoints = {
   }
   pep_db_eu = {
     resource_group       = "rg-westeurope"
+    attached_resource_type = "Microsoft.Sql/servers"
+    attached_resource_required_tags = {
+      name = "coyhub-db-eu"
+    }
     attached_resource    = "coyhub-db-eu"
     is_manual_connection = false
     subnet               = "vnet_db_eu_subnet_db_pep"
