@@ -550,9 +550,10 @@ front_doors = {
   front_door_1 = {
     name = "front-door-1"
     resource_group = "rg-eastus"
+    sku_name = "Premium_AzureFrontDoor"
     endpoints = ["phonebook"]
-    origin_groups = [
-      {
+    origin_groups = {
+      phonebook-origin-group = {
         name = "phonebook-origin-group"
         session_affinity_enabled = false
         restore_traffic_time_to_healed_or_new_endpoint_in_minutes = 10
@@ -570,13 +571,13 @@ front_doors = {
           successful_samples_required        = 3
         }
       }
-    ]
+    }
     origins = {
       phonebook-eu = {
         name                          = "phonebook-eu"
         cdn_frontdoor_origin_group = "phonebook-origin-group"
         enabled                       = true
-        certificate_name_check_enabled = false
+        certificate_name_check_enabled = true
         host_name          = "10.11.4.4"
         http_port          = 80
         https_port         = 443
@@ -584,25 +585,66 @@ front_doors = {
         weight             = 500
         private_link = {
           request_message = "Gimme gimme"
-          location =
-          private_link_target_id =
+          location = "West Europe"
+          private_link_target_id = "/subscriptions/14528ad0-4c9e-48a9-8ed0-111c1034b033/resourceGroups/rg-westeurope/providers/Microsoft.Network/privateLinkServices/phonebook-lb-pls"
         }
       }
     }
     routes = {
-      phonebook-route = {
-        name                          = "route"
+      phonebook-route-http = {
+        name                          = "phonebook-route-http"
         cdn_frontdoor_endpoint        = "phonebook"
         cdn_frontdoor_origin_group    = "phonebook-origin-group"
         cdn_frontdoor_origins         = ["phonebook-eu"]
-        # cdn_frontdoor_rule_set_ids  = [azurerm_cdn_frontdoor_rule_set.example.id]
+        # cdn_frontdoor_rule_sets       = ["phonebookruleset"]
         enabled                       = true
 
-        forwarding_protocol    = "HttpsOnly"
-        https_redirect_enabled = true
+        forwarding_protocol    = "HttpOnly"
+        https_redirect_enabled = false
         patterns_to_match      = ["/*"]
-        supported_protocols    = ["Http", "Https"]
+        supported_protocols    = ["Http"]
+      }
+      phonebook-route-https = {
+        name                          = "phonebook-route-https"
+        cdn_frontdoor_endpoint        = "phonebook"
+        cdn_frontdoor_origin_group    = "phonebook-origin-group"
+        cdn_frontdoor_origins         = ["phonebook-eu"]
+        # cdn_frontdoor_rule_sets       = ["phonebookruleset"]
+        enabled                       = true
+
+        forwarding_protocol    = "HttpOnly"
+        https_redirect_enabled = false
+        patterns_to_match      = ["/*"]
+        supported_protocols    = ["Https"]
       }
     }
+    # rule_sets = {
+    #   phonebookruleset = {
+    #     name = "phonebookruleset"
+    #   }
+    # }
+    # rules = [
+    #   {
+    #     name = "httpstohttp"
+    #     rule_set = "phonebookruleset"
+    #     conditions = {
+    #       request_scheme_conditions = {
+    #         equal_https = {
+    #           operator         = "Equal"
+    #           match_values     = ["HTTPS"]
+    #         }
+    #       }
+    #     }
+    #     actions = {
+    #       url_redirect_actions = {
+    #         movedhttp = {
+    #           redirect_type        = "Moved"
+    #           redirect_protocol    = "Http"
+    #           destination_hostname = ""
+    #         }
+		#       }
+    #     }
+		#   }
+    # ]
   }
 }

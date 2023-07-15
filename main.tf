@@ -383,8 +383,11 @@ module "front_doors" {
   for_each = var.front_doors
   name = each.value.name
   resource_group_name = module.resource_groups[each.value.resource_group].name
+  sku_name = each.value.sku_name
   endpoints = each.value.endpoints
   origin_groups = each.value.origin_groups
   origins = each.value.origins
   routes = each.value.routes
+  # rule_sets = each.value.rule_sets
+  # rules = each.value.rules
 }
