@@ -598,24 +598,10 @@ front_doors = {
         cdn_frontdoor_origins         = ["phonebook-eu"]
         # cdn_frontdoor_rule_sets       = ["phonebookruleset"]
         enabled                       = true
-
         forwarding_protocol    = "HttpOnly"
         https_redirect_enabled = false
         patterns_to_match      = ["/*"]
-        supported_protocols    = ["Http"]
-      }
-      phonebook-route-https = {
-        name                          = "phonebook-route-https"
-        cdn_frontdoor_endpoint        = "phonebook"
-        cdn_frontdoor_origin_group    = "phonebook-origin-group"
-        cdn_frontdoor_origins         = ["phonebook-eu"]
-        # cdn_frontdoor_rule_sets       = ["phonebookruleset"]
-        enabled                       = true
-
-        forwarding_protocol    = "HttpOnly"
-        https_redirect_enabled = false
-        patterns_to_match      = ["/*"]
-        supported_protocols    = ["Https"]
+        supported_protocols    = ["Http", "Https"]
       }
     }
     # rule_sets = {

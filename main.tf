@@ -209,7 +209,7 @@ module "azapi_create_phonebook_sync_group" {
 }
 
 module "arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu" {
-  source              = "./modules/ARMTemplateDeployment"
+  source              = "./modules/ArmTemplateDeployment"
   name                = "create-phonebook-sync-group-member-phonebook-eu"
   resource_group_name = module.resource_groups["rg-eastus"].name
   deployment_mode     = "Incremental"
