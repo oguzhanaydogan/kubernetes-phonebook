@@ -625,6 +625,7 @@ front_doors = {
             resource_group_name = "rg-westeurope"
           }
         }
+        ####iceri pls data cek.
       }
     }
     routes = {
