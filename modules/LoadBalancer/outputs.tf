@@ -1,5 +1,5 @@
 output "backend_address_pool_ids" {
-    value = azurerm_lb_backend_address_pool.bpepool.id
+  value = azurerm_lb_backend_address_pool.bpepool.id
 }
 
 output "frontend_ip_configuration_id" {

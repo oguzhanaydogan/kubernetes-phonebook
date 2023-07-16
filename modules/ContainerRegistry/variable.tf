@@ -4,17 +4,17 @@ variable "name" {
 variable "resource_group_name" {
 }
 
-variable "location" {  
+variable "location" {
 }
 
-variable "admin_enabled" {  
+variable "admin_enabled" {
 }
 
-variable "sku" {  
+variable "sku" {
 }
 
-variable "public_network_access_enabled" {  
+variable "public_network_access_enabled" {
 }
 
-variable "network_rule_bypass_option" {  
+variable "network_rule_bypass_option" {
 }

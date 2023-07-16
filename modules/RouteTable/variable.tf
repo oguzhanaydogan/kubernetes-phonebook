@@ -10,5 +10,5 @@ variable "location" {
 variable "routes" {
 }
 
-variable "subnet_associations" {  
+variable "subnet_associations" {
 }

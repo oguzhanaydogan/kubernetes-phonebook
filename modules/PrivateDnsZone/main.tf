@@ -4,7 +4,7 @@ resource "azurerm_private_dns_zone" "private_dns_zone" {
 }
 
 data "azurerm_virtual_network" "example" {
-  for_each = var.virtual_network_links
+  for_each            = var.virtual_network_links
   name                = each.value.virtual_network_name
   resource_group_name = each.value.virtual_network_resource_group_name
 }

@@ -1,14 +1,14 @@
-variable "name" {  
+variable "name" {
 }
 
-variable "location" {  
+variable "location" {
 }
 
-variable "resource_group_name" {  
+variable "resource_group_name" {
 }
 
-variable "allocation_method" {  
+variable "allocation_method" {
 }
 
-variable "sku" { 
+variable "sku" {
 }

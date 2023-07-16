@@ -62,7 +62,7 @@ module "vnet_peerings" {
 
 module "route_tables" {
   source              = "./modules/RouteTable"
-  depends_on = [module.subnets]
+  depends_on          = [module.subnets]
   for_each            = var.route_tables
   resource_group_name = module.resource_groups[each.value.resource_group].name
   location            = module.resource_groups[each.value.resource_group].location
@@ -354,15 +354,15 @@ module "private_dns_zones" {
 }
 
 module "private_endpoints" {
-  source                 = "./modules/PrivateEndpoint"
-  for_each               = var.private_endpoints
-  resource_group_name    = module.resource_groups[each.value.resource_group].name
-  location               = module.resource_groups[each.value.resource_group].location
-  attached_resource_type = each.value.attached_resource_type
+  source                          = "./modules/PrivateEndpoint"
+  for_each                        = var.private_endpoints
+  resource_group_name             = module.resource_groups[each.value.resource_group].name
+  location                        = module.resource_groups[each.value.resource_group].location
+  attached_resource_type          = each.value.attached_resource_type
   attached_resource_required_tags = each.value.attached_resource_required_tags
-  attached_resource_name = each.value.attached_resource
-  is_manual_connection   = each.value.is_manual_connection
-  subnet_id              = module.subnets[each.value.subnet].id
+  attached_resource_name          = each.value.attached_resource
+  is_manual_connection            = each.value.is_manual_connection
+  subnet_id                       = module.subnets[each.value.subnet].id
   private_dns_zone_ids = [
     for private_dns_zone in each.value.private_dns_zones :
     module.private_dns_zones[private_dns_zone].id
@@ -370,19 +370,19 @@ module "private_endpoints" {
   subresource_names = each.value.subresource_names
   depends_on = [
     module.mssql_servers
-   ]
+  ]
 }
 
 module "front_doors" {
-  source = "./modules/FrontDoor"
-  for_each = var.front_doors
-  name = each.value.name
+  source              = "./modules/FrontDoor"
+  for_each            = var.front_doors
+  name                = each.value.name
   resource_group_name = module.resource_groups[each.value.resource_group].name
-  sku_name = each.value.sku_name
-  endpoints = each.value.endpoints
-  origin_groups = each.value.origin_groups
-  origins = each.value.origins
-  routes = each.value.routes
+  sku_name            = each.value.sku_name
+  endpoints           = each.value.endpoints
+  origin_groups       = each.value.origin_groups
+  origins             = each.value.origins
+  routes              = each.value.routes
   # rule_sets = each.value.rule_sets
   # rules = each.value.rules
   depends_on = [

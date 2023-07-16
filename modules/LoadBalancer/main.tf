@@ -5,7 +5,7 @@ resource "azurerm_lb" "example" {
   sku                 = var.sku
 
   frontend_ip_configuration {
-    name                 = var.frontend_ip_configuration_name
+    name      = var.frontend_ip_configuration_name
     subnet_id = var.frontend_ip_configuration_subnet_id
   }
 }

@@ -5,5 +5,5 @@ resource "azurerm_mssql_server" "example" {
   version                      = "12.0"
   administrator_login          = var.administrator_login
   administrator_login_password = var.administrator_login_password
-  tags = var.tags
+  tags                         = var.tags
 }

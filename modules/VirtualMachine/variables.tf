@@ -1,28 +1,28 @@
-variable "vm_name" {  
+variable "vm_name" {
 }
 
-variable "location" {  
+variable "location" {
 }
 
-variable "resourcegroup" {  
+variable "resourcegroup" {
 }
 
-variable "vm_size" {  
+variable "vm_size" {
 }
 
-variable "delete_os_disk_on_termination" {  
+variable "delete_os_disk_on_termination" {
 }
 
-variable "delete_data_disks_on_termination" {  
+variable "delete_data_disks_on_termination" {
 }
 
-variable "identity_enabled" {  
+variable "identity_enabled" {
 }
 
-variable "vm_identity_type" {  
+variable "vm_identity_type" {
 }
 
-variable "storage_image_reference_publisher" {  
+variable "storage_image_reference_publisher" {
 }
 
 variable "storage_image_reference_offer" {
@@ -34,28 +34,28 @@ variable "storage_image_reference_sku" {
 variable "storage_image_reference_version" {
 }
 
-variable "storage_os_disk_name" {  
+variable "storage_os_disk_name" {
 }
 
-variable "storage_os_disk_caching" {  
+variable "storage_os_disk_caching" {
 }
 
-variable "storage_os_disk_create_option" {  
+variable "storage_os_disk_create_option" {
 }
 
 variable "storage_os_disk_managed_disk_type" {
 }
 
-variable "admin_username" {  
+variable "admin_username" {
 }
 
-variable "custom_data" {  
+variable "custom_data" {
 }
 
 variable "os_profile_linux_config_disable_password_authentication" {
 }
 
-variable "ip_configuration_name" {  
+variable "ip_configuration_name" {
 }
 
 variable "ip_configuration_subnet_id" {
@@ -67,7 +67,7 @@ variable "ip_configuration_private_ip_address_allocation" {
 variable "ip_configuration_public_ip_assigned" {
 }
 
-variable "ip_configuration_public_ip_address_id" {  
+variable "ip_configuration_public_ip_address_id" {
 }
 
 variable "ssh_key_rg" {

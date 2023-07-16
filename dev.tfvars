@@ -236,8 +236,8 @@ route_tables = {
     }
     subnet_associations = {
       vnet_app_subnet_app = {
-        subnet_name       = "subnet-app"
-        resource_group_name = "rg-eastus"
+        subnet_name          = "subnet-app"
+        resource_group_name  = "rg-eastus"
         virtual_network_name = "vnet-app"
       }
     }
@@ -253,8 +253,8 @@ route_tables = {
     }
     subnet_associations = {
       vnet_db_subnet_db = {
-        subnet_name       = "subnet-db"
-        resource_group_name = "rg-eastus"
+        subnet_name          = "subnet-db"
+        resource_group_name  = "rg-eastus"
         virtual_network_name = "vnet-db"
       }
     }
@@ -270,8 +270,8 @@ route_tables = {
     }
     subnet_associations = {
       vnet_acr_subnet_acr = {
-        subnet_name       = "subnet-acr"
-        resource_group_name = "rg-eastus"
+        subnet_name          = "subnet-acr"
+        resource_group_name  = "rg-eastus"
         virtual_network_name = "vnet-acr"
       }
     }
@@ -414,7 +414,7 @@ mssql_servers = {
     resource_group        = "rg-eastus"
     administrator_login   = "azureuser"
     admin_password_secret = "key_vault_secret_mssql_password"
-    tags                  = {
+    tags = {
       name = "coyhub-db-us"
     }
   }
@@ -422,7 +422,7 @@ mssql_servers = {
     resource_group        = "rg-westeurope"
     administrator_login   = "azureuser"
     admin_password_secret = "key_vault_secret_mssql_password"
-    tags                  = {
+    tags = {
       name = "coyhub-db-eu"
     }
   }
@@ -522,28 +522,28 @@ private_dns_zones = {
     resource_group = "rg-eastus"
     virtual_network_links = {
       zone_db_to_vnet_db = {
-        virtual_network_name = "vnet-db"
+        virtual_network_name                = "vnet-db"
         virtual_network_resource_group_name = "rg-eastus"
-        link_name = "zone-db-to-vnet-db"
-        dns_zone_resource_group_name = "rg-eastus"
+        link_name                           = "zone-db-to-vnet-db"
+        dns_zone_resource_group_name        = "rg-eastus"
       }
       zone_db_to_vnet_db_eu = {
-        virtual_network_name = "vnet-db-eu"
+        virtual_network_name                = "vnet-db-eu"
         virtual_network_resource_group_name = "rg-westeurope"
-        link_name = "zone-db-to-vnet-db-eu"
-        dns_zone_resource_group_name = "rg-eastus"
+        link_name                           = "zone-db-to-vnet-db-eu"
+        dns_zone_resource_group_name        = "rg-eastus"
       }
       zone_db_to_vnet_app = {
-        virtual_network_name = "vnet-app"
+        virtual_network_name                = "vnet-app"
         virtual_network_resource_group_name = "rg-eastus"
-        link_name = "zone-db-to-vnet-app"
-        dns_zone_resource_group_name = "rg-eastus"
+        link_name                           = "zone-db-to-vnet-app"
+        dns_zone_resource_group_name        = "rg-eastus"
       }
       zone_db_to_vnet_app_eu = {
-        virtual_network_name = "vnet-app-eu"
+        virtual_network_name                = "vnet-app-eu"
         virtual_network_resource_group_name = "rg-westeurope"
-        link_name = "zone-db-to-vnet-app-eu"
-        dns_zone_resource_group_name = "rg-eastus"
+        link_name                           = "zone-db-to-vnet-app-eu"
+        dns_zone_resource_group_name        = "rg-eastus"
       }
     }
   }
@@ -551,7 +551,7 @@ private_dns_zones = {
 
 private_endpoints = {
   pep_db = {
-    resource_group       = "rg-eastus"
+    resource_group         = "rg-eastus"
     attached_resource_type = "Microsoft.Sql/servers"
     attached_resource_required_tags = {
       name = "coyhub-db-us"
@@ -563,7 +563,7 @@ private_endpoints = {
     subresource_names    = ["sqlServer"]
   }
   pep_db_eu = {
-    resource_group       = "rg-westeurope"
+    resource_group         = "rg-westeurope"
     attached_resource_type = "Microsoft.Sql/servers"
     attached_resource_required_tags = {
       name = "coyhub-db-eu"
@@ -578,14 +578,14 @@ private_endpoints = {
 
 front_doors = {
   front_door_1 = {
-    name = "front-door-1"
+    name           = "front-door-1"
     resource_group = "rg-eastus"
-    sku_name = "Premium_AzureFrontDoor"
-    endpoints = ["phonebook"]
+    sku_name       = "Premium_AzureFrontDoor"
+    endpoints      = ["phonebook"]
     origin_groups = {
       phonebook-origin-group = {
-        name = "phonebook-origin-group"
-        session_affinity_enabled = false
+        name                                                      = "phonebook-origin-group"
+        session_affinity_enabled                                  = false
         restore_traffic_time_to_healed_or_new_endpoint_in_minutes = 10
         health_probes = {
           health_probe_http = {
@@ -604,24 +604,24 @@ front_doors = {
     }
     origins = {
       phonebook-eu = {
-        name                          = "phonebook-eu"
-        cdn_frontdoor_origin_group = "phonebook-origin-group"
-        enabled                       = true
+        name                           = "phonebook-eu"
+        cdn_frontdoor_origin_group     = "phonebook-origin-group"
+        enabled                        = true
         certificate_name_check_enabled = true
         host = {
           resource_group_name = "rg-westeurope"
-          name = "phonebook-lb"
-          type = "Microsoft.Network/loadBalancers"
+          name                = "phonebook-lb"
+          type                = "Microsoft.Network/loadBalancers"
         }
-        http_port          = 80
-        https_port         = 443
-        priority           = 1
-        weight             = 500
+        http_port  = 80
+        https_port = 443
+        priority   = 1
+        weight     = 500
         private_link = {
           request_message = "Gimme gimme"
-          location = "West Europe"
+          location        = "West Europe"
           target = {
-            name = "phonebook-lb-pls"
+            name                = "phonebook-lb-pls"
             resource_group_name = "rg-westeurope"
           }
         }
@@ -629,12 +629,12 @@ front_doors = {
     }
     routes = {
       phonebook-route-http = {
-        name                          = "phonebook-route-http"
-        cdn_frontdoor_endpoint        = "phonebook"
-        cdn_frontdoor_origin_group    = "phonebook-origin-group"
-        cdn_frontdoor_origins         = ["phonebook-eu"]
+        name                       = "phonebook-route-http"
+        cdn_frontdoor_endpoint     = "phonebook"
+        cdn_frontdoor_origin_group = "phonebook-origin-group"
+        cdn_frontdoor_origins      = ["phonebook-eu"]
         # cdn_frontdoor_rule_sets       = ["phonebookruleset"]
-        enabled                       = true
+        enabled                = true
         forwarding_protocol    = "HttpOnly"
         https_redirect_enabled = false
         patterns_to_match      = ["/*"]
@@ -665,9 +665,9 @@ front_doors = {
     #           redirect_protocol    = "Http"
     #           destination_hostname = ""
     #         }
-		#       }
+    #       }
     #     }
-		#   }
+    #   }
     # ]
   }
 }
