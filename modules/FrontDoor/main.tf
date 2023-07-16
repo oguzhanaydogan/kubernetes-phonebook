@@ -38,6 +38,71 @@ resource "azurerm_cdn_frontdoor_origin_group" "example" {
 	}
 }
 
+data "azurerm_resources" "hosts" {
+	for_each = var.origins
+
+	resource_group_name = each.value.host.resource_group_name
+	name = each.value.host.name
+	type = each.value.host.type
+}
+
+locals {
+	load_balancers = {
+		for k, v in var.origins : v.host.name => {
+			name = v.host.name
+			resource_group_name = v.host.resource_group_name
+		} if v.host.type == "Microsoft.Network/loadBalancers"
+	}
+	private_link_services = {
+		for k, v in var.origins : v.private_link.target.name => {
+			name = v.private_link.target.name
+			resource_group_name = v.private_link.target.resource_group_name
+		} if v.host.type == "Microsoft.Network/loadBalancers"
+	}
+	storage_blobs = {
+		for k, v in var.origins : v.host.name => {
+			name = v.host.name
+			storage_account_name = v.host.storage_account_name
+			storage_container_name = v.host.storage_container_name
+		} if v.host.type == "Microsoft.Storage/blobs"
+	}
+	app_services = {
+		for k, v in var.origins : v.host.name => {
+			name = v.host.name
+			resource_group_name = v.host.resource_group_name
+		} if v.host.type == "Microsoft.Web/sites"
+	}
+}
+
+data "azurerm_lb" "load_balancers" {
+	for_each = local.load_balancers
+
+	name = each.value.name
+	resource_group_name = each.value.resource_group_name
+}
+
+data "azurerm_private_link_service" "private_link_services" {
+	for_each = local.private_link_services
+
+	name = each.value.name
+	resource_group_name = each.value.resource_group_name
+}
+
+data "azurerm_storage_blob" "storage_blobs" {
+	for_each = local.storage_blobs
+
+	name = each.value.name
+	storage_account_name = each.value.storage_account_name
+	storage_container_name = each.value.storage_container_name
+}
+
+data "azurerm_linux_web_app" "app_services" {
+	for_each = local.app_services
+
+	name = each.value.name
+	resource_group_name = each.value.resource_group_name
+}
+
 resource "azurerm_cdn_frontdoor_origin" "example" {
 	for_each = var.origins
 
@@ -47,19 +112,27 @@ resource "azurerm_cdn_frontdoor_origin" "example" {
 
 	certificate_name_check_enabled = each.value.certificate_name_check_enabled
 
-	host_name          = each.value.host_name
+	host_name          = coalesce(
+		try(data.azurerm_lb.load_balancers[each.value.host.name].private_ip_address, ""),
+		try(data.azurerm_storage_blob.storage_blobs[each.value.host.name].url, ""),
+		try(data.azurerm_linux_web_app.app_services[each.value.host.name].default_hostname, "")
+	)
 	http_port          = each.value.http_port
 	https_port         = each.value.https_port
 	priority           = each.value.priority
 	weight             = each.value.weight
 
 	dynamic "private_link" {
-		for_each = each.value.private_link == null ? [] : ["xxx"]
+		for_each = each.value.private_link == null ? [] : [1]
 
 		content {
 			request_message        = each.value.private_link.request_message
 			location               = each.value.private_link.location
-			private_link_target_id = each.value.private_link.private_link_target_id
+			private_link_target_id = coalesce(
+				try(data.azurerm_private_link_service.private_link_services[each.value.private_link.target.name].id, ""),
+				try(data.azurerm_storage_blob.storage_blobs[each.value.private_link.target.name].id, ""),
+				try(data.azurerm_linux_web_app.app_services[each.value.private_link.target.name].id, "")
+			)
 		}
 	}
 }

@@ -71,17 +71,17 @@ module "route_tables" {
   subnet_associations = each.value.subnet_associations
 }
 
-module "acrs" {
-  source                        = "./modules/ContainerRegistry"
-  for_each                      = var.acrs
-  name                          = each.key
-  resource_group_name           = module.resource_groups[each.value.resource_group].name
-  location                      = module.resource_groups[each.value.resource_group].location
-  admin_enabled                 = each.value.admin_enabled
-  sku                           = each.value.sku
-  public_network_access_enabled = each.value.public_network_access_enabled
-  network_rule_bypass_option    = each.value.network_rule_bypass_option
-}
+# module "acrs" {
+#   source                        = "./modules/ContainerRegistry"
+#   for_each                      = var.acrs
+#   name                          = each.key
+#   resource_group_name           = module.resource_groups[each.value.resource_group].name
+#   location                      = module.resource_groups[each.value.resource_group].location
+#   admin_enabled                 = each.value.admin_enabled
+#   sku                           = each.value.sku
+#   public_network_access_enabled = each.value.public_network_access_enabled
+#   network_rule_bypass_option    = each.value.network_rule_bypass_option
+# }
 
 module "public_ip_addresses" {
   source              = "./modules/PublicIPAddress"
@@ -348,6 +348,9 @@ module "private_dns_zones" {
   name                  = each.value.name
   resource_group_name   = module.resource_groups[each.value.resource_group].name
   virtual_network_links = each.value.virtual_network_links
+  depends_on = [
+    module.virtual_networks
+  ]
 }
 
 module "private_endpoints" {
@@ -365,6 +368,9 @@ module "private_endpoints" {
     module.private_dns_zones[private_dns_zone].id
   ]
   subresource_names = each.value.subresource_names
+  depends_on = [
+    module.mssql_servers
+   ]
 }
 
 module "front_doors" {
@@ -379,4 +385,8 @@ module "front_doors" {
   routes = each.value.routes
   # rule_sets = each.value.rule_sets
   # rules = each.value.rules
+  depends_on = [
+    module.load_balancers,
+    module.private_link_services
+  ]
 }

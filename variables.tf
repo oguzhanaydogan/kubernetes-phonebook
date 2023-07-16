@@ -15,8 +15,8 @@ variable "vnet_peerings" {
 variable "route_tables" {
 }
 
-variable "acrs" {
-}
+# variable "acrs" {
+# }
 
 variable "public_ip_addresses" {
 }

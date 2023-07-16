@@ -4,7 +4,6 @@ resource_groups = {
 }
 
 virtual_networks = {
-  #EAST US
   vnet-hub = {
     resource_group = "rg-eastus"
     address_space  = ["10.0.0.0/16"]
@@ -25,7 +24,6 @@ virtual_networks = {
     resource_group = "rg-eastus"
     address_space  = ["10.4.0.0/16"]
   }
-  #WEST euROPE
   vnet-app-eu = {
     resource_group = "rg-westeurope"
     address_space  = ["10.11.0.0/16"]
@@ -280,15 +278,15 @@ route_tables = {
   }
 }
 
-acrs = {
-  coyhub = {
-    sku                           = "Premium"
-    admin_enabled                 = false
-    public_network_access_enabled = false
-    network_rule_bypass_option    = "None"
-    resource_group                = "rg-eastus"
-  }
-}
+# acrs = {
+#   coyhub = {
+#     sku                           = "Premium"
+#     admin_enabled                 = false
+#     public_network_access_enabled = false
+#     network_rule_bypass_option    = "None"
+#     resource_group                = "rg-eastus"
+#   }
+# }
 
 public_ip_addresses = {
   public-ip-hub-firewall-management = {
@@ -610,7 +608,11 @@ front_doors = {
         cdn_frontdoor_origin_group = "phonebook-origin-group"
         enabled                       = true
         certificate_name_check_enabled = true
-        host_name          = "10.11.4.4"
+        host = {
+          resource_group_name = "rg-westeurope"
+          name = "phonebook-lb"
+          type = "Microsoft.Network/loadBalancers"
+        }
         http_port          = 80
         https_port         = 443
         priority           = 1
@@ -618,7 +620,10 @@ front_doors = {
         private_link = {
           request_message = "Gimme gimme"
           location = "West Europe"
-          private_link_target_id = "/subscriptions/14528ad0-4c9e-48a9-8ed0-111c1034b033/resourceGroups/rg-westeurope/providers/Microsoft.Network/privateLinkServices/phonebook-lb-pls"
+          target = {
+            name = "phonebook-lb-pls"
+            resource_group_name = "rg-westeurope"
+          }
         }
       }
     }
