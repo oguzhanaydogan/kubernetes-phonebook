@@ -620,6 +620,7 @@ front_doors = {
           location = "West Europe"
           private_link_target_id = "/subscriptions/14528ad0-4c9e-48a9-8ed0-111c1034b033/resourceGroups/rg-westeurope/providers/Microsoft.Network/privateLinkServices/phonebook-lb-pls"
         }
+        ####iceri pls data cek.
       }
     }
     routes = {
