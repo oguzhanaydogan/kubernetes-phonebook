@@ -1,45 +1,57 @@
 resource_groups = {
-  rg-eastus     = "East Us"
-  rg-westeurope = "West Europe"
+  rg_eastus = {
+    name     = "rg-eastus"
+    location = "East Us"
+  }
+  rg_westeurope = {
+    name     = "rg-westeurope"
+    location = "West Europe"
+  }
 }
 
 virtual_networks = {
-  vnet-hub = {
-    resource_group = "rg-eastus"
+  vnet_hub = {
+    name           = "vnet-hub"
+    resource_group = "rg_eastus"
     address_space  = ["10.0.0.0/16"]
   }
-  vnet-app = {
-    resource_group = "rg-eastus"
+  vnet_app = {
+    name           = "vnet-app"
+    resource_group = "rg_eastus"
     address_space  = ["10.1.0.0/16"]
   }
-  vnet-acr = {
-    resource_group = "rg-eastus"
+  vnet_acr = {
+    name           = "vnet-acr"
+    resource_group = "rg_eastus"
     address_space  = ["10.2.0.0/16"]
   }
-  vnet-db = {
-    resource_group = "rg-eastus"
+  vnet_db = {
+    name           = "vnet-db"
+    resource_group = "rg_eastus"
     address_space  = ["10.3.0.0/16"]
   }
-  vnet-agent = {
-    resource_group = "rg-eastus"
+  vnet_agent = {
+    name           = "vnet-agent"
+    resource_group = "rg_eastus"
     address_space  = ["10.4.0.0/16"]
   }
-  vnet-app-eu = {
-    resource_group = "rg-westeurope"
+  vnet_app_eu = {
+    name           = "vnet-app-eu"
+    resource_group = "rg_westeurope"
     address_space  = ["10.11.0.0/16"]
   }
-  vnet-db-eu = {
-    resource_group = "rg-westeurope"
+  vnet_db_eu = {
+    name           = "vnet-db-eu"
+    resource_group = "rg_westeurope"
     address_space  = ["10.12.0.0/16"]
   }
 }
 
 subnets = {
-  #EAST US
   vnet_hub_subnet_firewall = {
     name                                          = "AzureFirewallSubnet"
-    resource_group                                = "rg-eastus"
-    virtual_network                               = "vnet-hub"
+    resource_group                                = "rg_eastus"
+    virtual_network                               = "vnet_hub"
     address_prefixes                              = ["10.0.0.0/26"]
     delegation                                    = false
     delegation_name                               = ""
@@ -47,8 +59,8 @@ subnets = {
   }
   vnet_hub_subnet_firewall_management = {
     name                                          = "AzureFirewallSubnetManagement"
-    resource_group                                = "rg-eastus"
-    virtual_network                               = "vnet-hub"
+    resource_group                                = "rg_eastus"
+    virtual_network                               = "vnet_hub"
     address_prefixes                              = ["10.0.1.0/26"]
     delegation                                    = false
     delegation_name                               = ""
@@ -56,8 +68,8 @@ subnets = {
   }
   vnet_app_subnet_app = {
     name                                          = "subnet-app"
-    resource_group                                = "rg-eastus"
-    virtual_network                               = "vnet-app"
+    resource_group                                = "rg_eastus"
+    virtual_network                               = "vnet_app"
     address_prefixes                              = ["10.1.0.0/24"]
     delegation                                    = false
     delegation_name                               = ""
@@ -65,8 +77,8 @@ subnets = {
   }
   vnet_acr_subnet_acr = {
     name                                          = "subnet-acr"
-    resource_group                                = "rg-eastus"
-    virtual_network                               = "vnet-acr"
+    resource_group                                = "rg_eastus"
+    virtual_network                               = "vnet_acr"
     address_prefixes                              = ["10.2.0.0/24"]
     delegation                                    = false
     delegation_name                               = ""
@@ -74,8 +86,8 @@ subnets = {
   }
   vnet_db_subnet_db = {
     name                                          = "subnet-db"
-    resource_group                                = "rg-eastus"
-    virtual_network                               = "vnet-db"
+    resource_group                                = "rg_eastus"
+    virtual_network                               = "vnet_db"
     address_prefixes                              = ["10.3.0.0/24"]
     delegation                                    = false
     delegation_name                               = ""
@@ -83,8 +95,8 @@ subnets = {
   }
   vnet_db_subnet_db_pep = {
     name                                          = "subnet-db-pep"
-    resource_group                                = "rg-eastus"
-    virtual_network                               = "vnet-db"
+    resource_group                                = "rg_eastus"
+    virtual_network                               = "vnet_db"
     address_prefixes                              = ["10.3.1.0/24"]
     delegation                                    = false
     delegation_name                               = ""
@@ -92,19 +104,17 @@ subnets = {
   }
   vnet_agent_subnet_agent = {
     name                                          = "subnet-agent"
-    resource_group                                = "rg-eastus"
-    virtual_network                               = "vnet-agent"
+    resource_group                                = "rg_eastus"
+    virtual_network                               = "vnet_agent"
     address_prefixes                              = ["10.4.0.0/24"]
     delegation                                    = false
     delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
-
-  #WEST EUROPE
   vnet_app_eu_subnet_app = {
     name                                          = "subnet-app"
-    resource_group                                = "rg-westeurope"
-    virtual_network                               = "vnet-app-eu"
+    resource_group                                = "rg_westeurope"
+    virtual_network                               = "vnet_app_eu"
     address_prefixes                              = ["10.11.0.0/24"]
     delegation                                    = false
     delegation_name                               = ""
@@ -112,8 +122,8 @@ subnets = {
   }
   vnet_app_eu_subnet_lb = {
     name                                          = "subnet-lb"
-    resource_group                                = "rg-westeurope"
-    virtual_network                               = "vnet-app-eu"
+    resource_group                                = "rg_westeurope"
+    virtual_network                               = "vnet_app_eu"
     address_prefixes                              = ["10.11.1.0/24"]
     delegation                                    = false
     delegation_name                               = ""
@@ -121,8 +131,8 @@ subnets = {
   }
   vnet_app_eu_subnet_lb_pls = {
     name                                          = "subnet-lb-pls"
-    resource_group                                = "rg-westeurope"
-    virtual_network                               = "vnet-app-eu"
+    resource_group                                = "rg_westeurope"
+    virtual_network                               = "vnet_app_eu"
     address_prefixes                              = ["10.11.2.0/24"]
     delegation                                    = false
     delegation_name                               = ""
@@ -130,8 +140,8 @@ subnets = {
   }
   vnet_app_eu_subnet_lb_pls_pep = {
     name                                          = "subnet-lb-pls-pep"
-    resource_group                                = "rg-westeurope"
-    virtual_network                               = "vnet-app-eu"
+    resource_group                                = "rg_westeurope"
+    virtual_network                               = "vnet_app_eu"
     address_prefixes                              = ["10.11.4.0/24"]
     delegation                                    = false
     delegation_name                               = ""
@@ -139,8 +149,8 @@ subnets = {
   }
   vnet_app_eu_subnet_bastion = {
     name                                          = "AzureBastionSubnet"
-    resource_group                                = "rg-westeurope"
-    virtual_network                               = "vnet-app-eu"
+    resource_group                                = "rg_westeurope"
+    virtual_network                               = "vnet_app_eu"
     address_prefixes                              = ["10.11.3.0/24"]
     delegation                                    = false
     delegation_name                               = ""
@@ -148,8 +158,8 @@ subnets = {
   }
   vnet_db_eu_subnet_db = {
     name                                          = "subnet-db"
-    resource_group                                = "rg-westeurope"
-    virtual_network                               = "vnet-db-eu"
+    resource_group                                = "rg_westeurope"
+    virtual_network                               = "vnet_db_eu"
     address_prefixes                              = ["10.12.0.0/24"]
     delegation                                    = false
     delegation_name                               = ""
@@ -157,8 +167,8 @@ subnets = {
   }
   vnet_db_eu_subnet_db_pep = {
     name                                          = "subnet-db-pep"
-    resource_group                                = "rg-westeurope"
-    virtual_network                               = "vnet-db-eu"
+    resource_group                                = "rg_westeurope"
+    virtual_network                               = "vnet_db_eu"
     address_prefixes                              = ["10.12.1.0/24"]
     delegation                                    = false
     delegation_name                               = ""
@@ -167,68 +177,81 @@ subnets = {
 }
 
 vnet_peerings = {
-  db-hub = {
-    virtual_network        = "vnet-db"
-    remote_virtual_network = "vnet-hub"
-    resource_group         = "rg-eastus"
+  db_hub = {
+    name                   = "db-hub"
+    virtual_network        = "vnet_db"
+    remote_virtual_network = "vnet_hub"
+    resource_group         = "rg_eastus"
   }
-  hub-db = {
-    virtual_network        = "vnet-hub"
-    remote_virtual_network = "vnet-db"
-    resource_group         = "rg-eastus"
+  hub_db = {
+    name                   = "hub-db"
+    virtual_network        = "vnet_hub"
+    remote_virtual_network = "vnet_db"
+    resource_group         = "rg_eastus"
   }
-  app-hub = {
-    virtual_network        = "vnet-app"
-    remote_virtual_network = "vnet-hub"
-    resource_group         = "rg-eastus"
+  app_hub = {
+    name                   = "app-hub"
+    virtual_network        = "vnet_app"
+    remote_virtual_network = "vnet_hub"
+    resource_group         = "rg_eastus"
   }
-  hub-app = {
-    virtual_network        = "vnet-hub"
-    remote_virtual_network = "vnet-app"
-    resource_group         = "rg-eastus"
+  hub_app = {
+    name                   = "hub-app"
+    virtual_network        = "vnet_hub"
+    remote_virtual_network = "vnet_app"
+    resource_group         = "rg_eastus"
   }
-  acr-hub = {
-    virtual_network        = "vnet-acr"
-    remote_virtual_network = "vnet-hub"
-    resource_group         = "rg-eastus"
+  acr_hub = {
+    name                   = "acr-hub"
+    virtual_network        = "vnet_acr"
+    remote_virtual_network = "vnet_hub"
+    resource_group         = "rg_eastus"
   }
-  hub-acr = {
-    virtual_network        = "vnet-hub"
-    remote_virtual_network = "vnet-acr"
-    resource_group         = "rg-eastus"
+  hub_acr = {
+    name                   = "hub-acr"
+    virtual_network        = "vnet_hub"
+    remote_virtual_network = "vnet_acr"
+    resource_group         = "rg_eastus"
   }
-  db-dbeu = {
-    virtual_network        = "vnet-db"
-    remote_virtual_network = "vnet-db-eu"
-    resource_group         = "rg-eastus"
+  db_dbeu = {
+    name                   = "db-dbeu"
+    virtual_network        = "vnet_db"
+    remote_virtual_network = "vnet_db_eu"
+    resource_group         = "rg_eastus"
   }
-  dbeu-db = {
-    virtual_network        = "vnet-db-eu"
-    remote_virtual_network = "vnet-db"
-    resource_group         = "rg-westeurope"
+  dbeu_db = {
+    name                   = "dbeu-db"
+    virtual_network        = "vnet_db_eu"
+    remote_virtual_network = "vnet_db"
+    resource_group         = "rg_westeurope"
   }
-  appeu-dbeu = {
-    virtual_network        = "vnet-app-eu"
-    remote_virtual_network = "vnet-db-eu"
-    resource_group         = "rg-westeurope"
+  appeu_dbeu = {
+    name                   = "appeu-dbeu"
+    virtual_network        = "vnet_app_eu"
+    remote_virtual_network = "vnet_db_eu"
+    resource_group         = "rg_westeurope"
   }
-  dbeu-appeu = {
-    virtual_network        = "vnet-db-eu"
-    remote_virtual_network = "vnet-app-eu"
-    resource_group         = "rg-westeurope"
+  dbeu_appeu = {
+    name                   = "dbeu-appeu"
+    virtual_network        = "vnet_db_eu"
+    remote_virtual_network = "vnet_app_eu"
+    resource_group         = "rg_westeurope"
   }
 }
 
 route_tables = {
-  route-table-subnet-app = {
-    resource_group = "rg-eastus"
+  vnet_app_subnet_app = {
+    name           = "vnet-app-subnet-app"
+    resource_group = "rg_eastus"
     routes = {
-      subnet-app-to-subnet-acr = {
+      vnet_app_subnet_app_to_vnet_acr_subnet_acr = {
+        name                   = "vnet-app-subnet-app-to-vnet-acr-subnet-acr"
         address_prefix         = "10.2.0.0/24"
         next_hop_type          = "VirtualAppliance"
         next_hop_in_ip_address = "10.0.0.4"
       }
-      subnet-app-to-subnet-db = {
+      vnet_app_subnet_app_to_vnet_db_subnet_db = {
+        name                   = "vnet-app-subnet-app-to-vnet-db-subnet-db"
         address_prefix         = "10.3.0.0/24"
         next_hop_type          = "VirtualAppliance"
         next_hop_in_ip_address = "10.0.0.4"
@@ -242,10 +265,12 @@ route_tables = {
       }
     }
   }
-  route-table-subnet-db = {
-    resource_group = "rg-eastus"
+  vnet_app_subnet_db = {
+    name           = "vnet-app-subnet-db"
+    resource_group = "rg_eastus"
     routes = {
-      subnet-db-to-subnet-app = {
+      vnet_db_subnet_db_to_vnet_app_subnet_app = {
+        name                   = "vnet-db-subnet-db-to-vnet-app-subnet-app"
         address_prefix         = "10.1.0.0/24"
         next_hop_type          = "VirtualAppliance"
         next_hop_in_ip_address = "10.0.0.4"
@@ -259,10 +284,12 @@ route_tables = {
       }
     }
   }
-  route-table-subnet-acr = {
-    resource_group = "rg-eastus"
+  vnet_app_subnet_acr = {
+    name           = "vnet-app-subnet-acr"
+    resource_group = "rg_eastus"
     routes = {
-      subnet-acr-to-everywhere = {
+      vnet_acr_subnet_acr_to_everywhere = {
+        name                   = "vnet-acr-subnet-acr-to-everywhere"
         address_prefix         = "10.0.0.0/8"
         next_hop_type          = "VirtualAppliance"
         next_hop_in_ip_address = "10.4.0.4"
@@ -270,7 +297,7 @@ route_tables = {
     }
     subnet_associations = {
       vnet_acr_subnet_acr = {
-        subnet_name          = "subnet-acr"
+        subnet_name          = "vnet_acr_subnet_acr"
         resource_group_name  = "rg-eastus"
         virtual_network_name = "vnet-acr"
       }
@@ -289,31 +316,30 @@ route_tables = {
 # }
 
 public_ip_addresses = {
-  public-ip-hub-firewall-management = {
-    allocation_method = "Static"
+  hub_firewall_management = {
+    name              = "hub-firewall-management"
+    allocation_method = "Dynamic"
     sku               = "Standard"
-    resource_group    = "rg-eastus"
+    resource_group    = "rg_eastus"
   }
-  public-ip-application-gateway = {
+  ci_cd_agent = {
+    name              = "ci-cd-agent"
     allocation_method = "Static"
     sku               = "Standard"
-    resource_group    = "rg-eastus"
+    resource_group    = "rg_eastus"
   }
-  public-ip-agent = {
-    allocation_method = "Static"
+  bastion_host_eu = {
+    name              = "bastion-host-eu"
+    allocation_method = "Dynamic"
     sku               = "Standard"
-    resource_group    = "rg-eastus"
-  }
-  public-ip-bastion-eu = {
-    allocation_method = "Static"
-    sku               = "Standard"
-    resource_group    = "rg-westeurope"
+    resource_group    = "rg_westeurope"
   }
 }
 
 network_security_groups = {
-  nsg-ssh = {
-    resource_group = "rg-eastus"
+  ssh = {
+    name           = "ssh"
+    resource_group = "rg_eastus"
     security_rules = {
       allowssh = {
         name                       = "AllowSSH"
@@ -328,8 +354,9 @@ network_security_groups = {
       }
     }
   }
-  nsg-ssh-and-http = {
-    resource_group = "rg-westeurope"
+  ssh_and_http = {
+    name           = "ssh-and-http"
+    resource_group = "rg_westeurope"
     security_rules = {
       allowssh = {
         name                       = "AllowSSH"
@@ -356,34 +383,61 @@ network_security_groups = {
     }
   }
 }
+
 linux_virtual_machines = {
-  vm-agent = {
+  ci_cd_agent = {
+    name                                                    = "ci-cd-agent"
     resource_group                                          = "rg-eastus"
-    vm_size                                                 = "Standard_B1s"
+    size                                                    = "Standard_B1s"
     delete_data_disks_on_termination                        = true
     delete_os_disk_on_termination                           = true
-    identity_enabled                                        = true
-    vm_identity_type                                        = "SystemAssigned"
-    storage_image_reference_publisher                       = "Canonical"
-    storage_image_reference_offer                           = "UbuntuServer"
-    storage_image_reference_sku                             = "18.04-LTS"
-    storage_image_reference_version                         = "latest"
-    storage_os_disk_name                                    = "myosdisk1"
-    storage_os_disk_caching                                 = "ReadWrite"
-    storage_os_disk_create_option                           = "FromImage"
-    storage_os_disk_managed_disk_type                       = "Standard_LRS"
-    admin_username                                          = "azureuser"
-    custom_data                                             = "modules/VirtualMachine/agent.sh"
-    os_profile_linux_config_disable_password_authentication = true
-    ip_configuration_name                                   = "testconfiguration1"
-    ip_configuration_subnet                                 = "vnet_agent_subnet_agent"
-    ip_configuration_private_ip_address_allocation          = "Dynamic"
-    ip_configuration_public_ip_assigned                     = true
-    ip_configuration_public_ip_address                      = "public-ip-agent"
-    ssh_key_rg                                              = "ssh-key"
-    ssh_key_name                                            = "azure"
-    nsg_association_enabled                                 = true
-    nsg                                                     = "nsg-ssh"
+    identity = {
+      enabled                                        = true
+      type                                           = "SystemAssigned"
+    }
+    storage_image_reference = {
+      publisher                       = "Canonical"
+      offer                           = "UbuntuServer"
+      sku                             = "18.04-LTS"
+      version                         = "latest"
+    }
+    storage_os_disk = {
+      caching                                 = "ReadWrite"
+      create_option                           = "FromImage"
+      managed_disk_type                       = "Standard_LRS"
+    }
+    os_profile = {
+      admin_username                                          = "azureuser"
+      custom_data                                             = "modules/VirtualMachine/agent.sh"
+    }
+    os_profile_linux_config = {
+      disable_password_authentication = true
+      ssh_key = {
+        resource_group_name                                 = "ssh-key"
+        name                               = "azure"
+      }
+    }
+    ip_configurations = {
+      ipConfiguration1 = {
+        name = "ipConfiguration1"
+        subnet = {
+          name                 = "vnet-agent-subnet-agent"
+          virtual_network_name = "vnet-agent"
+          resource_group_name  = "rg-eastus"
+        }
+        private_ip_address_allocation = "Dynamic"
+        public_ip_assigned            = true
+        public_ip_address = {
+          name                = "ci-cd-agent"
+          resource_group_name = "rg-eastus"
+        }
+      }
+    }
+    network_security_group_association = {
+      enabled = true
+      network_security_group_name = "nsg-ssh"
+      network_security_group_resource_group_name = "rg-eastus"
+    }
   }
 }
 

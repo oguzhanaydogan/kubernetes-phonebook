@@ -1,67 +1,94 @@
 data "azurerm_ssh_public_key" "ssh_public_key" {
-  resource_group_name = var.ssh_key_rg
-  name                = var.ssh_key_name
+  resource_group_name = var.os_profile_linux_config.ssh_key.resource_group_name
+  name                = var.os_profile_linux_config.ssh_key.name
 }
 
-resource "azurerm_virtual_machine" "vm1" {
-  name                             = var.vm_name
+data "azurerm_subnet" "subnets" {
+  for_each = var.ip_configurations
+
+  name                 = each.value.subnet.name
+  virtual_network_name = each.value.subnet.virtual_network_name
+  resource_group_name  = each.value.subnet.resource_group_name
+}
+
+data "azurerm_public_ip" "public_ip_addresses" {
+  for_each = var.ip_configurations
+
+  name                = each.value.public_ip_address.name
+  resource_group_name = each.value.public_ip_address.resource_group_name
+}
+
+resource "azurerm_network_interface" "network_interface" {
+  name                = "${var.name}-network_interface"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_virtual_machine" "vm" {
+  name                             = var.name
   location                         = var.location
-  resource_group_name              = var.resourcegroup
-  network_interface_ids            = [azurerm_network_interface.main.id]
-  vm_size                          = var.vm_size
+  resource_group_name              = var.resource_group_name
+  network_interface_ids            = [azurerm_network_interface.nic.id]
+  vm_size                          = var.size
   delete_os_disk_on_termination    = var.delete_os_disk_on_termination
   delete_data_disks_on_termination = var.delete_data_disks_on_termination
+
   dynamic "identity" {
-    for_each = var.identity_enabled ? [1] : []
+    for_each = var.identity.enabled ? [1] : []
 
     content {
-      type = var.vm_identity_type
+      type = identity.value.type
     }
   }
 
   storage_image_reference {
-    publisher = var.storage_image_reference_publisher
-    offer     = var.storage_image_reference_offer
-    sku       = var.storage_image_reference_sku
-    version   = var.storage_image_reference_version
+    publisher = var.storage_image_reference.publisher
+    offer     = var.storage_image_reference.offer
+    sku       = var.storage_image_reference.sku
+    version   = var.storage_image_reference.version
   }
-  storage_os_disk {
-    name              = var.storage_os_disk_name
-    caching           = var.storage_os_disk_caching
-    create_option     = var.storage_os_disk_create_option
-    managed_disk_type = var.storage_os_disk_managed_disk_type
-  }
-  os_profile {
-    computer_name  = var.vm_name
-    admin_username = var.admin_username
-    custom_data    = file("${var.custom_data}")
 
+  storage_os_disk {
+    name              = "${var.name}-disk"
+    caching           = var.storage_os_disk.caching
+    create_option     = var.storage_os_disk.create_option
+    managed_disk_type = var.storage_os_disk.managed_disk_type
   }
+
+  os_profile {
+    computer_name  = var.name
+    admin_username = var.os_profile.admin_username
+    custom_data    = file("${var.os_profile.custom_data}")
+  }
+
   os_profile_linux_config {
-    disable_password_authentication = var.os_profile_linux_config_disable_password_authentication
+    disable_password_authentication = var.os_profile_linux_config.disable_password_authentication
+
     ssh_keys {
-      path     = "/home/${var.admin_username}/.ssh/authorized_keys"
+      path     = "/home/${var.os_profile_linux_config.admin_username}/.ssh/authorized_keys"
       key_data = data.azurerm_ssh_public_key.ssh_public_key.public_key
+    }
+  }
+
+  dynamic "ip_configuration" {
+    for_each = var.ip_configurations
+
+    content {
+      name                          = ip_configuration.value.name
+      subnet_id                     = data.azurerm_subnet.subnets[ip_configuration.key].id
+      private_ip_address_allocation = ip_configuration.value.private_ip_address_allocation
+      public_ip_address_id          = ip_configuration.value.public_ip_assigned ? data.azurerm_public_ip.public_ip_addresses[ip_configuration.key].id : ""
     }
   }
 }
 
-resource "azurerm_network_interface" "main" {
-  name                = "${var.vm_name}-nic"
-  location            = var.location
-  resource_group_name = var.resourcegroup
-
-  ip_configuration {
-    name                          = var.ip_configuration_name
-    subnet_id                     = var.ip_configuration_subnet_id
-    private_ip_address_allocation = var.ip_configuration_private_ip_address_allocation
-    public_ip_address_id          = var.ip_configuration_public_ip_assigned ? var.ip_configuration_public_ip_address_id : null
-  }
+data "azurerm_network_security_group" "network_security_group" {
+  network_security_group_name                = var.network_security_group_association.network_security_group_name
+  network_security_group_resource_group_name = var.network_security_group_association.network_security_group_resource_group_name
 }
 
-resource "azurerm_network_interface_security_group_association" "nic1" {
-  count                     = var.nsg_association_enabled ? 1 : 0
-  network_interface_id      = azurerm_network_interface.main.id
-  network_security_group_id = var.nsg_id
+resource "azurerm_network_interface_security_group_association" "nic_nsg_association" {
+  count                     = var.network_security_group_association.enabled ? 1 : 0
+  network_interface_id      = azurerm_network_interface.network_interface.id
+  network_security_group_id = data.azurerm_network_security_group.network_security_group.id
 }
-

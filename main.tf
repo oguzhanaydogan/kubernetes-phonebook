@@ -26,23 +26,26 @@ provider "azurerm" {
 module "resource_groups" {
   source   = "./modules/ResourceGroup"
   for_each = var.resource_groups
-  name     = each.key
-  location = each.value
+
+  name     = each.value.name
+  location = each.value.location
 }
 
 module "virtual_networks" {
-  source              = "./modules/VirtualNetwork"
-  for_each            = var.virtual_networks
-  name                = each.key
+  source   = "./modules/VirtualNetwork"
+  for_each = var.virtual_networks
+
+  name                = each.value.name
   resource_group_name = module.resource_groups[each.value.resource_group].name
   location            = module.resource_groups[each.value.resource_group].location
   address_space       = each.value.address_space
 }
 
 module "subnets" {
-  source                                        = "./modules/Subnet"
-  for_each                                      = var.subnets
-  subnet_name                                   = each.value.name
+  source   = "./modules/Subnet"
+  for_each = var.subnets
+
+  name                                          = each.value.name
   address_prefixes                              = each.value.address_prefixes
   resource_group_name                           = module.resource_groups[each.value.resource_group].name
   virtual_network_name                          = module.virtual_networks[each.value.virtual_network].name
@@ -52,23 +55,26 @@ module "subnets" {
 }
 
 module "vnet_peerings" {
-  source                    = "./modules/VirtualNetworkPeering"
-  for_each                  = var.vnet_peerings
+  source   = "./modules/VirtualNetworkPeering"
+  for_each = var.vnet_peerings
+
   resource_group_name       = module.resource_groups[each.value.resource_group].name
-  name                      = each.key
+  name                      = each.value.name
   virtual_network_name      = module.virtual_networks[each.value.virtual_network].name
   remote_virtual_network_id = module.virtual_networks[each.value.remote_virtual_network].id
 }
 
 module "route_tables" {
-  source              = "./modules/RouteTable"
-  depends_on          = [module.subnets]
-  for_each            = var.route_tables
+  source   = "./modules/RouteTable"
+  for_each = var.route_tables
+
   resource_group_name = module.resource_groups[each.value.resource_group].name
   location            = module.resource_groups[each.value.resource_group].location
-  name                = each.key
+  name                = each.value.name
   routes              = each.value.routes
   subnet_associations = each.value.subnet_associations
+
+  depends_on = [module.subnets]
 }
 
 # module "acrs" {
@@ -84,55 +90,43 @@ module "route_tables" {
 # }
 
 module "public_ip_addresses" {
-  source              = "./modules/PublicIPAddress"
-  for_each            = var.public_ip_addresses
+  source   = "./modules/PublicIPAddress"
+  for_each = var.public_ip_addresses
+
+  name                = each.value.name
   resource_group_name = module.resource_groups[each.value.resource_group].name
   location            = module.resource_groups[each.value.resource_group].location
-  name                = each.key
   allocation_method   = each.value.allocation_method
   sku                 = each.value.sku
 }
 
 module "network_security_groups" {
-  source         = "./modules/NetworkSecurityGroup"
-  for_each       = var.network_security_groups
+  source   = "./modules/NetworkSecurityGroup"
+  for_each = var.network_security_groups
+
+  name           = each.value.name
   location       = module.resource_groups[each.value.resource_group].location
   resourcegroup  = module.resource_groups[each.value.resource_group].name
-  name           = each.key
   security_rules = each.value.security_rules
 }
 
 module "linux_virtual_machines" {
-  source                                                  = "./modules/VirtualMachine"
-  for_each                                                = var.linux_virtual_machines
+  source   = "./modules/VirtualMachine"
+  for_each = var.linux_virtual_machines
+
+  name                                                    = each.value.name
   location                                                = module.resource_groups[each.value.resource_group].location
-  resourcegroup                                           = module.resource_groups[each.value.resource_group].name
-  vm_name                                                 = each.key
-  vm_size                                                 = each.value.vm_size
+  resource_group_name                                     = module.resource_groups[each.value.resource_group].name
+  size                                                    = each.value.size
   delete_os_disk_on_termination                           = each.value.delete_os_disk_on_termination
   delete_data_disks_on_termination                        = each.value.delete_data_disks_on_termination
-  identity_enabled                                        = each.value.identity_enabled
-  vm_identity_type                                        = each.value.vm_identity_type
-  storage_image_reference_publisher                       = each.value.storage_image_reference_publisher
-  storage_image_reference_offer                           = each.value.storage_image_reference_offer
-  storage_image_reference_sku                             = each.value.storage_image_reference_sku
-  storage_image_reference_version                         = each.value.storage_image_reference_version
-  storage_os_disk_name                                    = each.value.storage_os_disk_name
-  storage_os_disk_caching                                 = each.value.storage_os_disk_caching
-  storage_os_disk_create_option                           = each.value.storage_os_disk_create_option
-  storage_os_disk_managed_disk_type                       = each.value.storage_os_disk_managed_disk_type
-  admin_username                                          = each.value.admin_username
-  custom_data                                             = each.value.custom_data
-  os_profile_linux_config_disable_password_authentication = each.value.os_profile_linux_config_disable_password_authentication
-  ip_configuration_name                                   = each.value.ip_configuration_name
-  ip_configuration_subnet_id                              = module.subnets[each.value.ip_configuration_subnet].id
-  ip_configuration_private_ip_address_allocation          = each.value.ip_configuration_private_ip_address_allocation
-  ip_configuration_public_ip_assigned                     = each.value.ip_configuration_public_ip_assigned
-  ip_configuration_public_ip_address_id                   = each.value.ip_configuration_public_ip_assigned ? module.public_ip_addresses[each.value.ip_configuration_public_ip_address].id : null
-  ssh_key_rg                                              = each.value.ssh_key_rg
-  ssh_key_name                                            = each.value.ssh_key_name
-  nsg_association_enabled                                 = each.value.nsg_association_enabled
-  nsg_id                                                  = module.network_security_groups["${each.value.nsg}"].id
+  identity                                        = each.value.identity
+  storage_image_reference                       = each.value.storage_image_reference
+  storage_os_disk                                    = each.value.storage_os_disk
+  os_profile = each.value.os_profile
+  os_profile_linux_config = each.value.os_profile_linux_config
+  ip_configurations                                       = each.value.ip_configurations
+  network_security_group_association              = each.value.network_security_group_association
 }
 
 data "azurerm_key_vault" "example" {
