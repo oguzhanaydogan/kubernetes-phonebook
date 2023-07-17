@@ -23,23 +23,30 @@ data "azurerm_network_security_group" "example" {
 }
 
 data "azurerm_lb" "example" {
-  for_each            = var.network_interface.ip_configurations.load_balancer_backend_address_pools
+  for_each            = toset(local.load_balancers)
 
   name                = each.value.load_balancer_name
   resource_group_name = each.value.load_balancer_resource_group_name
 }
 
+data "azurerm_lb_backend_address_pool" "example" {
+  for_each = var.network_interface.ip_configurations.load_balancer_backend_address_pools
+
+  name            = each.value.name
+  loadbalancer_id = data.azurerm_lb.example[each.key].id
+}
+
 locals {
-  load_balancers = [
+  load_balancers = {
     for key, ip_configuration in var.network_interface.ip_configurations : {
       for key2, load_balancer_backend_address_pool in ip_configuration.load_balancer_backend_address_pools : load_balancer_backend_address_pool.load_balancer_name => {
         load_balancer_name = load_balancer_backend_address_pool.load_balancer_name
         load_balancer_resource_group_name = load_balancer_backend_address_pool.load_balancer_resource_group_name
-        
-      }
+      }...
     }
-  ]
+  }
 }
+
 
 # locals {
 #   lb_backend_address_pool_ids = {
@@ -48,12 +55,7 @@ locals {
 #     ]
 #   }
 # }
-data "azurerm_lb_backend_address_pool" "example" {
-  for_each = var.network_interface.ip_configurations.load_balancer_backend_address_pools
 
-  name            = each.value.name
-  loadbalancer_id = data.azurerm_lb.example[each.key].id
-}
 
 resource "azurerm_linux_virtual_machine_scale_set" "example" {
   name                = var.name
