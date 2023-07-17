@@ -612,6 +612,7 @@ front_doors = {
           resource_group_name = "rg-westeurope"
           name                = "phonebook-lb"
           type                = "Microsoft.Network/loadBalancers"
+          pls_enabled         = true
         }
         http_port  = 80
         https_port = 443

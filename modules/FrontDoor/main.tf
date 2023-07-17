@@ -38,26 +38,18 @@ resource "azurerm_cdn_frontdoor_origin_group" "example" {
   }
 }
 
-data "azurerm_resources" "hosts" {
-  for_each = var.origins
-
-  resource_group_name = each.value.host.resource_group_name
-  name                = each.value.host.name
-  type                = each.value.host.type
-}
-
 locals {
   load_balancers = {
     for k, v in var.origins : v.host.name => {
       name                = v.host.name
       resource_group_name = v.host.resource_group_name
-    } if v.host.type == "Microsoft.Network/loadBalancers"
+    } if !v.host.pls_enabled && v.host.type == "Microsoft.Network/loadBalancers"
   }
   private_link_services = {
     for k, v in var.origins : v.private_link.target.name => {
       name                = v.private_link.target.name
       resource_group_name = v.private_link.target.resource_group_name
-    } if v.host.type == "Microsoft.Network/loadBalancers"
+    } if v.host.pls_enabled && v.host.type == "Microsoft.Network/loadBalancers"
   }
   storage_blobs = {
     for k, v in var.origins : v.host.name => {
@@ -129,6 +121,7 @@ resource "azurerm_cdn_frontdoor_origin" "example" {
       request_message = each.value.private_link.request_message
       location        = each.value.private_link.location
       private_link_target_id = coalesce(
+        try(data.azurerm_lb.load_balancers[each.value.private_link.target.name].id, ""),
         try(data.azurerm_private_link_service.private_link_services[each.value.private_link.target.name].id, ""),
         try(data.azurerm_storage_blob.storage_blobs[each.value.private_link.target.name].id, ""),
         try(data.azurerm_linux_web_app.app_services[each.value.private_link.target.name].id, "")
