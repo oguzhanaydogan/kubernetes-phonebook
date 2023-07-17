@@ -1,12 +1,24 @@
+data "azurerm_subnet" "example" {
+  for_each = var.frontend_ip_configurations
+
+  name                 = each.value.subnet.name
+  virtual_network_name = each.value.subnet.virtual_network_name
+  resource_group_name  = each.value.subnet.resource_group_name
+}
+
 resource "azurerm_lb" "example" {
   name                = var.name
   location            = var.location
   resource_group_name = var.resource_group_name
   sku                 = var.sku
 
-  frontend_ip_configuration {
-    name      = var.frontend_ip_configuration_name
-    subnet_id = var.frontend_ip_configuration_subnet_id
+  dynamic "frontend_ip_configuration" {
+    for_each = var.frontend_ip_configurations
+
+    content {
+      name      = frontend_ip_configuration.value.name
+      subnet_id = data.azurerm_subnet.example[frontend_ip_configurations.key].id
+    }
   }
 }
 

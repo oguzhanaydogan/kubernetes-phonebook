@@ -386,35 +386,35 @@ network_security_groups = {
 
 linux_virtual_machines = {
   ci_cd_agent = {
-    name                                                    = "ci-cd-agent"
-    resource_group                                          = "rg-eastus"
-    size                                                    = "Standard_B1s"
-    delete_data_disks_on_termination                        = true
-    delete_os_disk_on_termination                           = true
+    name                             = "ci-cd-agent"
+    resource_group                   = "rg-eastus"
+    size                             = "Standard_B1s"
+    delete_data_disks_on_termination = true
+    delete_os_disk_on_termination    = true
     identity = {
-      enabled                                        = true
-      type                                           = "SystemAssigned"
+      enabled = true
+      type    = "SystemAssigned"
     }
     storage_image_reference = {
-      publisher                       = "Canonical"
-      offer                           = "UbuntuServer"
-      sku                             = "18.04-LTS"
-      version                         = "latest"
+      publisher = "Canonical"
+      offer     = "UbuntuServer"
+      sku       = "18.04-LTS"
+      version   = "latest"
     }
     storage_os_disk = {
-      caching                                 = "ReadWrite"
-      create_option                           = "FromImage"
-      managed_disk_type                       = "Standard_LRS"
+      caching           = "ReadWrite"
+      create_option     = "FromImage"
+      managed_disk_type = "Standard_LRS"
     }
     os_profile = {
-      admin_username                                          = "azureuser"
-      custom_data                                             = "modules/VirtualMachine/agent.sh"
+      admin_username = "azureuser"
+      custom_data    = "modules/VirtualMachine/agent.sh"
     }
     os_profile_linux_config = {
       disable_password_authentication = true
       ssh_key = {
-        resource_group_name                                 = "ssh-key"
-        name                               = "azure"
+        resource_group_name = "ssh-key"
+        name                = "azure"
       }
     }
     ip_configurations = {
@@ -434,8 +434,8 @@ linux_virtual_machines = {
       }
     }
     network_security_group_association = {
-      enabled = true
-      network_security_group_name = "nsg-ssh"
+      enabled                                    = true
+      network_security_group_name                = "nsg-ssh"
       network_security_group_resource_group_name = "rg-eastus"
     }
   }
@@ -464,16 +464,18 @@ key_vault_secrets = {
 }
 
 mssql_servers = {
-  coyhub-db-us = {
-    resource_group        = "rg-eastus"
+  coyhub_db_us = {
+    name                  = "coyhub-db-us"
+    resource_group        = "rg_eastus"
     administrator_login   = "azureuser"
     admin_password_secret = "key_vault_secret_mssql_password"
     tags = {
       name = "coyhub-db-us"
     }
   }
-  coyhub-db-eu = {
-    resource_group        = "rg-westeurope"
+  coyhub_db_eu = {
+    name = "coyhub-db-eu"
+    resource_group        = "rg_westeurope"
     administrator_login   = "azureuser"
     admin_password_secret = "key_vault_secret_mssql_password"
     tags = {
@@ -485,7 +487,7 @@ mssql_servers = {
 mssql_databases = {
   phonebook_us = {
     name                        = "phonebook"
-    server                      = "coyhub-db-us"
+    server                      = "coyhub_db_us"
     collation                   = "SQL_Latin1_General_CP1_CI_AS"
     max_size_gb                 = 32
     sku_name                    = "GP_S_Gen5_1"
@@ -498,7 +500,7 @@ mssql_databases = {
 
   phonebook_eu = {
     name                        = "phonebook"
-    server                      = "coyhub-db-eu"
+    server                      = "coyhub_db_eu"
     collation                   = "SQL_Latin1_General_CP1_CI_AS"
     max_size_gb                 = 32
     sku_name                    = "GP_S_Gen5_1"
@@ -511,11 +513,20 @@ mssql_databases = {
 }
 
 load_balancers = {
-  phonebook-lb = {
-    resource_group                   = "rg-westeurope"
+  phonebook_lb = {
+    name = "phonebook-lb"
+    resource_group                   = "rg_westeurope"
     sku                              = "Standard"
-    frontend_ip_configuration_name   = "internal"
-    frontend_ip_configuration_subnet = "vnet_app_eu_subnet_lb"
+    frontend_ip_configurations = {
+      configuration_01 = {
+        name = "internal"
+        subnet = {
+          name = "vnet-app-eu-subnet-lb"
+          virtual_network_name = "vnet-app-eu"
+          resource_group_name = "rg-westeurope"
+        }
+      }
+    }
     lb_backend_address_pool_name     = "backend-pool"
     lb_probe_name                    = "probe-http"
     lb_probe_protocol                = "Tcp"

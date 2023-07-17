@@ -114,19 +114,19 @@ module "linux_virtual_machines" {
   source   = "./modules/VirtualMachine"
   for_each = var.linux_virtual_machines
 
-  name                                                    = each.value.name
-  location                                                = module.resource_groups[each.value.resource_group].location
-  resource_group_name                                     = module.resource_groups[each.value.resource_group].name
-  size                                                    = each.value.size
-  delete_os_disk_on_termination                           = each.value.delete_os_disk_on_termination
-  delete_data_disks_on_termination                        = each.value.delete_data_disks_on_termination
-  identity                                        = each.value.identity
-  storage_image_reference                       = each.value.storage_image_reference
-  storage_os_disk                                    = each.value.storage_os_disk
-  os_profile = each.value.os_profile
-  os_profile_linux_config = each.value.os_profile_linux_config
-  ip_configurations                                       = each.value.ip_configurations
-  network_security_group_association              = each.value.network_security_group_association
+  name                               = each.value.name
+  location                           = module.resource_groups[each.value.resource_group].location
+  resource_group_name                = module.resource_groups[each.value.resource_group].name
+  size                               = each.value.size
+  delete_os_disk_on_termination      = each.value.delete_os_disk_on_termination
+  delete_data_disks_on_termination   = each.value.delete_data_disks_on_termination
+  identity                           = each.value.identity
+  storage_image_reference            = each.value.storage_image_reference
+  storage_os_disk                    = each.value.storage_os_disk
+  os_profile                         = each.value.os_profile
+  os_profile_linux_config            = each.value.os_profile_linux_config
+  ip_configurations                  = each.value.ip_configurations
+  network_security_group_association = each.value.network_security_group_association
 }
 
 data "azurerm_key_vault" "example" {
@@ -158,7 +158,7 @@ module "key_vault_secrets" {
 module "mssql_servers" {
   source                       = "./modules/MsSqlServer"
   for_each                     = var.mssql_servers
-  name                         = each.key
+  name                         = each.value.name
   resource_group_name          = module.resource_groups[each.value.resource_group].name
   location                     = module.resource_groups[each.value.resource_group].location
   administrator_login          = each.value.administrator_login
@@ -268,12 +268,11 @@ module "arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu"
 module "load_balancers" {
   source                              = "./modules/LoadBalancer"
   for_each                            = var.load_balancers
-  name                                = each.key
+  name                                = each.value.name
   location                            = module.resource_groups[each.value.resource_group].location
   resource_group_name                 = module.resource_groups[each.value.resource_group].name
   sku                                 = each.value.sku
-  frontend_ip_configuration_name      = each.value.frontend_ip_configuration_name
-  frontend_ip_configuration_subnet_id = module.subnets[each.value.frontend_ip_configuration_subnet].id
+  frontend_ip_configurations = each.value.frontend_ip_configurations
   lb_backend_address_pool_name        = each.value.lb_backend_address_pool_name
   lb_probe_name                       = each.value.lb_probe_name
   lb_probe_protocol                   = each.value.lb_probe_protocol
