@@ -200,6 +200,15 @@ variable "load_balancers" {
 }
 
 variable "private_link_services" {
+  type = map(object({
+     resource_group = string
+    load_balancer  = string
+    nat_ip_configurations = list(object({
+      subnet  = string
+      name    = string
+      primary = bool
+    }))
+  }))
 }
 
 variable "linux_virtual_machine_scale_sets" {

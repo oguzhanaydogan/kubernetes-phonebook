@@ -537,8 +537,8 @@ load_balancers = {
 
 private_link_services = {
   phonebook-lb-pls = {
-    resource_group = "rg-westeurope"
-    load_balancer  = "phonebook-lb"
+    resource_group = "rg_westeurope"
+    load_balancer  = "phonebook_lb"
     nat_ip_configurations = [
       {
         subnet  = "vnet_app_eu_subnet_lb_pls"
@@ -550,26 +550,48 @@ private_link_services = {
 }
 
 linux_virtual_machine_scale_sets = {
-  app-vmss = {
-    ssh_key_rg                       = "ssh-key"
-    ssh_key_name                     = "azure"
-    shared_image_name                = "myimagedefinitongen"
-    shared_image_gallery_name        = "mygallery"
-    shared_image_resource_group_name = "ssh-key"
-    resource_group                   = "rg-westeurope"
+  app_vmss = {
+    admin_ssh_key ={
+      resource_group_name              = "ssh-key"
+      name                     = "azure"
+    }
+    shared_image = {
+      name                = "myimagedefinitongen"
+      gallery_name        = "mygallery"
+      resource_group_name = "ssh-key"
+    }
+    name                             = "app-vmss"
+    resource_group                   = "rg_westeurope"
     sku                              = "Standard_B1s"
     instances                        = 2
     admin_username                   = "azureuser"
-    load_balancer                    = "phonebook-lb"
-    os_disk_storage_account_type     = "Standard_LRS"
-    os_disk_caching                  = "ReadWrite"
-    network_interface_name           = "example"
-    network_interface_primary        = true
-    network_security_group           = "nsg-ssh-and-http"
-    ip_configuration_name            = "internal"
-    ip_configuration_primary         = true
-    ip_configuration_subnet          = "vnet_app_eu_subnet_app"
-    ip_configuration_load_balancer   = "phonebook-lb"
+    upgrade_mode        = "Rolling"
+    os_disk = {
+      os_disk_storage_account_type     = "Standard_LRS"
+      os_disk_caching                  = "ReadWrite"
+    }
+    network_interface = {
+      name           = "example"
+      primary        = true
+      network_security_group = {
+        name = "nsg-ssh-and-http"
+        resource_group_name = "rg-westeurope" 
+      }
+      ip_configurations = {
+        internal = {
+          name            = "internal"
+          primary         = true
+          subnet          = "vnet_app_eu_subnet_app"
+          load_balancer_backend_address_pools  = {
+            phonebook_lb_bapool = {
+              name = "bapool"
+              load_balancer_name = "phonebook-lb"
+              load_balancer_resource_group_name = "rg-westeurope"
+            }
+          }
+        }
+      }  
+    }  
   }
 }
 

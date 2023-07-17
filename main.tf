@@ -318,11 +318,11 @@ module "linux_virtual_machine_scale_sets" {
   os_disk_caching                                         = each.value.os_disk_caching
   network_interface_name                                  = each.value.network_interface_name
   network_interface_primary                               = each.value.network_interface_primary
-  network_security_group_id                               = module.network_security_groups[each.value.network_security_group].id
-  ip_configuration_name                                   = each.value.ip_configuration_name
-  ip_configuration_primary                                = each.value.ip_configuration_primary
-  ip_configuration_subnet_id                              = module.subnets[each.value.ip_configuration_subnet].id
-  ip_configuration_load_balancer_backend_address_pool_ids = [module.load_balancers[each.value.ip_configuration_load_balancer].backend_address_pool_ids]
+  network_security_group_id                               = module.network_security_groups[each.value.network_interface.network_security_group].id
+  ip_configuration_name                                   = each.value.ip_configuration.name
+  ip_configuration_primary                                = each.value.ip_configuration.primary
+  ip_configuration_subnet_id                              = module.subnets[each.value.ip_configuration.subnet].id
+  ip_configuration_load_balancer_backend_address_pool_ids = [module.load_balancers[each.value.ip_configuration.load_balancer].backend_address_pool_ids]
 }
 
 module "bastion_hosts" {

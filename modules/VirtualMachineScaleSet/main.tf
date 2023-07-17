@@ -1,12 +1,45 @@
 data "azurerm_ssh_public_key" "ssh_public_key" {
-  resource_group_name = var.ssh_key_rg
-  name                = var.ssh_key_name
+  resource_group_name = var.admin_ssh_key.resource_group_name
+  name                = var.admin_ssh_key.name
 }
 
 data "azurerm_shared_image" "example" {
-  name                = var.shared_image_name
-  gallery_name        = var.shared_image_gallery_name
-  resource_group_name = var.shared_image_resource_group_name
+  name                = var.shared_image.name
+  gallery_name        = var.shared_image.gallery_name
+  resource_group_name = var.shared_image.resource_group_name
+}
+
+data "azurerm_subnet" "example" {
+  for_each = var.network_interface.ip_configurations
+
+  name                 = each.value.subnet.name
+  virtual_network_name = each.value.subnet.virtual_network_name
+  resource_group_name  = each.value.subnet.resource_group_name
+}
+
+data "azurerm_network_security_group" "example" {
+  name                = var.network_interface.network_security_group.name
+  resource_group_name = var.network_interface.network_security_group.resource_group_name
+}
+
+data "azurerm_lb" "example" {
+  for_each            = var.network_interface.ip_configurations.load_balancer_backend_address_pools
+
+  name                = each.value.load_balancer_name
+  resource_group_name = each.value.load_balancer_resource_group_name
+}
+# locals {
+#   lb_backend_address_pool_ids = {
+#     for k, v in var.network_interface.ip_configurations.load_balancers : k => [
+#       for bap in v.backend_address_pools : data.azurerm_lb_backend_address_pool.example[]
+#     ]
+#   }
+# }
+data "azurerm_lb_backend_address_pool" "example" {
+  for_each = var.network_interface.ip_configurations.load_balancer_backend_address_pools
+
+  name            = each.value.name
+  loadbalancer_id = data.azurerm_lb.example[each.key].id
 }
 
 resource "azurerm_linux_virtual_machine_scale_set" "example" {
@@ -30,15 +63,19 @@ resource "azurerm_linux_virtual_machine_scale_set" "example" {
   }
 
   network_interface {
-    name                      = var.network_interface_name
-    primary                   = var.network_interface_primary
-    network_security_group_id = var.network_security_group_id
+    name                      = var.network_interface.name
+    primary                   = var.network_interface.primary
+    network_security_group_id = data.azurerm_network_security_group.example.id
 
-    ip_configuration {
-      name                                   = var.ip_configuration_name
-      primary                                = var.ip_configuration_primary
-      subnet_id                              = var.ip_configuration_subnet_id
-      load_balancer_backend_address_pool_ids = var.ip_configuration_load_balancer_backend_address_pool_ids
+    dynamic "ip_configuration" {
+      for_each = var.network_interface.ip_configurations
+
+      content {
+        name                                   = ip_configuration.value.name
+        primary                                = ip_configuration.value.primary
+        subnet_id                              = data.azurerm_shared_image.example[ip_configuration.key].id
+        load_balancer_backend_address_pool_ids = data.azurerm_lb_backend_address_pool.example[*].id
+      }
     }
   }
   rolling_upgrade_policy {
