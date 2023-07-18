@@ -81,15 +81,15 @@ variable "network_security_groups" {
 
 variable "linux_virtual_machines" {
   type = map(object({
-    name                             = string
-    resource_group                   = string
+    name           = string
+    resource_group = string
     network_interface = object({
       ip_configurations = map(object({
         name = string
         subnet = object({
-          name = string
+          name                 = string
           virtual_network_name = string
-          resource_group_name = string
+          resource_group_name  = string
         })
         private_ip_address_allocation = string
         public_ip_assigned            = bool
@@ -204,7 +204,7 @@ variable "load_balancers" {
     lb_rules = map(object({
       name                           = string
       probe                          = string
-      backend_address_pools     = list(string)
+      backend_address_pools          = list(string)
       frontend_ip_configuration_name = string
       protocol                       = string
       frontend_port                  = string
@@ -215,7 +215,7 @@ variable "load_balancers" {
 
 variable "private_link_services" {
   type = map(object({
-    name = string
+    name           = string
     resource_group = string
     load_balancer  = string
     nat_ip_configurations = list(object({
@@ -238,9 +238,9 @@ variable "linux_virtual_machine_scale_sets" {
       gallery_name        = string
       resource_group_name = string
     })
-    upgrade_mode               = string
+    upgrade_mode = string
     health_probe = object({
-      name = string
+      name          = string
       load_balancer = string
     })
     admin_ssh_key = object({

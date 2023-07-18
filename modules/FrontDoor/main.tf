@@ -43,7 +43,7 @@ locals {
     for k, v in var.origins : v.host.name => {
       name                = v.host.name
       resource_group_name = v.host.resource_group_name
-    } if !v.host.pls_enabled && v.host.type == "Microsoft.Network/loadBalancers"
+    } if v.host.pls_enabled && v.host.type == "Microsoft.Network/loadBalancers"
   }
   private_link_services = {
     for k, v in var.origins : v.private_link.target.name => {
@@ -107,7 +107,8 @@ resource "azurerm_cdn_frontdoor_origin" "cdn_frontdoor_origins" {
   host_name = coalesce(
     try(data.azurerm_lb.load_balancers[each.value.host.name].private_ip_address, ""),
     try(data.azurerm_storage_blob.storage_blobs[each.value.host.name].url, ""),
-    try(data.azurerm_linux_web_app.app_services[each.value.host.name].default_hostname, "")
+    try(data.azurerm_linux_web_app.app_services[each.value.host.name].default_hostname, ""),
+    "Coalesce could not find any non empty result!"
   )
   http_port  = each.value.http_port
   https_port = each.value.https_port
@@ -124,7 +125,8 @@ resource "azurerm_cdn_frontdoor_origin" "cdn_frontdoor_origins" {
         try(data.azurerm_private_link_service.private_link_services[each.value.private_link.target.name].id, ""),
         try(data.azurerm_lb.load_balancers[each.value.private_link.target.name].id, ""),
         try(data.azurerm_storage_blob.storage_blobs[each.value.private_link.target.name].id, ""),
-        try(data.azurerm_linux_web_app.app_services[each.value.private_link.target.name].id, "")
+        try(data.azurerm_linux_web_app.app_services[each.value.private_link.target.name].id, ""),
+        "Coalesce could not find any non empty result!"
       )
     }
   }

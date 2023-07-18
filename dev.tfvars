@@ -297,7 +297,7 @@ route_tables = {
     }
     subnet_associations = {
       vnet_acr_subnet_acr = {
-        subnet_name          = "vnet_acr_subnet_acr"
+        subnet_name          = "subnet-acr"
         resource_group_name  = "rg-eastus"
         virtual_network_name = "vnet-acr"
       }
@@ -318,7 +318,7 @@ route_tables = {
 public_ip_addresses = {
   hub_firewall_management = {
     name              = "hub-firewall-management"
-    allocation_method = "Dynamic"
+    allocation_method = "Static"
     sku               = "Standard"
     resource_group    = "rg_eastus"
   }
@@ -330,7 +330,7 @@ public_ip_addresses = {
   }
   bastion_host_eu = {
     name              = "bastion-host-eu"
-    allocation_method = "Dynamic"
+    allocation_method = "Static"
     sku               = "Standard"
     resource_group    = "rg_westeurope"
   }
@@ -386,8 +386,8 @@ network_security_groups = {
 
 linux_virtual_machines = {
   ci_cd_agent = {
-    name                             = "ci-cd-agent"
-    resource_group                   = "rg_eastus"
+    name           = "ci-cd-agent"
+    resource_group = "rg_eastus"
     network_interface = {
       ip_configurations = {
         ipConfiguration1 = {
@@ -437,7 +437,7 @@ linux_virtual_machines = {
     }
     network_security_group_association = {
       enabled                                    = true
-      network_security_group_name                = "nsg-ssh"
+      network_security_group_name                = "ssh"
       network_security_group_resource_group_name = "rg-eastus"
     }
   }
@@ -523,7 +523,7 @@ load_balancers = {
       internal = {
         name = "internal"
         subnet = {
-          name                 = "vnet-app-eu-subnet-lb"
+          name                 = "subnet-lb"
           virtual_network_name = "vnet-app-eu"
           resource_group_name  = "rg-westeurope"
         }
@@ -545,7 +545,7 @@ load_balancers = {
       http = {
         name                           = "http"
         probe                          = "http"
-        backend_address_pools     = ["backend_pool"]
+        backend_address_pools          = ["backend_pool"]
         frontend_ip_configuration_name = "internal"
         protocol                       = "Tcp"
         frontend_port                  = "80"
@@ -582,10 +582,10 @@ linux_virtual_machine_scale_sets = {
       gallery_name        = "mygallery"
       resource_group_name = "ssh-key"
     }
-    upgrade_mode               = "Rolling"
+    upgrade_mode = "Rolling"
     health_probe = {
       load_balancer = "phonebook_lb"
-      name = "http"
+      name          = "http"
     }
     admin_ssh_key = {
       resource_group_name = "ssh-key"
@@ -599,7 +599,7 @@ linux_virtual_machine_scale_sets = {
       name    = "example"
       primary = true
       network_security_group = {
-        name                = "nsg-ssh-and-http"
+        name                = "ssh-and-http"
         resource_group_name = "rg-westeurope"
       }
       ip_configurations = {
@@ -612,10 +612,10 @@ linux_virtual_machine_scale_sets = {
             resource_group_name  = "rg-westeurope"
           }
           load_balancer_backend_address_pools = {
-            phonebook_lb_bapool = {
-              name                              = "bapool"
-              load_balancer_name                = "phonebook-lb"
-              resource_group_name = "rg-westeurope"
+            phonebook_lb_backend_pool = {
+              name                = "backend-pool"
+              load_balancer_name  = "phonebook-lb"
+              load_balancer_resource_group_name = "rg-westeurope"
             }
           }
         }
@@ -638,12 +638,12 @@ bastion_hosts = {
       ipConfiguration1 = {
         name = "ipConfiguration1"
         subnet = {
-          name                 = "subnet-bastion"
+          name                 = "AzureBastionSubnet"
           virtual_network_name = "vnet-app-eu"
           resource_group_name  = "rg-westeurope"
         }
         public_ip_address = {
-          name                = "public-ip-bastion-eu"
+          name                = "bastion-host-eu"
           resource_group_name = "rg-westeurope"
         }
       }

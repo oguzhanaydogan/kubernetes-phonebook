@@ -41,10 +41,10 @@ resource "azurerm_lb_probe" "lb_probes" {
 resource "azurerm_lb_rule" "lb_rules" {
   for_each = var.lb_rules
 
-  name                           = each.value.name
-  loadbalancer_id                = azurerm_lb.lb.id
-  probe_id                       = azurerm_lb_probe.lb_probes[each.value.probe].id
-  backend_address_pool_ids       = [
+  name            = each.value.name
+  loadbalancer_id = azurerm_lb.lb.id
+  probe_id        = azurerm_lb_probe.lb_probes[each.value.probe].id
+  backend_address_pool_ids = [
     for pool in each.value.backend_address_pools : azurerm_lb_backend_address_pool.lb_backend_address_pools[pool].id
   ]
   frontend_ip_configuration_name = each.value.frontend_ip_configuration_name

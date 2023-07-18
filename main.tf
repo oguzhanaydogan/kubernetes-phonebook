@@ -127,7 +127,10 @@ module "linux_virtual_machines" {
   os_profile                         = each.value.os_profile
   os_profile_linux_config            = each.value.os_profile_linux_config
   network_security_group_association = each.value.network_security_group_association
-  depends_on = [ module.network_security_groups ]
+  depends_on                         = [
+    module.network_security_groups,
+    module.subnets
+  ]
 }
 
 data "azurerm_key_vault" "example" {
@@ -282,7 +285,7 @@ module "load_balancers" {
   lb_backend_address_pools   = each.value.lb_backend_address_pools
   lb_probes                  = each.value.lb_probes
   lb_rules                   = each.value.lb_rules
-  depends_on = [ module.subnets ]
+  depends_on                 = [module.subnets]
 }
 
 module "private_link_services" {
@@ -335,7 +338,7 @@ module "bastion_hosts" {
   resource_group_name = module.resource_groups[each.value.resource_group].name
   location            = module.resource_groups[each.value.resource_group].location
   ip_configurations   = each.value.ip_configurations
-  depends_on = [ module.public_ip_addresses,module.subnets ]    
+  depends_on          = [module.public_ip_addresses, module.subnets]
 }
 
 module "private_dns_zones" {
