@@ -12,7 +12,7 @@ data "azurerm_subnet" "subnets" {
 }
 
 data "azurerm_public_ip" "public_ip_addresses" {
-  for_each = var.ip_configurations
+  for_each = var.network_interface.ip_configurations
 
   name                = each.value.public_ip_address.name
   resource_group_name = each.value.public_ip_address.resource_group_name
@@ -22,7 +22,7 @@ resource "azurerm_network_interface" "network_interface" {
   name                = "${var.name}-network_interface"
   location            = var.location
   resource_group_name = var.resource_group_name
-    dynamic "ip_configuration" {
+  dynamic "ip_configuration" {
     for_each = var.network_interface.ip_configurations
 
     content {

@@ -1,5 +1,5 @@
 resource "azurerm_private_link_service" "example" {
-  name                = var.link_name
+  name                = var.name
   resource_group_name = var.resource_group_name
   location            = var.location
 

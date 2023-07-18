@@ -545,7 +545,7 @@ load_balancers = {
       http = {
         name                           = "http"
         probe                          = "http"
-        backend_address_pool_names     = ["backend-pool"]
+        backend_address_pools     = ["backend_pool"]
         frontend_ip_configuration_name = "internal"
         protocol                       = "Tcp"
         frontend_port                  = "80"
@@ -557,7 +557,7 @@ load_balancers = {
 
 private_link_services = {
   phonebook_lb_pls = {
-    link_name           = "phonebook-lb-pls"
+    name           = "phonebook-lb-pls"
     resource_group = "rg_westeurope"
     load_balancer  = "phonebook_lb"
     nat_ip_configurations = [

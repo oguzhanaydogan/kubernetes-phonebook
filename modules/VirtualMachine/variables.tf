@@ -34,8 +34,5 @@ variable "os_profile" {
 variable "os_profile_linux_config" {
 }
 
-variable "ip_configurations" {
-}
-
 variable "network_security_group_association" {
 }

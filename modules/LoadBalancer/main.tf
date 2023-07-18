@@ -22,7 +22,7 @@ resource "azurerm_lb" "lb" {
   }
 }
 
-resource "azurerm_lb_backend_address_pool" "bapools" {
+resource "azurerm_lb_backend_address_pool" "lb_backend_address_pools" {
   for_each = var.lb_backend_address_pools
 
   loadbalancer_id = azurerm_lb.lb.id
@@ -38,26 +38,21 @@ resource "azurerm_lb_probe" "lb_probes" {
   port            = each.value.port
 }
 
-data "azurerm_lb_backend_address_pool" "lb_backend_address_pools" {
-  for_each = toset(var.lb_rules.backend_address_pool_names)
-
-  name            = each.value
-  loadbalancer_id = azurerm_lb.lb.id
-}
-
 resource "azurerm_lb_rule" "lb_rules" {
   for_each = var.lb_rules
 
   name                           = each.value.name
   loadbalancer_id                = azurerm_lb.lb.id
   probe_id                       = azurerm_lb_probe.lb_probes[each.value.probe].id
-  backend_address_pool_ids       = [data.azurerm_lb_backend_address_pool.lb_backend_address_pools[*].id]
+  backend_address_pool_ids       = [
+    for pool in each.value.backend_address_pools : azurerm_lb_backend_address_pool.lb_backend_address_pools[pool].id
+  ]
   frontend_ip_configuration_name = each.value.frontend_ip_configuration_name
   protocol                       = each.value.protocol
   frontend_port                  = each.value.frontend_port
   backend_port                   = each.value.backend_port
 
   depends_on = [
-    azurerm_lb_backend_address_pool.bapools
+    azurerm_lb_backend_address_pool.lb_backend_address_pools
   ]
 }

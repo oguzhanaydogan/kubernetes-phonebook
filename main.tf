@@ -117,7 +117,7 @@ module "linux_virtual_machines" {
   name                               = each.value.name
   location                           = module.resource_groups[each.value.resource_group].location
   resource_group_name                = module.resource_groups[each.value.resource_group].name
-  network_interface = each.value.network_interface
+  network_interface                  = each.value.network_interface
   size                               = each.value.size
   delete_os_disk_on_termination      = each.value.delete_os_disk_on_termination
   delete_data_disks_on_termination   = each.value.delete_data_disks_on_termination
@@ -126,7 +126,6 @@ module "linux_virtual_machines" {
   storage_os_disk                    = each.value.storage_os_disk
   os_profile                         = each.value.os_profile
   os_profile_linux_config            = each.value.os_profile_linux_config
-  ip_configurations                  = each.value.network_interface.ip_configurations
   network_security_group_association = each.value.network_security_group_association
 }
 
@@ -289,7 +288,7 @@ module "private_link_services" {
   source   = "./modules/PrivateLinkService"
   for_each = var.private_link_services
 
-  link_name                                   = each.value.link_name
+  name                                        = each.value.name
   resource_group_name                         = module.resource_groups[each.value.resource_group].name
   location                                    = module.resource_groups[each.value.resource_group].location
   auto_approval_subscription_ids              = [data.azurerm_client_config.current.subscription_id]

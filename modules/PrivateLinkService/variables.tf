@@ -1,4 +1,4 @@
-variable "link_name" {
+variable "name" {
 }
 
 variable "resource_group_name" {

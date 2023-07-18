@@ -84,7 +84,7 @@ variable "linux_virtual_machines" {
     name                             = string
     resource_group                   = string
     network_interface = object({
-      ip_configuration = object({
+      ip_configurations = map(object({
         name = string
         subnet = object({
           name = string
@@ -97,7 +97,7 @@ variable "linux_virtual_machines" {
           name                = string
           resource_group_name = string
         })
-      })
+      }))
     })
     size                             = string
     delete_data_disks_on_termination = bool
@@ -204,7 +204,7 @@ variable "load_balancers" {
     lb_rules = map(object({
       name                           = string
       probe                          = string
-      backend_address_pool_names     = list(string)
+      backend_address_pools     = list(string)
       frontend_ip_configuration_name = string
       protocol                       = string
       frontend_port                  = string
