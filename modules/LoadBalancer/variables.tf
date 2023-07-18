@@ -7,23 +7,17 @@ variable "location" {
 variable "resource_group_name" {
 }
 
+variable "sku" {
+}
+
 variable "frontend_ip_configurations" {
 }
 
-variable "lb_backend_address_pool_name" {
+variable "lb_backend_address_pools" {
 }
 
-variable "lb_probe_name" {
+variable "lb_probes" {
 }
 
-variable "lb_probe_protocol" {
-}
-
-variable "lb_probe_port" {
-}
-
-variable "lb_rule_name" {
-}
-
-variable "sku" {
+variable "lb_rules" {
 }

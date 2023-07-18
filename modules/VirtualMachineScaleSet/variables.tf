@@ -1,18 +1,3 @@
-variable "ssh_key_rg" {
-}
-
-variable "ssh_key_name" {
-}
-
-variable "shared_image_name" {
-}
-
-variable "shared_image_gallery_name" {
-}
-
-variable "shared_image_resource_group_name" {
-}
-
 variable "name" {
 }
 
@@ -31,15 +16,23 @@ variable "instances" {
 variable "admin_username" {
 }
 
+variable "shared_image" {
+}
+
+variable "upgrade_mode" {
+}
+
 variable "health_probe_id" {
 }
 
-variable "os_disk_storage_account_type" {
+variable "admin_ssh_key" {
 }
 
-variable "os_disk_caching" {
+variable "os_disk" {
 }
 
 variable "network_interface" {
 }
 
+variable "rolling_upgrade_policy" {
+}

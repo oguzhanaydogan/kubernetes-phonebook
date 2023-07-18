@@ -1,4 +1,4 @@
-data "azurerm_subnet" "example" {
+data "azurerm_subnet" "subnets" {
   for_each = var.frontend_ip_configurations
 
   name                 = each.value.subnet.name
@@ -6,10 +6,10 @@ data "azurerm_subnet" "example" {
   resource_group_name  = each.value.subnet.resource_group_name
 }
 
-resource "azurerm_lb" "example" {
+resource "azurerm_lb" "lb" {
   name                = var.name
-  location            = var.location
   resource_group_name = var.resource_group_name
+  location            = var.location
   sku                 = var.sku
 
   dynamic "frontend_ip_configuration" {
@@ -17,30 +17,47 @@ resource "azurerm_lb" "example" {
 
     content {
       name      = frontend_ip_configuration.value.name
-      subnet_id = data.azurerm_subnet.example[frontend_ip_configurations.key].id
+      subnet_id = data.azurerm_subnet.subnets[frontend_ip_configuration.key].id
     }
   }
 }
 
-resource "azurerm_lb_backend_address_pool" "bpepool" {
-  loadbalancer_id = azurerm_lb.example.id
-  name            = var.lb_backend_address_pool_name
+resource "azurerm_lb_backend_address_pool" "bapools" {
+  for_each = var.lb_backend_address_pools
+
+  loadbalancer_id = azurerm_lb.lb.id
+  name            = each.value.name
 }
 
-resource "azurerm_lb_probe" "example" {
-  loadbalancer_id = azurerm_lb.example.id
-  name            = var.lb_probe_name
-  protocol        = var.lb_probe_protocol
-  port            = var.lb_probe_port
+resource "azurerm_lb_probe" "lb_probes" {
+  for_each = var.lb_probes
+
+  loadbalancer_id = azurerm_lb.lb.id
+  name            = each.value.name
+  protocol        = each.value.protocol
+  port            = each.value.port
 }
 
-resource "azurerm_lb_rule" "main" {
-  name                           = var.lb_rule_name
-  loadbalancer_id                = azurerm_lb.example.id
-  probe_id                       = azurerm_lb_probe.example.id
-  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.bpepool.id]
-  frontend_ip_configuration_name = var.frontend_ip_configuration_name
-  protocol                       = var.lb_probe_protocol
-  frontend_port                  = var.lb_probe_port
-  backend_port                   = var.lb_probe_port
+data "azurerm_lb_backend_address_pool" "lb_backend_address_pools" {
+  for_each = toset(var.lb_rules.backend_address_pool_names)
+
+  name            = each.value
+  loadbalancer_id = data.azurerm_lb.lb.id
+}
+
+resource "azurerm_lb_rule" "lb_rules" {
+  for_each = var.lb_rules
+
+  name                           = each.value.name
+  loadbalancer_id                = azurerm_lb.lb.id
+  probe_id                       = azurerm_lb_probe.lb_probes[each.value.probe].id
+  backend_address_pool_ids       = [data.azurerm_lb_backend_address_pool.lb_backend_address_pools[*].id]
+  frontend_ip_configuration_name = each.value.frontend_ip_configuration_name
+  protocol                       = each.value.protocol
+  frontend_port                  = each.value.frontend_port
+  backend_port                   = each.value.backend_port
+
+  depends_on = [
+    azurerm_lb_backend_address_pool.bapools
+  ]
 }

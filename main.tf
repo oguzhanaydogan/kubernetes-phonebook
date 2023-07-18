@@ -137,8 +137,9 @@ data "azurerm_key_vault" "example" {
 data "azurerm_client_config" "current" {}
 
 module "key_vault_access_policies" {
-  source                        = "./modules/KeyVaultAccessPolicy"
-  for_each                      = var.key_vault_access_policies
+  source   = "./modules/KeyVaultAccessPolicy"
+  for_each = var.key_vault_access_policies
+
   key_vault_name                = each.value.key_vault_name
   key_vault_resource_group_name = each.value.key_vault_resource_group_name
   key_permissions               = each.value.key_permissions
@@ -147,8 +148,9 @@ module "key_vault_access_policies" {
 }
 
 module "key_vault_secrets" {
-  source                        = "./modules/KeyVaultSecret"
-  for_each                      = var.key_vault_secrets
+  source   = "./modules/KeyVaultSecret"
+  for_each = var.key_vault_secrets
+
   key_vault_name                = each.value.key_vault_name
   key_vault_resource_group_name = each.value.key_vault_resource_group_name
   secret_name                   = each.value.secret_name
@@ -156,8 +158,9 @@ module "key_vault_secrets" {
 }
 
 module "mssql_servers" {
-  source                       = "./modules/MsSqlServer"
-  for_each                     = var.mssql_servers
+  source   = "./modules/MsSqlServer"
+  for_each = var.mssql_servers
+
   name                         = each.value.name
   resource_group_name          = module.resource_groups[each.value.resource_group].name
   location                     = module.resource_groups[each.value.resource_group].location
@@ -167,8 +170,9 @@ module "mssql_servers" {
 }
 
 module "mssql_databases" {
-  source                      = "./modules/MsSqlDatabase"
-  for_each                    = var.mssql_databases
+  source   = "./modules/MsSqlDatabase"
+  for_each = var.mssql_databases
+
   name                        = each.value.name
   server_id                   = module.mssql_servers[each.value.server].id
   collation                   = each.value.collation
@@ -266,24 +270,24 @@ module "arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu"
 # }
 
 module "load_balancers" {
-  source                              = "./modules/LoadBalancer"
-  for_each                            = var.load_balancers
-  name                                = each.value.name
-  location                            = module.resource_groups[each.value.resource_group].location
-  resource_group_name                 = module.resource_groups[each.value.resource_group].name
-  sku                                 = each.value.sku
+  source   = "./modules/LoadBalancer"
+  for_each = var.load_balancers
+
+  name                       = each.value.name
+  location                   = module.resource_groups[each.value.resource_group].location
+  resource_group_name        = module.resource_groups[each.value.resource_group].name
+  sku                        = each.value.sku
   frontend_ip_configurations = each.value.frontend_ip_configurations
-  lb_backend_address_pool_name        = each.value.lb_backend_address_pool_name
-  lb_probe_name                       = each.value.lb_probe_name
-  lb_probe_protocol                   = each.value.lb_probe_protocol
-  lb_probe_port                       = each.value.lb_probe_port
-  lb_rule_name                        = each.value.lb_rule_name
+  lb_backend_address_pools   = each.value.lb_backend_address_pools
+  lb_probes                  = each.value.lb_probes
+  lb_rules                   = each.value.lb_rules
 }
 
 module "private_link_services" {
-  source                                      = "./modules/PrivateLinkService"
-  for_each                                    = var.private_link_services
-  link_name                                   = each.key
+  source   = "./modules/PrivateLinkService"
+  for_each = var.private_link_services
+
+  link_name                                   = each.value.name
   resource_group_name                         = module.resource_groups[each.value.resource_group].name
   location                                    = module.resource_groups[each.value.resource_group].location
   auto_approval_subscription_ids              = [data.azurerm_client_config.current.subscription_id]
@@ -299,76 +303,74 @@ module "private_link_services" {
 }
 
 module "linux_virtual_machine_scale_sets" {
-  source                                                  = "./modules/VirtualMachineScaleSet"
-  for_each                                                = var.linux_virtual_machine_scale_sets
-  ssh_key_rg                                              = each.value.ssh_key_rg
-  ssh_key_name                                            = each.value.ssh_key_name
-  shared_image_name                                       = each.value.shared_image_name
-  shared_image_gallery_name                               = each.value.shared_image_gallery_name
-  shared_image_resource_group_name                        = each.value.shared_image_resource_group_name
-  depends_on                                              = [module.load_balancers]
-  name                                                    = each.key
-  resource_group_name                                     = module.resource_groups[each.value.resource_group].name
-  location                                                = module.resource_groups[each.value.resource_group].location
-  sku                                                     = each.value.sku
-  instances                                               = each.value.instances
-  admin_username                                          = each.value.admin_username
-  health_probe_id                                         = module.load_balancers[each.value.load_balancer].health_probe_id
-  os_disk_storage_account_type                            = each.value.os_disk_storage_account_type
-  os_disk_caching                                         = each.value.os_disk_caching
-  network_interface_name                                  = each.value.network_interface_name
-  network_interface_primary                               = each.value.network_interface_primary
-  network_security_group_id                               = module.network_security_groups[each.value.network_interface.network_security_group].id
-  ip_configuration_name                                   = each.value.ip_configuration.name
-  ip_configuration_primary                                = each.value.ip_configuration.primary
-  ip_configuration_subnet_id                              = module.subnets[each.value.ip_configuration.subnet].id
-  ip_configuration_load_balancer_backend_address_pool_ids = [module.load_balancers[each.value.ip_configuration.load_balancer].backend_address_pool_ids]
+  source   = "./modules/VirtualMachineScaleSet"
+  for_each = var.linux_virtual_machine_scale_sets
+
+  name                   = each.value.name
+  resource_group_name    = module.resource_groups[each.value.resource_group].name
+  location               = module.resource_groups[each.value.resource_group].location
+  sku                    = each.value.sku
+  instances              = each.value.instances
+  admin_username         = each.value.admin_username
+  shared_image           = each.value.shared_image
+  upgrade_mode           = each.value.upgrade_mode
+  health_probe_id        = module.load_balancers[each.value.health_probe_load_balancer].health_probe_id
+  admin_ssh_key          = each.value.admin_ssh_key
+  os_disk                = each.value.os_disk
+  network_interface      = each.value.network_interface
+  rolling_upgrade_policy = try(each.value.rolling_upgrade_policy, [])
+
+  depends_on = [
+    module.load_balancers
+  ]
 }
 
 module "bastion_hosts" {
-  source               = "./modules/BastionHost"
-  for_each             = var.bastion_hosts
-  name                 = each.key
-  resource_group_name  = module.resource_groups[each.value.resource_group].name
-  location             = module.resource_groups[each.value.resource_group].location
-  subnet_id            = module.subnets[each.value.subnet].id
-  public_ip_address_id = module.public_ip_addresses[each.value.public_ip_address].id
+  source   = "./modules/BastionHost"
+  for_each = var.bastion_hosts
+
+  name                = each.value.name
+  resource_group_name = module.resource_groups[each.value.resource_group].name
+  location            = module.resource_groups[each.value.resource_group].location
+  ip_configurations   = each.value.ip_configurations
 }
 
 module "private_dns_zones" {
-  source                = "./modules/PrivateDnsZone"
-  for_each              = var.private_dns_zones
+  source   = "./modules/PrivateDnsZone"
+  for_each = var.private_dns_zones
+
   name                  = each.value.name
   resource_group_name   = module.resource_groups[each.value.resource_group].name
   virtual_network_links = each.value.virtual_network_links
+
   depends_on = [
     module.virtual_networks
   ]
 }
 
 module "private_endpoints" {
-  source                          = "./modules/PrivateEndpoint"
-  for_each                        = var.private_endpoints
-  resource_group_name             = module.resource_groups[each.value.resource_group].name
-  location                        = module.resource_groups[each.value.resource_group].location
-  attached_resource_type          = each.value.attached_resource_type
-  attached_resource_required_tags = each.value.attached_resource_required_tags
-  attached_resource_name          = each.value.attached_resource
-  is_manual_connection            = each.value.is_manual_connection
-  subnet_id                       = module.subnets[each.value.subnet].id
+  source   = "./modules/PrivateEndpoint"
+  for_each = var.private_endpoints
+
+  attached_resource          = each.value.attached_resource
+  resource_group_name        = module.resource_groups[each.value.resource_group].name
+  location                   = module.resource_groups[each.value.resource_group].location
+  subnet_id                  = module.subnets[each.value.subnet].id
+  private_service_connection = each.value.private_service_connection
   private_dns_zone_ids = [
-    for private_dns_zone in each.value.private_dns_zones :
+    for private_dns_zone in each.value.private_dns_zone_group.private_dns_zones :
     module.private_dns_zones[private_dns_zone].id
   ]
-  subresource_names = each.value.subresource_names
+
   depends_on = [
     module.mssql_servers
   ]
 }
 
 module "front_doors" {
-  source              = "./modules/FrontDoor"
-  for_each            = var.front_doors
+  source   = "./modules/FrontDoor"
+  for_each = var.front_doors
+
   name                = each.value.name
   resource_group_name = module.resource_groups[each.value.resource_group].name
   sku_name            = each.value.sku_name
@@ -378,6 +380,7 @@ module "front_doors" {
   routes              = each.value.routes
   # rule_sets = each.value.rule_sets
   # rules = each.value.rules
+
   depends_on = [
     module.load_balancers,
     module.private_link_services
