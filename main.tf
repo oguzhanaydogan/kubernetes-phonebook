@@ -189,56 +189,56 @@ module "mssql_databases" {
   zone_redundant              = each.value.zone_redundant
 }
 
-module "azapi_create_phonebook_sync_group" {
-  source    = "./modules/AzApi"
-  name      = "phonebook-sync-group"
-  type      = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
-  parent_id = module.mssql_databases["phonebook_us"].id
-  body = {
-    properties = {
-      conflictResolutionPolicy = "HubWin"
-      hubDatabasePassword      = "Test1234."
-      hubDatabaseUserName      = "azureuser"
-      interval                 = 60
-      syncDatabaseId           = "${module.mssql_databases["phonebook_us"].id}"
-      usePrivateLinkConnection = false
-    }
-  }
-}
+# module "azapi_create_phonebook_sync_group" {
+#   source    = "./modules/AzApi"
+#   name      = "phonebook-sync-group"
+#   type      = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
+#   parent_id = module.mssql_databases["phonebook_us"].id
+#   body = {
+#     properties = {
+#       conflictResolutionPolicy = "HubWin"
+#       hubDatabasePassword      = "Test1234."
+#       hubDatabaseUserName      = "azureuser"
+#       interval                 = 60
+#       syncDatabaseId           = "${module.mssql_databases["phonebook_us"].id}"
+#       usePrivateLinkConnection = false
+#     }
+#   }
+# }
 
-module "arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu" {
-  source              = "./modules/ArmTemplateDeployment"
-  name                = "create-phonebook-sync-group-member-phonebook-eu"
-  resource_group_name = module.resource_groups["rg_eastus"].name
-  deployment_mode     = "Incremental"
-  depends_on          = [module.azapi_create_phonebook_sync_group]
-  template_content    = <<TEMPLATE
-  {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {},
-    "variables": {},
-    "resources": [
-      {
-        "type": "Microsoft.Sql/servers/databases/syncGroups/syncMembers",
-        "apiVersion": "2022-05-01-preview",
-        "name": "coyhub-db-us/phonebook/phonebook-sync-group/coyhub-db-eu",
-        "properties": {
-          "databaseName": "phonebook",
-          "databaseType": "AzureSqlDatabase",
-          "userName": "azureuser",
-          "password": "Test1234.",
-          "serverName": "coyhub-db-eu.database.windows.net",
-          "syncDirection": "Bidirectional",
-          "syncMemberAzureDatabaseResourceId": "${module.mssql_databases["phonebook_eu"].id}",
-          "usePrivateLinkConnection": false
-        }
-      }
-    ]
-  }
-  TEMPLATE
-}
-
+# module "arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu" {
+#   source              = "./modules/ArmTemplateDeployment"
+#   name                = "create-phonebook-sync-group-member-phonebook-eu"
+#   resource_group_name = module.resource_groups["rg_eastus"].name
+#   deployment_mode     = "Incremental"
+#   depends_on          = [module.azapi_create_phonebook_sync_group]
+#   template_content    = <<TEMPLATE
+#   {
+#     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+#     "contentVersion": "1.0.0.0",
+#     "parameters": {},
+#     "variables": {},
+#     "resources": [
+#       {
+#         "type": "Microsoft.Sql/servers/databases/syncGroups/syncMembers",
+#         "apiVersion": "2022-05-01-preview",
+#         "name": "coyhub-db-us/phonebook/phonebook-sync-group/coyhub-db-eu",
+#         "properties": {
+#           "databaseName": "phonebook",
+#           "databaseType": "AzureSqlDatabase",
+#           "userName": "azureuser",
+#           "password": "Test1234.",
+#           "serverName": "coyhub-db-eu.database.windows.net",
+#           "syncDirection": "Bidirectional",
+#           "syncMemberAzureDatabaseResourceId": "${module.mssql_databases["phonebook_eu"].id}",
+#           "usePrivateLinkConnection": false
+#         }
+#       }
+#     ]
+#   }
+#   TEMPLATE
+# }
+# 
 # module "azapi_update_phonebook_sync_group" {
 #   source      = "./modules/AzApiUpdate"
 #   type        = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"

@@ -475,15 +475,15 @@ mssql_servers = {
       name = "coyhub-db-us"
     }
   }
-  coyhub_db_eu = {
-    name                  = "coyhub-db-eu"
-    resource_group        = "rg_westeurope"
-    administrator_login   = "azureuser"
-    admin_password_secret = "key_vault_secret_mssql_password"
-    tags = {
-      name = "coyhub-db-eu"
-    }
-  }
+  # coyhub_db_eu = {
+  #   name                  = "coyhub-db-eu"
+  #   resource_group        = "rg_westeurope"
+  #   administrator_login   = "azureuser"
+  #   admin_password_secret = "key_vault_secret_mssql_password"
+  #   tags = {
+  #     name = "coyhub-db-eu"
+  #   }
+  # }
 }
 
 mssql_databases = {
@@ -500,18 +500,18 @@ mssql_databases = {
     zone_redundant              = false
   }
 
-  phonebook_eu = {
-    name                        = "phonebook"
-    server                      = "coyhub_db_eu"
-    collation                   = "SQL_Latin1_General_CP1_CI_AS"
-    max_size_gb                 = 32
-    sku_name                    = "GP_S_Gen5_1"
-    min_capacity                = 0.5
-    auto_pause_delay_in_minutes = 60
-    read_replica_count          = 0
-    read_scale                  = false
-    zone_redundant              = false
-  }
+  # phonebook_eu = {
+  #   name                        = "phonebook"
+  #   server                      = "coyhub_db_eu"
+  #   collation                   = "SQL_Latin1_General_CP1_CI_AS"
+  #   max_size_gb                 = 32
+  #   sku_name                    = "GP_S_Gen5_1"
+  #   min_capacity                = 0.5
+  #   auto_pause_delay_in_minutes = 60
+  #   read_replica_count          = 0
+  #   read_scale                  = false
+  #   zone_redundant              = false
+  # }
 }
 
 load_balancers = {
@@ -728,98 +728,98 @@ private_endpoints = {
 }
 
 front_doors = {
-  phonebook = {
-    name           = "phonebook"
-    resource_group = "rg_eastus"
-    sku_name       = "Premium_AzureFrontDoor"
-    endpoints      = ["phonebook"]
-    origin_groups = {
-      phonebook_origin_group = {
-        name                                                      = "phonebook-origin-group"
-        session_affinity_enabled                                  = false
-        restore_traffic_time_to_healed_or_new_endpoint_in_minutes = 10
-        health_probes = {
-          health_probe_http = {
-            interval_in_seconds = 240
-            path                = "/"
-            protocol            = "Http"
-            request_type        = "GET"
-          }
-        }
-        load_balancing = {
-          additional_latency_in_milliseconds = 0
-          sample_size                        = 16
-          successful_samples_required        = 3
-        }
-      }
-    }
-    origins = {
-      phonebook_eu = {
-        name                           = "phonebook-eu"
-        cdn_frontdoor_origin_group     = "phonebook_origin_group"
-        enabled                        = true
-        certificate_name_check_enabled = true
-        host = {
-          resource_group_name = "rg-westeurope"
-          name                = "phonebook-lb"
-          type                = "Microsoft.Network/loadBalancers"
-          pls_enabled         = true
-        }
-        http_port  = 80
-        https_port = 443
-        priority   = 1
-        weight     = 500
-        private_link = {
-          request_message = "Gimme gimme"
-          location        = "West Europe"
-          target = {
-            name                = "phonebook-lb-pls"
-            resource_group_name = "rg-westeurope"
-          }
-        }
-      }
-    }
-    routes = {
-      phonebook_route_http = {
-        name                       = "phonebook-route-http"
-        cdn_frontdoor_endpoint     = "phonebook"
-        cdn_frontdoor_origin_group = "phonebook_origin_group"
-        cdn_frontdoor_origins      = ["phonebook_eu"]
-        # cdn_frontdoor_rule_sets       = ["phonebookruleset"]
-        enabled                = true
-        forwarding_protocol    = "HttpOnly"
-        https_redirect_enabled = false
-        patterns_to_match      = ["/*"]
-        supported_protocols    = ["Http", "Https"]
-      }
-    }
-    # rule_sets = {
-    #   phonebookruleset = {
-    #     name = "phonebookruleset"
-    #   }
-    # }
-    # rules = [
-    #   {
-    #     name = "httpstohttp"
-    #     rule_set = "phonebookruleset"
-    #     conditions = {
-    #       request_scheme_conditions = {
-    #         equal_https = {
-    #           operator         = "Equal"
-    #           match_values     = ["HTTPS"]
-    #         }
-    #       }
-    #     }
-    #     actions = {
-    #       url_redirect_actions = {
-    #         movedhttp = {
-    #           redirect_type        = "Moved"
-    #           redirect_protocol    = "Http"
-    #           destination_hostname = ""
-    #         }
-    #       }
-    #     }
-    #   }
-    # ]
-  }
+  # phonebook = {
+  #   name           = "phonebook"
+  #   resource_group = "rg_eastus"
+  #   sku_name       = "Premium_AzureFrontDoor"
+  #   endpoints      = ["phonebook"]
+  #   origin_groups = {
+  #     phonebook_origin_group = {
+  #       name                                                      = "phonebook-origin-group"
+  #       session_affinity_enabled                                  = false
+  #       restore_traffic_time_to_healed_or_new_endpoint_in_minutes = 10
+  #       health_probes = {
+  #         health_probe_http = {
+  #           interval_in_seconds = 240
+  #           path                = "/"
+  #           protocol            = "Http"
+  #           request_type        = "GET"
+  #         }
+  #       }
+  #       load_balancing = {
+  #         additional_latency_in_milliseconds = 0
+  #         sample_size                        = 16
+  #         successful_samples_required        = 3
+  #       }
+  #     }
+  #   }
+  #   origins = {
+  #     phonebook_eu = {
+  #       name                           = "phonebook-eu"
+  #       cdn_frontdoor_origin_group     = "phonebook_origin_group"
+  #       enabled                        = true
+  #       certificate_name_check_enabled = true
+  #       host = {
+  #         resource_group_name = "rg-westeurope"
+  #         name                = "phonebook-lb"
+  #         type                = "Microsoft.Network/loadBalancers"
+  #         pls_enabled         = true
+  #       }
+  #       http_port  = 80
+  #       https_port = 443
+  #       priority   = 1
+  #       weight     = 500
+  #       private_link = {
+  #         request_message = "Gimme gimme"
+  #         location        = "West Europe"
+  #         target = {
+  #           name                = "phonebook-lb-pls"
+  #           resource_group_name = "rg-westeurope"
+  #         }
+  #       }
+  #     }
+  #   }
+  #   routes = {
+  #     phonebook_route_http = {
+  #       name                       = "phonebook-route-http"
+  #       cdn_frontdoor_endpoint     = "phonebook"
+  #       cdn_frontdoor_origin_group = "phonebook_origin_group"
+  #       cdn_frontdoor_origins      = ["phonebook_eu"]
+  #       # cdn_frontdoor_rule_sets       = ["phonebookruleset"]
+  #       enabled                = true
+  #       forwarding_protocol    = "HttpOnly"
+  #       https_redirect_enabled = false
+  #       patterns_to_match      = ["/*"]
+  #       supported_protocols    = ["Http", "Https"]
+  #     }
+  #   }
+  #   # rule_sets = {
+  #   #   phonebookruleset = {
+  #   #     name = "phonebookruleset"
+  #   #   }
+  #   # }
+  #   # rules = [
+  #   #   {
+  #   #     name = "httpstohttp"
+  #   #     rule_set = "phonebookruleset"
+  #   #     conditions = {
+  #   #       request_scheme_conditions = {
+  #   #         equal_https = {
+  #   #           operator         = "Equal"
+  #   #           match_values     = ["HTTPS"]
+  #   #         }
+  #   #       }
+  #   #     }
+  #   #     actions = {
+  #   #       url_redirect_actions = {
+  #   #         movedhttp = {
+  #   #           redirect_type        = "Moved"
+  #   #           redirect_protocol    = "Http"
+  #   #           destination_hostname = ""
+  #   #         }
+  #   #       }
+  #   #     }
+  #   #   }
+  #   # ]
+  # }
 }
