@@ -316,7 +316,7 @@ module "linux_virtual_machine_scale_sets" {
   admin_username         = each.value.admin_username
   shared_image           = each.value.shared_image
   upgrade_mode           = each.value.upgrade_mode
-  health_probe_id        = module.load_balancers[each.value.health_probe_load_balancer].health_probe_id
+  health_probe_id        = module.load_balancers[each.value.health_probe.load_balancer].health_probes[each.value.health_probe.name].id
   admin_ssh_key          = each.value.admin_ssh_key
   os_disk                = each.value.os_disk
   network_interface      = each.value.network_interface

@@ -47,7 +47,7 @@ resource "azurerm_virtual_machine" "vm" {
     for_each = var.identity.enabled ? [1] : []
 
     content {
-      type = identity.value.type
+      type = var.identity.type
     }
   }
 
@@ -75,7 +75,7 @@ resource "azurerm_virtual_machine" "vm" {
     disable_password_authentication = var.os_profile_linux_config.disable_password_authentication
 
     ssh_keys {
-      path     = "/home/${var.os_profile_linux_config.admin_username}/.ssh/authorized_keys"
+      path     = "/home/${var.os_profile.admin_username}/.ssh/authorized_keys"
       key_data = data.azurerm_ssh_public_key.ssh_public_key.public_key
     }
   }

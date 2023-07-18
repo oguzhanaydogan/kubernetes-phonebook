@@ -387,7 +387,7 @@ network_security_groups = {
 linux_virtual_machines = {
   ci_cd_agent = {
     name                             = "ci-cd-agent"
-    resource_group                   = "rg-eastus"
+    resource_group                   = "rg_eastus"
     network_interface = {
       ip_configurations = {
         ipConfiguration1 = {
@@ -583,7 +583,10 @@ linux_virtual_machine_scale_sets = {
       resource_group_name = "ssh-key"
     }
     upgrade_mode               = "Rolling"
-    health_probe_load_balancer = "phonebook_lb"
+    health_probe = {
+      load_balancer = "phonebook_lb"
+      name = "http"
+    }
     admin_ssh_key = {
       resource_group_name = "ssh-key"
       name                = "azure"
@@ -612,7 +615,7 @@ linux_virtual_machine_scale_sets = {
             phonebook_lb_bapool = {
               name                              = "bapool"
               load_balancer_name                = "phonebook-lb"
-              load_balancer_resource_group_name = "rg-westeurope"
+              resource_group_name = "rg-westeurope"
             }
           }
         }

@@ -215,6 +215,7 @@ variable "load_balancers" {
 
 variable "private_link_services" {
   type = map(object({
+    name = string
     resource_group = string
     load_balancer  = string
     nat_ip_configurations = list(object({
@@ -238,7 +239,10 @@ variable "linux_virtual_machine_scale_sets" {
       resource_group_name = string
     })
     upgrade_mode               = string
-    health_probe_load_balancer = string
+    health_probe = object({
+      name = string
+      load_balancer = string
+    })
     admin_ssh_key = object({
       resource_group_name = string
       name                = string

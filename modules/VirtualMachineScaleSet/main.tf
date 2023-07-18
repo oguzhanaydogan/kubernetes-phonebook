@@ -27,7 +27,7 @@ data "azurerm_network_security_group" "example" {
 locals {
   load_balancer_backend_address_pools_flattened_info = flatten([
     for k, v in var.network_interface.ip_configurations : [
-      for key, pool in v.lb_backend_address_pools : {
+      for key, pool in v.load_balancer_backend_address_pools : {
         load_balancer_backend_address_pool_name = pool.name
         load_balancer_name                      = pool.load_balancer_name
         load_balancer_resource_group_name       = pool.resource_group_name
