@@ -127,6 +127,7 @@ module "linux_virtual_machines" {
   os_profile                         = each.value.os_profile
   os_profile_linux_config            = each.value.os_profile_linux_config
   network_security_group_association = each.value.network_security_group_association
+  depends_on = [ module.network_security_groups ]
 }
 
 data "azurerm_key_vault" "example" {
