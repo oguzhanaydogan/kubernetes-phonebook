@@ -42,7 +42,7 @@ data "azurerm_lb_backend_address_pool" "lb_backend_address_pools" {
   for_each = toset(var.lb_rules.backend_address_pool_names)
 
   name            = each.value
-  loadbalancer_id = data.azurerm_lb.lb.id
+  loadbalancer_id = azurerm_lb.lb.id
 }
 
 resource "azurerm_lb_rule" "lb_rules" {

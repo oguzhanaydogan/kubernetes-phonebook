@@ -83,6 +83,22 @@ variable "linux_virtual_machines" {
   type = map(object({
     name                             = string
     resource_group                   = string
+    network_interface = object({
+      ip_configuration = object({
+        name = string
+        subnet = object({
+          name = string
+          virtual_network_name = string
+          resource_group_name = string
+        })
+        private_ip_address_allocation = string
+        public_ip_assigned            = bool
+        public_ip_address = object({
+          name                = string
+          resource_group_name = string
+        })
+      })
+    })
     size                             = string
     delete_data_disks_on_termination = bool
     delete_os_disk_on_termination    = bool
@@ -112,20 +128,6 @@ variable "linux_virtual_machines" {
         resource_group_name = string
       })
     })
-    ip_configurations = map(object({
-      name = string
-      subnet = object({
-        name                 = string
-        virtual_network_name = string
-        resource_group_name  = string
-      })
-      private_ip_address_allocation = string
-      public_ip_assigned            = bool
-      public_ip_address = object({
-        name                = string
-        resource_group_name = string
-      })
-    }))
     network_security_group_association = object({
       enabled                                    = bool
       network_security_group_name                = string
@@ -345,9 +347,9 @@ variable "front_doors" {
         request_type        = string
       }))
       load_balancing = object({
-        additional_latency_in_milliseconds = 0
-        sample_size                        = 16
-        successful_samples_required        = 3
+        additional_latency_in_milliseconds = number
+        sample_size                        = number
+        successful_samples_required        = number
       })
     }))
     origins = map(object({

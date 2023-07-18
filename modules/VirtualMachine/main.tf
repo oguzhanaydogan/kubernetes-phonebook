@@ -4,7 +4,7 @@ data "azurerm_ssh_public_key" "ssh_public_key" {
 }
 
 data "azurerm_subnet" "subnets" {
-  for_each = var.ip_configurations
+  for_each = var.network_interface.ip_configurations
 
   name                 = each.value.subnet.name
   virtual_network_name = each.value.subnet.virtual_network_name
@@ -22,13 +22,23 @@ resource "azurerm_network_interface" "network_interface" {
   name                = "${var.name}-network_interface"
   location            = var.location
   resource_group_name = var.resource_group_name
+    dynamic "ip_configuration" {
+    for_each = var.network_interface.ip_configurations
+
+    content {
+      name                          = ip_configuration.value.name
+      subnet_id                     = data.azurerm_subnet.subnets[ip_configuration.key].id
+      private_ip_address_allocation = ip_configuration.value.private_ip_address_allocation
+      public_ip_address_id          = ip_configuration.value.public_ip_assigned ? data.azurerm_public_ip.public_ip_addresses[ip_configuration.key].id : ""
+    }
+  }
 }
 
 resource "azurerm_virtual_machine" "vm" {
   name                             = var.name
   location                         = var.location
   resource_group_name              = var.resource_group_name
-  network_interface_ids            = [azurerm_network_interface.nic.id]
+  network_interface_ids            = [azurerm_network_interface.network_interface.id]
   vm_size                          = var.size
   delete_os_disk_on_termination    = var.delete_os_disk_on_termination
   delete_data_disks_on_termination = var.delete_data_disks_on_termination
@@ -69,22 +79,11 @@ resource "azurerm_virtual_machine" "vm" {
       key_data = data.azurerm_ssh_public_key.ssh_public_key.public_key
     }
   }
-
-  dynamic "ip_configuration" {
-    for_each = var.ip_configurations
-
-    content {
-      name                          = ip_configuration.value.name
-      subnet_id                     = data.azurerm_subnet.subnets[ip_configuration.key].id
-      private_ip_address_allocation = ip_configuration.value.private_ip_address_allocation
-      public_ip_address_id          = ip_configuration.value.public_ip_assigned ? data.azurerm_public_ip.public_ip_addresses[ip_configuration.key].id : ""
-    }
-  }
 }
 
 data "azurerm_network_security_group" "network_security_group" {
-  network_security_group_name                = var.network_security_group_association.network_security_group_name
-  network_security_group_resource_group_name = var.network_security_group_association.network_security_group_resource_group_name
+  name                = var.network_security_group_association.network_security_group_name
+  resource_group_name = var.network_security_group_association.network_security_group_resource_group_name
 }
 
 resource "azurerm_network_interface_security_group_association" "nic_nsg_association" {

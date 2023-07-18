@@ -388,6 +388,24 @@ linux_virtual_machines = {
   ci_cd_agent = {
     name                             = "ci-cd-agent"
     resource_group                   = "rg-eastus"
+    network_interface = {
+      ip_configurations = {
+        ipConfiguration1 = {
+          name = "ipConfiguration1"
+          subnet = {
+            name                 = "subnet-agent"
+            virtual_network_name = "vnet-agent"
+            resource_group_name  = "rg-eastus"
+          }
+          private_ip_address_allocation = "Dynamic"
+          public_ip_assigned            = true
+          public_ip_address = {
+            name                = "ci-cd-agent"
+            resource_group_name = "rg-eastus"
+          }
+        }
+      }
+    }
     size                             = "Standard_B1s"
     delete_data_disks_on_termination = true
     delete_os_disk_on_termination    = true
@@ -415,22 +433,6 @@ linux_virtual_machines = {
       ssh_key = {
         resource_group_name = "ssh-key"
         name                = "azure"
-      }
-    }
-    ip_configurations = {
-      ipConfiguration1 = {
-        name = "ipConfiguration1"
-        subnet = {
-          name                 = "vnet-agent-subnet-agent"
-          virtual_network_name = "vnet-agent"
-          resource_group_name  = "rg-eastus"
-        }
-        private_ip_address_allocation = "Dynamic"
-        public_ip_assigned            = true
-        public_ip_address = {
-          name                = "ci-cd-agent"
-          resource_group_name = "rg-eastus"
-        }
       }
     }
     network_security_group_association = {
@@ -555,7 +557,7 @@ load_balancers = {
 
 private_link_services = {
   phonebook_lb_pls = {
-    name           = "phonebook-lb-pls"
+    link_name           = "phonebook-lb-pls"
     resource_group = "rg_westeurope"
     load_balancer  = "phonebook_lb"
     nat_ip_configurations = [

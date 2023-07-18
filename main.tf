@@ -117,6 +117,7 @@ module "linux_virtual_machines" {
   name                               = each.value.name
   location                           = module.resource_groups[each.value.resource_group].location
   resource_group_name                = module.resource_groups[each.value.resource_group].name
+  network_interface = each.value.network_interface
   size                               = each.value.size
   delete_os_disk_on_termination      = each.value.delete_os_disk_on_termination
   delete_data_disks_on_termination   = each.value.delete_data_disks_on_termination
@@ -125,7 +126,7 @@ module "linux_virtual_machines" {
   storage_os_disk                    = each.value.storage_os_disk
   os_profile                         = each.value.os_profile
   os_profile_linux_config            = each.value.os_profile_linux_config
-  ip_configurations                  = each.value.ip_configurations
+  ip_configurations                  = each.value.network_interface.ip_configurations
   network_security_group_association = each.value.network_security_group_association
 }
 
@@ -205,7 +206,7 @@ module "azapi_create_phonebook_sync_group" {
 module "arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu" {
   source              = "./modules/ArmTemplateDeployment"
   name                = "create-phonebook-sync-group-member-phonebook-eu"
-  resource_group_name = module.resource_groups["rg-eastus"].name
+  resource_group_name = module.resource_groups["rg_eastus"].name
   deployment_mode     = "Incremental"
   depends_on          = [module.azapi_create_phonebook_sync_group]
   template_content    = <<TEMPLATE
@@ -281,13 +282,14 @@ module "load_balancers" {
   lb_backend_address_pools   = each.value.lb_backend_address_pools
   lb_probes                  = each.value.lb_probes
   lb_rules                   = each.value.lb_rules
+  depends_on = [ module.subnets ]
 }
 
 module "private_link_services" {
   source   = "./modules/PrivateLinkService"
   for_each = var.private_link_services
 
-  link_name                                   = each.value.name
+  link_name                                   = each.value.link_name
   resource_group_name                         = module.resource_groups[each.value.resource_group].name
   location                                    = module.resource_groups[each.value.resource_group].location
   auto_approval_subscription_ids              = [data.azurerm_client_config.current.subscription_id]
@@ -333,6 +335,7 @@ module "bastion_hosts" {
   resource_group_name = module.resource_groups[each.value.resource_group].name
   location            = module.resource_groups[each.value.resource_group].location
   ip_configurations   = each.value.ip_configurations
+  depends_on = [ module.public_ip_addresses,module.subnets ]    
 }
 
 module "private_dns_zones" {
