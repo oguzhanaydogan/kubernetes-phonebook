@@ -392,3 +392,17 @@ module "front_doors" {
     module.private_link_services
   ]
 }
+
+module "kubernetes_clusters" {
+  source = "./modules/KubernetesCluster"
+  for_each = var.kubernetes_clusters
+  subnet_aks = each.value.subnet_aks
+  subnet_appgw = each.value.subnet_appgw
+  name = each.value.name
+  location = module.resource_groups[each.value.resource_group].location
+  resource_group_name = module.resource_groups[each.value.resource_group].name
+  kubernetes_version = each.value.kubernetes_version
+  default_node_pool = each.value.default_node_pool
+  identity = each.value.identity
+  ingress_application_gateway = each.value.ingress_application_gateway
+}

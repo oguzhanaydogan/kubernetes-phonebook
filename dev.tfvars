@@ -75,6 +75,24 @@ subnets = {
     delegation_name                               = ""
     private_link_service_network_policies_enabled = true
   }
+  vnet_app_subnet_aks = {
+    name                                          = "subnet-aks"
+    resource_group                                = "rg_eastus"
+    virtual_network                               = "vnet_app"
+    address_prefixes                              = ["10.1.1.0/24"]
+    delegation                                    = false
+    delegation_name                               = ""
+    private_link_service_network_policies_enabled = true
+  }
+  vnet_app_subnet_appgw = {
+    name                                          = "subnet-appgw"
+    resource_group                                = "rg_eastus"
+    virtual_network                               = "vnet_app"
+    address_prefixes                              = ["10.1.2.0/24"]
+    delegation                                    = false
+    delegation_name                               = ""
+    private_link_service_network_policies_enabled = true
+  }
   vnet_acr_subnet_acr = {
     name                                          = "subnet-acr"
     resource_group                                = "rg_eastus"
@@ -575,7 +593,7 @@ linux_virtual_machine_scale_sets = {
     name           = "phonebook-vmss"
     resource_group = "rg_westeurope"
     sku            = "Standard_B1s"
-    instances      = 2
+    instances      = 1
     admin_username = "azureuser"
     shared_image = {
       name                = "myimagedefinitongen"
@@ -823,3 +841,4 @@ front_doors = {
   #   # ]
   # }
 }
+
