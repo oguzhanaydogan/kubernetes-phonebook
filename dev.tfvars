@@ -723,20 +723,20 @@ private_endpoints = {
 }
 
 front_doors = {
-  front_door_1 = {
-    name           = "front-door-1"
-    resource_group = "rg-eastus"
+  phonebook = {
+    name           = "phonebook"
+    resource_group = "rg_eastus"
     sku_name       = "Premium_AzureFrontDoor"
     endpoints      = ["phonebook"]
     origin_groups = {
-      phonebook-origin-group = {
+      phonebook_origin_group = {
         name                                                      = "phonebook-origin-group"
         session_affinity_enabled                                  = false
         restore_traffic_time_to_healed_or_new_endpoint_in_minutes = 10
         health_probes = {
           health_probe_http = {
             interval_in_seconds = 240
-            path                = "/healthProbe"
+            path                = "/"
             protocol            = "Http"
             request_type        = "GET"
           }
@@ -749,9 +749,9 @@ front_doors = {
       }
     }
     origins = {
-      phonebook-eu = {
+      phonebook_eu = {
         name                           = "phonebook-eu"
-        cdn_frontdoor_origin_group     = "phonebook-origin-group"
+        cdn_frontdoor_origin_group     = "phonebook_origin_group"
         enabled                        = true
         certificate_name_check_enabled = true
         host = {
@@ -775,11 +775,11 @@ front_doors = {
       }
     }
     routes = {
-      phonebook-route-http = {
+      phonebook_route_http = {
         name                       = "phonebook-route-http"
         cdn_frontdoor_endpoint     = "phonebook"
-        cdn_frontdoor_origin_group = "phonebook-origin-group"
-        cdn_frontdoor_origins      = ["phonebook-eu"]
+        cdn_frontdoor_origin_group = "phonebook_origin_group"
+        cdn_frontdoor_origins      = ["phonebook_eu"]
         # cdn_frontdoor_rule_sets       = ["phonebookruleset"]
         enabled                = true
         forwarding_protocol    = "HttpOnly"

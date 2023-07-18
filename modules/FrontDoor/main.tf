@@ -1,21 +1,21 @@
-resource "azurerm_cdn_frontdoor_profile" "example" {
+resource "azurerm_cdn_frontdoor_profile" "cdn_frontdoor_profile" {
   name                = var.name
   resource_group_name = var.resource_group_name
   sku_name            = var.sku_name
 }
 
-resource "azurerm_cdn_frontdoor_endpoint" "example" {
+resource "azurerm_cdn_frontdoor_endpoint" "cdn_frontdoor_endpoints" {
   for_each = toset(var.endpoints)
 
-  name                     = each.key
-  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.example.id
+  name                     = each.value
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn_frontdoor_profile.id
 }
 
-resource "azurerm_cdn_frontdoor_origin_group" "example" {
+resource "azurerm_cdn_frontdoor_origin_group" "cdn_frontdoor_origin_groups" {
   for_each = var.origin_groups
 
   name                     = each.value.name
-  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.example.id
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn_frontdoor_profile.id
   session_affinity_enabled = each.value.session_affinity_enabled
 
   restore_traffic_time_to_healed_or_new_endpoint_in_minutes = each.value.restore_traffic_time_to_healed_or_new_endpoint_in_minutes
@@ -95,11 +95,11 @@ data "azurerm_linux_web_app" "app_services" {
   resource_group_name = each.value.resource_group_name
 }
 
-resource "azurerm_cdn_frontdoor_origin" "example" {
+resource "azurerm_cdn_frontdoor_origin" "cdn_frontdoor_origins" {
   for_each = var.origins
 
   name                          = each.value.name
-  cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.example[each.value.cdn_frontdoor_origin_group].id
+  cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.cdn_frontdoor_origin_groups[each.value.cdn_frontdoor_origin_group].id
   enabled                       = each.value.enabled
 
   certificate_name_check_enabled = each.value.certificate_name_check_enabled
@@ -121,8 +121,8 @@ resource "azurerm_cdn_frontdoor_origin" "example" {
       request_message = each.value.private_link.request_message
       location        = each.value.private_link.location
       private_link_target_id = coalesce(
-        try(data.azurerm_lb.load_balancers[each.value.private_link.target.name].id, ""),
         try(data.azurerm_private_link_service.private_link_services[each.value.private_link.target.name].id, ""),
+        try(data.azurerm_lb.load_balancers[each.value.private_link.target.name].id, ""),
         try(data.azurerm_storage_blob.storage_blobs[each.value.private_link.target.name].id, ""),
         try(data.azurerm_linux_web_app.app_services[each.value.private_link.target.name].id, "")
       )
@@ -130,17 +130,17 @@ resource "azurerm_cdn_frontdoor_origin" "example" {
   }
 }
 
-resource "azurerm_cdn_frontdoor_route" "example" {
+resource "azurerm_cdn_frontdoor_route" "cdn_frontdoor_routes" {
   for_each = var.routes
 
   name                          = each.value.name
-  cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.example[each.value.cdn_frontdoor_endpoint].id
-  cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.example[each.value.cdn_frontdoor_origin_group].id
+  cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.cdn_frontdoor_endpoints[each.value.cdn_frontdoor_endpoint].id
+  cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.cdn_frontdoor_origin_groups[each.value.cdn_frontdoor_origin_group].id
   cdn_frontdoor_origin_ids = [
-    for origin in each.value.cdn_frontdoor_origins : azurerm_cdn_frontdoor_origin.example[origin].id
+    for origin in each.value.cdn_frontdoor_origins : azurerm_cdn_frontdoor_origin.cdn_frontdoor_origins[origin].id
   ]
   # cdn_frontdoor_rule_set_ids    = [
-  # 	for rule_set in each.value.cdn_frontdoor_rule_sets : azurerm_cdn_frontdoor_rule_set.example[rule_set].id
+  # 	for rule_set in each.value.cdn_frontdoor_rule_sets : azurerm_cdn_frontdoor_rule_set.cdn_frontdoor_rule_sets[rule_set].id
   # ]
   enabled = each.value.enabled
 
@@ -150,22 +150,22 @@ resource "azurerm_cdn_frontdoor_route" "example" {
   supported_protocols    = each.value.supported_protocols
 }
 
-# resource "azurerm_cdn_frontdoor_rule_set" "example" {
+# resource "azurerm_cdn_frontdoor_rule_set" "cdn_frontdoor_rule_sets" {
 # 	for_each = var.rule_sets
 
 # 	name                     = each.value.name
-# 	cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.example.id
+# 	cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn_frontdoor_profile.id
 # }
 
-# resource "azurerm_cdn_frontdoor_rule" "example" {
+# resource "azurerm_cdn_frontdoor_rule" "cdn_frontdoor_rules" {
 # 	for_each = {
 # 		for index, rule in var.rules : index => rule
 # 	}
 
-# 	depends_on = [azurerm_cdn_frontdoor_origin_group.example, azurerm_cdn_frontdoor_origin.example]
+# 	depends_on = [azurerm_cdn_frontdoor_origin_group.cdn_frontdoor_origin_groups, azurerm_cdn_frontdoor_origin.cdn_frontdoor_origins]
 
 # 	name                      = each.value.name
-# 	cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.example[each.value.rule_set].id
+# 	cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.cdn_frontdoor_rule_sets[each.value.rule_set].id
 # 	order                     = each.key + 1
 
 # 	conditions {
