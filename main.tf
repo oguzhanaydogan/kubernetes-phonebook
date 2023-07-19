@@ -20,7 +20,6 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false
     }
   }
-  # skip_provider_registration = true
 }
 
 module "resource_groups" {
@@ -41,19 +40,6 @@ module "virtual_networks" {
   address_space       = each.value.address_space
 }
 
-module "subnets" {
-  source   = "./modules/Subnet"
-  for_each = var.subnets
-
-  name                                          = each.value.name
-  address_prefixes                              = each.value.address_prefixes
-  resource_group_name                           = module.resource_groups[each.value.resource_group].name
-  virtual_network_name                          = module.virtual_networks[each.value.virtual_network].name
-  delegation                                    = each.value.delegation
-  delegation_name                               = each.value.delegation_name
-  private_link_service_network_policies_enabled = each.value.private_link_service_network_policies_enabled
-}
-
 module "vnet_peerings" {
   source   = "./modules/VirtualNetworkPeering"
   for_each = var.vnet_peerings
@@ -62,6 +48,18 @@ module "vnet_peerings" {
   name                      = each.value.name
   virtual_network_name      = module.virtual_networks[each.value.virtual_network].name
   remote_virtual_network_id = module.virtual_networks[each.value.remote_virtual_network].id
+}
+
+module "subnets" {
+  source   = "./modules/Subnet"
+  for_each = var.subnets
+
+  name                                          = each.value.name
+  resource_group_name                           = module.resource_groups[each.value.resource_group].name
+  virtual_network_name                          = module.virtual_networks[each.value.virtual_network].name
+  address_prefixes                              = each.value.address_prefixes
+  private_link_service_network_policies_enabled = each.value.private_link_service_network_policies_enabled
+  delegation                                    = each.value.delegation
 }
 
 module "route_tables" {
@@ -127,7 +125,7 @@ module "linux_virtual_machines" {
   os_profile                         = each.value.os_profile
   os_profile_linux_config            = each.value.os_profile_linux_config
   network_security_group_association = each.value.network_security_group_association
-  depends_on                         = [
+  depends_on = [
     module.network_security_groups,
     module.subnets
   ]
@@ -394,19 +392,19 @@ module "front_doors" {
 }
 
 module "kubernetes_clusters" {
-  source = "./modules/KubernetesCluster"
+  source   = "./modules/KubernetesCluster"
   for_each = var.kubernetes_clusters
 
-  subnet_aks = each.value.subnet_aks
-  subnet_appgw = each.value.subnet_appgw
-  name = each.value.name
-  location = module.resource_groups[each.value.resource_group].location
-  resource_group_name = module.resource_groups[each.value.resource_group].name
-  private_cluster_enabled = each.value.private_cluster_enabled
-  default_node_pool = each.value.default_node_pool
-  identity = each.value.identity
+  subnet_aks                  = each.value.subnet_aks
+  subnet_appgw                = each.value.subnet_appgw
+  name                        = each.value.name
+  location                    = module.resource_groups[each.value.resource_group].location
+  resource_group_name         = module.resource_groups[each.value.resource_group].name
+  private_cluster_enabled     = each.value.private_cluster_enabled
+  default_node_pool           = each.value.default_node_pool
+  identity                    = each.value.identity
   ingress_application_gateway = each.value.ingress_application_gateway
-  network_profile = each.value.network_profile
+  network_profile             = each.value.network_profile
 
   depends_on = [
     module.subnets,
@@ -416,15 +414,15 @@ module "kubernetes_clusters" {
 }
 
 module "firewalls" {
-  source = "./modules/Firewall"
+  source   = "./modules/Firewall"
   for_each = var.firewalls
 
-  name = each.value.name
-  location = module.resource_groups[each.value.resource_group].location
-  resource_group_name = module.resource_groups[each.value.resource_group].name
-  sku_name = each.value.sku_name
-  sku_tier = each.value.sku_tier
-  ip_configuration = each.value.ip_configuration
+  name                        = each.value.name
+  location                    = module.resource_groups[each.value.resource_group].location
+  resource_group_name         = module.resource_groups[each.value.resource_group].name
+  sku_name                    = each.value.sku_name
+  sku_tier                    = each.value.sku_tier
+  ip_configuration            = each.value.ip_configuration
   management_ip_configuration = each.value.management_ip_configuration
 
   depends_on = [

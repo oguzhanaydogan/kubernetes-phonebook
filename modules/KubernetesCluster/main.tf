@@ -11,18 +11,18 @@ data "azurerm_subnet" "subnet_appgw" {
 }
 
 resource "azurerm_kubernetes_cluster" "k8s" {
-  name                = var.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  dns_prefix          = "${var.name}-dns"
-  node_resource_group = "${var.name}-node-rg"
+  name                    = var.name
+  location                = var.location
+  resource_group_name     = var.resource_group_name
+  dns_prefix              = "${var.name}-dns"
+  node_resource_group     = "${var.name}-node-rg"
   private_cluster_enabled = var.private_cluster_enabled
 
   default_node_pool {
-    name                 = var.default_node_pool.name
-    node_count           = var.default_node_pool.node_count
-    vm_size              = var.default_node_pool.vm_size
-    vnet_subnet_id       = data.azurerm_subnet.subnet_aks.id
+    name           = var.default_node_pool.name
+    node_count     = var.default_node_pool.node_count
+    vm_size        = var.default_node_pool.vm_size
+    vnet_subnet_id = data.azurerm_subnet.subnet_aks.id
   }
 
   identity {
@@ -34,12 +34,12 @@ resource "azurerm_kubernetes_cluster" "k8s" {
 
     content {
       gateway_name = var.ingress_application_gateway.gateway_name
-      subnet_id = data.azurerm_subnet.subnet_appgw.id
+      subnet_id    = data.azurerm_subnet.subnet_appgw.id
     }
   }
 
   network_profile {
     network_plugin = var.network_profile.network_plugin
-    outbound_type = var.network_profile.outbound_type
+    outbound_type  = var.network_profile.outbound_type
   }
 }

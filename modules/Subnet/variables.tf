@@ -1,21 +1,28 @@
 variable "name" {
+  type = string
 }
 
 variable "resource_group_name" {
+  type = string
 }
 variable "virtual_network_name" {
+  type = string
 }
 
 variable "address_prefixes" {
-}
-
-variable "delegation" {
-}
-
-variable "delegation_name" {
-  default  = null
-  nullable = true
+  type = list(string)
 }
 
 variable "private_link_service_network_policies_enabled" {
+  type = bool
+}
+
+variable "delegation" {
+  type = object({
+    name = string
+    service_delegation = object({
+      name    = string
+      actions = list(string)
+    })
+  })
 }

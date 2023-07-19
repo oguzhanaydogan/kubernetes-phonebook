@@ -5,17 +5,15 @@ resource "azurerm_subnet" "subnet" {
   address_prefixes                              = var.address_prefixes
   private_link_service_network_policies_enabled = var.private_link_service_network_policies_enabled
 
-  lifecycle {
-    ignore_changes = [delegation[0].service_delegation[0].actions]
-  }
   dynamic "delegation" {
-    for_each = var.delegation ? [1] : []
+    for_each = var.delegation.name ? [1] : []
+
     content {
-      name = "example-delegation"
+      name = var.delegation.name
 
       service_delegation {
-        name    = var.delegation_name
-        actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
+        name    = var.delegation.service_delegation.name
+        actions = var.delegation.service_delegation.actions
       }
     }
   }

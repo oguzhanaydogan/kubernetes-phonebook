@@ -13,24 +13,36 @@ variable "virtual_networks" {
   }))
 }
 
-variable "subnets" {
-  type = map(object({
-    name                                          = string
-    resource_group                                = string
-    virtual_network                               = string
-    address_prefixes                              = list(string)
-    delegation                                    = bool
-    delegation_name                               = string
-    private_link_service_network_policies_enabled = bool
-  }))
-}
-
 variable "vnet_peerings" {
   type = map(object({
     name                   = string
     virtual_network        = string
     remote_virtual_network = string
     resource_group         = string
+  }))
+}
+
+variable "subnets" {
+  type = map(object({
+    name                                          = string
+    resource_group                                = string
+    virtual_network                               = string
+    address_prefixes                              = list(string)
+    private_link_service_network_policies_enabled = optional(bool, true)
+    delegation = optional(object({
+      name = string
+      service_delegation = object({
+        name    = string
+        actions = optional(list(string), [])
+      })
+      }),
+      {
+        name = ""
+        service_delegation = {
+          name = ""
+        }
+      }
+    )
   }))
 }
 
@@ -418,37 +430,37 @@ variable "front_doors" {
 variable "kubernetes_clusters" {
   type = map(object({
     subnet_aks = object({
-      name = string
+      name                 = string
       virtual_network_name = string
-      resource_group_name = string
+      resource_group_name  = string
     })
     subnet_appgw = object({
-      name = string
+      name                 = string
       virtual_network_name = string
-      resource_group_name = string
+      resource_group_name  = string
     })
-    name = string
-    resource_group = string
+    name                    = string
+    resource_group          = string
     private_cluster_enabled = bool
     default_node_pool = object({
-      name                 = string
-      node_count           = number
-      vm_size              = string
+      name       = string
+      node_count = number
+      vm_size    = string
     })
     identity = object({
       type = string
     })
     ingress_application_gateway = object({
-      enabled = bool
+      enabled      = bool
       gateway_name = string
     })
     network_profile = object({
       network_plugin = string
-      outbound_type = string
+      outbound_type  = string
     })
   }))
 }
 
 variable "firewalls" {
-  
+
 }
