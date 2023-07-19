@@ -10,9 +10,15 @@ apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docke
 systemctl start docker
 systemctl enable docker
 
-usermod -a -G docker 
+usermod -a -G docker azureuser
 
+# Install kubectl
+curl https://s3.us-west-2.amazonaws.com/amazon-eks/1.24.10/2023-01-30/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
+chmod +x /usr/local/bin/kubectl
+
+# Install AzCLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
+# Login to ACR
 az login --identity
 az acr login -n coyhub

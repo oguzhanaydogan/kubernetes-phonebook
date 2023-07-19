@@ -238,7 +238,7 @@ module "mssql_databases" {
 #   }
 #   TEMPLATE
 # }
-# 
+#
 # module "azapi_update_phonebook_sync_group" {
 #   source      = "./modules/AzApiUpdate"
 #   type        = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
@@ -396,13 +396,39 @@ module "front_doors" {
 module "kubernetes_clusters" {
   source = "./modules/KubernetesCluster"
   for_each = var.kubernetes_clusters
+
   subnet_aks = each.value.subnet_aks
   subnet_appgw = each.value.subnet_appgw
   name = each.value.name
   location = module.resource_groups[each.value.resource_group].location
   resource_group_name = module.resource_groups[each.value.resource_group].name
-  kubernetes_version = each.value.kubernetes_version
+  private_cluster_enabled = each.value.private_cluster_enabled
   default_node_pool = each.value.default_node_pool
   identity = each.value.identity
   ingress_application_gateway = each.value.ingress_application_gateway
+  network_profile = each.value.network_profile
+
+  depends_on = [
+    module.subnets,
+    module.route_tables,
+    module.firewalls
+  ]
+}
+
+module "firewalls" {
+  source = "./modules/Firewall"
+  for_each = var.firewalls
+
+  name = each.value.name
+  location = module.resource_groups[each.value.resource_group].location
+  resource_group_name = module.resource_groups[each.value.resource_group].name
+  sku_name = each.value.sku_name
+  sku_tier = each.value.sku_tier
+  ip_configuration = each.value.ip_configuration
+  management_ip_configuration = each.value.management_ip_configuration
+
+  depends_on = [
+    module.subnets,
+    module.public_ip_addresses
+  ]
 }

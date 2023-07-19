@@ -414,3 +414,41 @@ variable "front_doors" {
     # }))
   }))
 }
+
+variable "kubernetes_clusters" {
+  type = map(object({
+    subnet_aks = object({
+      name = string
+      virtual_network_name = string
+      resource_group_name = string
+    })
+    subnet_appgw = object({
+      name = string
+      virtual_network_name = string
+      resource_group_name = string
+    })
+    name = string
+    resource_group = string
+    private_cluster_enabled = bool
+    default_node_pool = object({
+      name                 = string
+      node_count           = number
+      vm_size              = string
+    })
+    identity = object({
+      type = string
+    })
+    ingress_application_gateway = object({
+      enabled = bool
+      gateway_name = string
+    })
+    network_profile = object({
+      network_plugin = string
+      outbound_type = string
+    })
+  }))
+}
+
+variable "firewalls" {
+  
+}

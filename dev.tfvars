@@ -58,7 +58,7 @@ subnets = {
     private_link_service_network_policies_enabled = true
   }
   vnet_hub_subnet_firewall_management = {
-    name                                          = "AzureFirewallSubnetManagement"
+    name                                          = "AzureFirewallManagementSubnet"
     resource_group                                = "rg_eastus"
     virtual_network                               = "vnet_hub"
     address_prefixes                              = ["10.0.1.0/26"]
@@ -258,18 +258,18 @@ vnet_peerings = {
 }
 
 route_tables = {
-  vnet_app_subnet_app = {
-    name           = "vnet-app-subnet-app"
+  route_table_1 = {
+    name           = "route-table-1"
     resource_group = "rg_eastus"
     routes = {
-      vnet_app_subnet_app_to_vnet_acr_subnet_acr = {
-        name                   = "vnet-app-subnet-app-to-vnet-acr-subnet-acr"
+      route_to_vnet_acr_subnet_acr = {
+        name                   = "route-to-vnet-acr-subnet-acr"
         address_prefix         = "10.2.0.0/24"
         next_hop_type          = "VirtualAppliance"
         next_hop_in_ip_address = "10.0.0.4"
       }
-      vnet_app_subnet_app_to_vnet_db_subnet_db = {
-        name                   = "vnet-app-subnet-app-to-vnet-db-subnet-db"
+      route_to_vnet_db_subnet_db = {
+        name                   = "route-to-vnet-db-subnet-db"
         address_prefix         = "10.3.0.0/24"
         next_hop_type          = "VirtualAppliance"
         next_hop_in_ip_address = "10.0.0.4"
@@ -281,14 +281,19 @@ route_tables = {
         resource_group_name  = "rg-eastus"
         virtual_network_name = "vnet-app"
       }
+      vnet_app_subnet_aks = {
+        subnet_name          = "subnet-aks"
+        resource_group_name  = "rg-eastus"
+        virtual_network_name = "vnet-app"
+      }
     }
   }
-  vnet_app_subnet_db = {
-    name           = "vnet-app-subnet-db"
+  route_table_2 = {
+    name           = "route-table-2"
     resource_group = "rg_eastus"
     routes = {
-      vnet_db_subnet_db_to_vnet_app_subnet_app = {
-        name                   = "vnet-db-subnet-db-to-vnet-app-subnet-app"
+      route_to_vnet_app_subnet_app = {
+        name                   = "route-to-vnet-app-subnet-app"
         address_prefix         = "10.1.0.0/24"
         next_hop_type          = "VirtualAppliance"
         next_hop_in_ip_address = "10.0.0.4"
@@ -302,12 +307,12 @@ route_tables = {
       }
     }
   }
-  vnet_app_subnet_acr = {
-    name           = "vnet-app-subnet-acr"
+  route_table_3 = {
+    name           = "route-table-3"
     resource_group = "rg_eastus"
     routes = {
-      vnet_acr_subnet_acr_to_everywhere = {
-        name                   = "vnet-acr-subnet-acr-to-everywhere"
+      route_to_everywhere = {
+        name                   = "route-to-everywhere"
         address_prefix         = "10.0.0.0/8"
         next_hop_type          = "VirtualAppliance"
         next_hop_in_ip_address = "10.4.0.4"
@@ -346,12 +351,12 @@ public_ip_addresses = {
     sku               = "Standard"
     resource_group    = "rg_eastus"
   }
-  bastion_host_eu = {
-    name              = "bastion-host-eu"
-    allocation_method = "Static"
-    sku               = "Standard"
-    resource_group    = "rg_westeurope"
-  }
+  # bastion_host_eu = {
+  #   name              = "bastion-host-eu"
+  #   allocation_method = "Static"
+  #   sku               = "Standard"
+  #   resource_group    = "rg_westeurope"
+  # }
 }
 
 network_security_groups = {
@@ -484,15 +489,15 @@ key_vault_secrets = {
 }
 
 mssql_servers = {
-  coyhub_db_us = {
-    name                  = "coyhub-db-us"
-    resource_group        = "rg_eastus"
-    administrator_login   = "azureuser"
-    admin_password_secret = "key_vault_secret_mssql_password"
-    tags = {
-      name = "coyhub-db-us"
-    }
-  }
+  # coyhub_db_us = {
+  #   name                  = "coyhub-db-us"
+  #   resource_group        = "rg_eastus"
+  #   administrator_login   = "azureuser"
+  #   admin_password_secret = "key_vault_secret_mssql_password"
+  #   tags = {
+  #     name = "coyhub-db-us"
+  #   }
+  # }
   # coyhub_db_eu = {
   #   name                  = "coyhub-db-eu"
   #   resource_group        = "rg_westeurope"
@@ -505,19 +510,18 @@ mssql_servers = {
 }
 
 mssql_databases = {
-  phonebook_us = {
-    name                        = "phonebook"
-    server                      = "coyhub_db_us"
-    collation                   = "SQL_Latin1_General_CP1_CI_AS"
-    max_size_gb                 = 32
-    sku_name                    = "GP_S_Gen5_1"
-    min_capacity                = 0.5
-    auto_pause_delay_in_minutes = 60
-    read_replica_count          = 0
-    read_scale                  = false
-    zone_redundant              = false
-  }
-
+  # phonebook_us = {
+  #   name                        = "phonebook"
+  #   server                      = "coyhub_db_us"
+  #   collation                   = "SQL_Latin1_General_CP1_CI_AS"
+  #   max_size_gb                 = 32
+  #   sku_name                    = "GP_S_Gen5_1"
+  #   min_capacity                = 0.5
+  #   auto_pause_delay_in_minutes = 60
+  #   read_replica_count          = 0
+  #   read_scale                  = false
+  #   zone_redundant              = false
+  # }
   # phonebook_eu = {
   #   name                        = "phonebook"
   #   server                      = "coyhub_db_eu"
@@ -649,24 +653,24 @@ linux_virtual_machine_scale_sets = {
 }
 
 bastion_hosts = {
-  bastion_eu = {
-    name           = "bastion-eu"
-    resource_group = "rg_westeurope"
-    ip_configurations = {
-      ipConfiguration1 = {
-        name = "ipConfiguration1"
-        subnet = {
-          name                 = "AzureBastionSubnet"
-          virtual_network_name = "vnet-app-eu"
-          resource_group_name  = "rg-westeurope"
-        }
-        public_ip_address = {
-          name                = "bastion-host-eu"
-          resource_group_name = "rg-westeurope"
-        }
-      }
-    }
-  }
+  # bastion_eu = {
+  #   name           = "bastion-eu"
+  #   resource_group = "rg_westeurope"
+  #   ip_configurations = {
+  #     ipConfiguration1 = {
+  #       name = "ipConfiguration1"
+  #       subnet = {
+  #         name                 = "AzureBastionSubnet"
+  #         virtual_network_name = "vnet-app-eu"
+  #         resource_group_name  = "rg-westeurope"
+  #       }
+  #       public_ip_address = {
+  #         name                = "bastion-host-eu"
+  #         resource_group_name = "rg-westeurope"
+  #       }
+  #     }
+  #   }
+  # }
 }
 
 private_dns_zones = {
@@ -707,42 +711,42 @@ private_dns_zones = {
 }
 
 private_endpoints = {
-  pep_db = {
-    attached_resource = {
-      name = "coyhub-db-us"
-      type = "Microsoft.Sql/servers"
-      required_tags = {
-        name = "coyhub-db-us"
-      }
-    }
-    resource_group = "rg_eastus"
-    subnet         = "vnet_db_subnet_db_pep"
-    private_service_connection = {
-      is_manual_connection = false
-      subresource_names    = ["sqlServer"]
-    }
-    private_dns_zone_group = {
-      private_dns_zones = ["db"]
-    }
-  }
-  pep_db_eu = {
-    attached_resource = {
-      name = "coyhub-db-eu"
-      type = "Microsoft.Sql/servers"
-      required_tags = {
-        name = "coyhub-db-eu"
-      }
-    }
-    resource_group = "rg_westeurope"
-    subnet         = "vnet_db_eu_subnet_db_pep"
-    private_service_connection = {
-      is_manual_connection = false
-      subresource_names    = ["sqlServer"]
-    }
-    private_dns_zone_group = {
-      private_dns_zones = ["db"]
-    }
-  }
+  # pep_db = {
+  #   attached_resource = {
+  #     name = "coyhub-db-us"
+  #     type = "Microsoft.Sql/servers"
+  #     required_tags = {
+  #       name = "coyhub-db-us"
+  #     }
+  #   }
+  #   resource_group = "rg_eastus"
+  #   subnet         = "vnet_db_subnet_db_pep"
+  #   private_service_connection = {
+  #     is_manual_connection = false
+  #     subresource_names    = ["sqlServer"]
+  #   }
+  #   private_dns_zone_group = {
+  #     private_dns_zones = ["db"]
+  #   }
+  # }
+  # pep_db_eu = {
+  #   attached_resource = {
+  #     name = "coyhub-db-eu"
+  #     type = "Microsoft.Sql/servers"
+  #     required_tags = {
+  #       name = "coyhub-db-eu"
+  #     }
+  #   }
+  #   resource_group = "rg_westeurope"
+  #   subnet         = "vnet_db_eu_subnet_db_pep"
+  #   private_service_connection = {
+  #     is_manual_connection = false
+  #     subresource_names    = ["sqlServer"]
+  #   }
+  #   private_dns_zone_group = {
+  #     private_dns_zones = ["db"]
+  #   }
+  # }
 }
 
 front_doors = {
@@ -842,3 +846,63 @@ front_doors = {
   # }
 }
 
+kubernetes_clusters = {
+  phonebook = {
+    subnet_aks = {
+      name = "subnet-aks"
+      virtual_network_name = "vnet-app"
+      resource_group_name = "rg-eastus"
+    }
+    subnet_appgw = {
+      name = "subnet-appgw"
+      virtual_network_name = "vnet-app"
+      resource_group_name = "rg-eastus"
+    }
+    name = "phonebook"
+    resource_group = "rg_eastus"
+    private_cluster_enabled = true
+    default_node_pool = {
+      name                 = "default"
+      node_count           = 1
+      vm_size              = "Standard_B2s"
+    }
+    identity = {
+      type = "SystemAssigned"
+    }
+    ingress_application_gateway = {
+      enabled = true
+      gateway_name = "phonebook"
+    }
+    network_profile = {
+      network_plugin = "azure"
+      outbound_type = "userDefinedRouting"
+    }
+  }
+}
+
+firewalls = {
+  hub_us = {
+    name = "hub"
+    resource_group = "rg_eastus"
+    sku_name = "AZFW_VNet"
+    sku_tier = "Basic"
+    ip_configuration = {
+      subnet = {
+        name = "AzureFirewallSubnet"
+        virtual_network_name = "vnet-hub"
+        resource_group_name = "rg-eastus"
+      }
+    }
+    management_ip_configuration = {
+      enabled = true
+      subnet = {
+        virtual_network_name = "vnet-hub"
+        resource_group_name = "rg-eastus"
+      }
+      public_ip_address = {
+        name = "hub-firewall-management"
+        resource_group_name = "rg-eastus"
+      }
+    }
+  }
+}

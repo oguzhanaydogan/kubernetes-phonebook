@@ -7,13 +7,13 @@ variable "subnet_appgw" {
 variable "name" {
 }
 
-variable "location" { 
+variable "location" {
 }
 
 variable "resource_group_name" {
 }
 
-variable "kubernetes_version" {
+variable "private_cluster_enabled" {
 }
 
 variable "default_node_pool" {
@@ -23,4 +23,7 @@ variable "identity" {
 }
 
 variable "ingress_application_gateway" {
+}
+
+variable "network_profile" {
 }
