@@ -23,26 +23,26 @@ data "azurerm_network_security_group" "network_security_group" {
 }
 
 locals {
-  load_balancer_backend_address_pools_flattened_info = flatten([
+  lb_backend_address_pools_flattened_info = flatten([
     for k, v in var.network_interface.ip_configurations : [
       for key, pool in v.load_balancer_backend_address_pools : {
-        load_balancer_backend_address_pool_name = pool.name
-        load_balancer_name                      = pool.load_balancer_name
-        load_balancer_resource_group_name       = pool.load_balancer_resource_group_name
+        lb_backend_address_pool_name      = pool.name
+        load_balancer_name                = pool.load_balancer_name
+        load_balancer_resource_group_name = pool.load_balancer_resource_group_name
       }
     ]
   ])
 
   load_balancers = {
-    for info in local.load_balancer_backend_address_pools_flattened_info : info.load_balancer_name => {
+    for info in local.lb_backend_address_pools_flattened_info : info.load_balancer_name => {
       name                = info.load_balancer_name
       resource_group_name = info.load_balancer_resource_group_name
     }...
   }
 
-  load_balancer_backend_address_pools = {
-    for info in local.load_balancer_backend_address_pools_flattened_info : info.load_balancer_backend_address_pool_name => {
-      name               = info.load_balancer_backend_address_pool_name
+  lb_backend_address_pools = {
+    for info in local.lb_backend_address_pools_flattened_info : info.lb_backend_address_pool_name => {
+      name               = info.lb_backend_address_pool_name
       load_balancer_name = info.load_balancer_name
     }
   }
@@ -56,7 +56,7 @@ data "azurerm_lb" "lb" {
 }
 
 data "azurerm_lb_backend_address_pool" "lb_backend_address_pools" {
-  for_each = local.load_balancer_backend_address_pools
+  for_each = local.lb_backend_address_pools
 
   name            = each.value.name
   loadbalancer_id = data.azurerm_lb.lb[each.value.load_balancer_name].id

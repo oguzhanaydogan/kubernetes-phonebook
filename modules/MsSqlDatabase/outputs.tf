@@ -1,3 +1,3 @@
 output "id" {
-  value = azurerm_mssql_database.test.id
+  value = azurerm_mssql_database.mssql_database.id
 }

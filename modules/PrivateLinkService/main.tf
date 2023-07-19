@@ -1,4 +1,4 @@
-resource "azurerm_private_link_service" "example" {
+resource "azurerm_private_link_service" "private_link_service" {
   name                = var.name
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -9,6 +9,7 @@ resource "azurerm_private_link_service" "example" {
 
   dynamic "nat_ip_configuration" {
     for_each = var.nat_ip_configurations
+
     content {
       name      = nat_ip_configuration.value.name
       subnet_id = nat_ip_configuration.value.subnet_id

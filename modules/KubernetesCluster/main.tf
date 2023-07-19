@@ -10,7 +10,7 @@ data "azurerm_subnet" "subnet_appgw" {
   resource_group_name  = var.subnet_appgw.resource_group_name
 }
 
-resource "azurerm_kubernetes_cluster" "k8s" {
+resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
   name                    = var.name
   location                = var.location
   resource_group_name     = var.resource_group_name
@@ -30,7 +30,7 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   }
 
   dynamic "ingress_application_gateway" {
-    for_each = var.ingress_application_gateway.enabled == true ? [1] : []
+    for_each = var.ingress_application_gateway.enabled ? [1] : []
 
     content {
       gateway_name = var.ingress_application_gateway.gateway_name

@@ -2,7 +2,7 @@ variable "name" {
 }
 variable "location" {
 }
-variable "resourcegroup" {
+variable "resource_group_name" {
 }
 variable "security_rules" {
 }

@@ -48,6 +48,7 @@ module "vnet_peerings" {
   name                      = each.value.name
   virtual_network_name      = module.virtual_networks[each.value.virtual_network].name
   remote_virtual_network_id = module.virtual_networks[each.value.remote_virtual_network].id
+  allow_forwarded_traffic   = each.value.allow_forwarded_traffic
 }
 
 module "subnets" {
@@ -102,10 +103,10 @@ module "network_security_groups" {
   source   = "./modules/NetworkSecurityGroup"
   for_each = var.network_security_groups
 
-  name           = each.value.name
-  location       = module.resource_groups[each.value.resource_group].location
-  resourcegroup  = module.resource_groups[each.value.resource_group].name
-  security_rules = each.value.security_rules
+  name                = each.value.name
+  location            = module.resource_groups[each.value.resource_group].location
+  resource_group_name = module.resource_groups[each.value.resource_group].name
+  security_rules      = each.value.security_rules
 }
 
 module "linux_virtual_machines" {
@@ -142,40 +143,41 @@ module "key_vault_access_policies" {
   source   = "./modules/KeyVaultAccessPolicy"
   for_each = var.key_vault_access_policies
 
-  name                = each.value.name
-  resource_group_name = each.value.resource_group_name
+  key_vault_name                = each.value.key_vault_name
+  key_vault_resource_group_name = each.value.key_vault_resource_group_name
+  object_id                     = data.azurerm_client_config.client_config.object_id
   key_permissions               = each.value.key_permissions
   secret_permissions            = each.value.secret_permissions
-  object_id                     = data.azurerm_client_config.client_config.object_id
 }
 
 module "key_vault_secrets" {
   source   = "./modules/KeyVaultSecret"
   for_each = var.key_vault_secrets
 
-  name                = each.value.name
-  key_vault_resource_group_name = each.value.resource_group_name
-  key_vault_name                   = each.value.key_vault_name
+  name                          = each.value.name
+  key_vault_resource_group_name = each.value.key_vault_resource_group_name
+  key_vault_name                = each.value.key_vault_name
 
-  depends_on                    = [
+  depends_on = [
     module.key_vault_access_policies
   ]
 }
 
 module "mssql_servers" {
-  source   = "./modules/MsSqlServer"
+  source   = "./modules/MSSQLServer"
   for_each = var.mssql_servers
 
   name                         = each.value.name
   resource_group_name          = module.resource_groups[each.value.resource_group].name
   location                     = module.resource_groups[each.value.resource_group].location
+  msqql_version                = each.value.version
   administrator_login          = each.value.administrator_login
-  administrator_login_password = module.key_vault_secrets[each.value.admin_password_secret].value
+  administrator_login_password = module.key_vault_secrets[each.value.admin_password_key_vault_secret].value
   tags                         = each.value.tags
 }
 
 module "mssql_databases" {
-  source   = "./modules/MsSqlDatabase"
+  source   = "./modules/MSSQLDatabase"
   for_each = var.mssql_databases
 
   name                        = each.value.name
@@ -191,7 +193,7 @@ module "mssql_databases" {
 }
 
 # module "azapi_create_phonebook_sync_group" {
-#   source    = "./modules/AzApi"
+#   source    = "./modules/AzAPI"
 #   name      = "phonebook-sync-group"
 #   type      = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
 #   parent_id = module.mssql_databases["phonebook_us"].id
@@ -208,7 +210,7 @@ module "mssql_databases" {
 # }
 
 # module "arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu" {
-#   source              = "./modules/ArmTemplateDeployment"
+#   source              = "./modules/ARMTemplateDeployment"
 #   name                = "create-phonebook-sync-group-member-phonebook-eu"
 #   resource_group_name = module.resource_groups["rg_eastus"].name
 #   deployment_mode     = "Incremental"
@@ -241,7 +243,7 @@ module "mssql_databases" {
 # }
 #
 # module "azapi_update_phonebook_sync_group" {
-#   source      = "./modules/AzApiUpdateResource"
+#   source      = "./modules/AzAPIUpdateResource"
 #   type        = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
 #   resource_id = "/subscriptions/14528ad0-4c9e-48a9-8ed0-111c1034b033/resourceGroups/rg-eastus/providers/Microsoft.Sql/servers/coyhub-db-us/databases/phonebook/syncGroups/phonebook-sync-group"
 #   depends_on = [
@@ -296,8 +298,8 @@ module "private_link_services" {
   name                                        = each.value.name
   resource_group_name                         = module.resource_groups[each.value.resource_group].name
   location                                    = module.resource_groups[each.value.resource_group].location
-  auto_approval_subscription_ids              = [data.azurerm_client_config.current.subscription_id]
-  visibility_subscription_ids                 = [data.azurerm_client_config.current.subscription_id]
+  auto_approval_subscription_ids              = [data.azurerm_client_config.client_config.subscription_id]
+  visibility_subscription_ids                 = [data.azurerm_client_config.client_config.subscription_id]
   load_balancer_frontend_ip_configuration_ids = [module.load_balancers[each.value.load_balancer].frontend_ip_configuration_id]
   nat_ip_configurations = {
     for nat_ip_config in each.value.nat_ip_configurations : nat_ip_config.name => {
@@ -343,7 +345,7 @@ module "bastion_hosts" {
 }
 
 module "private_dns_zones" {
-  source   = "./modules/PrivateDnsZone"
+  source   = "./modules/PrivateDNSZone"
   for_each = var.private_dns_zones
 
   name                  = each.value.name
@@ -374,26 +376,6 @@ module "private_endpoints" {
   ]
 }
 
-module "front_doors" {
-  source   = "./modules/FrontDoor"
-  for_each = var.front_doors
-
-  name                = each.value.name
-  resource_group_name = module.resource_groups[each.value.resource_group].name
-  sku_name            = each.value.sku_name
-  endpoints           = each.value.endpoints
-  origin_groups       = each.value.origin_groups
-  origins             = each.value.origins
-  routes              = each.value.routes
-  # rule_sets = each.value.rule_sets
-  # rules = each.value.rules
-
-  depends_on = [
-    module.load_balancers,
-    module.private_link_services
-  ]
-}
-
 module "kubernetes_clusters" {
   source   = "./modules/KubernetesCluster"
   for_each = var.kubernetes_clusters
@@ -413,6 +395,27 @@ module "kubernetes_clusters" {
     module.subnets,
     module.route_tables,
     module.firewalls
+  ]
+}
+
+module "front_doors" {
+  source   = "./modules/FrontDoor"
+  for_each = var.front_doors
+
+  name                = each.value.name
+  resource_group_name = module.resource_groups[each.value.resource_group].name
+  sku_name            = each.value.sku_name
+  endpoints           = each.value.endpoints
+  origin_groups       = each.value.origin_groups
+  origins             = each.value.origins
+  routes              = each.value.routes
+  # rule_sets = each.value.rule_sets
+  # rules = each.value.rules
+
+  depends_on = [
+    module.load_balancers,
+    module.private_link_services,
+    module.kubernetes_clusters
   ]
 }
 

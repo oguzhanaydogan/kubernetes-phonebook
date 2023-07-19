@@ -49,64 +49,74 @@ virtual_networks = {
 
 vnet_peerings = {
   db_hub = {
-    name                   = "db-hub"
-    virtual_network        = "vnet_db"
-    remote_virtual_network = "vnet_hub"
-    resource_group         = "rg_eastus"
+    name                    = "db-hub"
+    virtual_network         = "vnet_db"
+    remote_virtual_network  = "vnet_hub"
+    resource_group          = "rg_eastus"
+    allow_forwarded_traffic = true
   }
   hub_db = {
-    name                   = "hub-db"
-    virtual_network        = "vnet_hub"
-    remote_virtual_network = "vnet_db"
-    resource_group         = "rg_eastus"
+    name                    = "hub-db"
+    virtual_network         = "vnet_hub"
+    remote_virtual_network  = "vnet_db"
+    resource_group          = "rg_eastus"
+    allow_forwarded_traffic = true
   }
   app_hub = {
-    name                   = "app-hub"
-    virtual_network        = "vnet_app"
-    remote_virtual_network = "vnet_hub"
-    resource_group         = "rg_eastus"
+    name                    = "app-hub"
+    virtual_network         = "vnet_app"
+    remote_virtual_network  = "vnet_hub"
+    resource_group          = "rg_eastus"
+    allow_forwarded_traffic = true
   }
   hub_app = {
-    name                   = "hub-app"
-    virtual_network        = "vnet_hub"
-    remote_virtual_network = "vnet_app"
-    resource_group         = "rg_eastus"
+    name                    = "hub-app"
+    virtual_network         = "vnet_hub"
+    remote_virtual_network  = "vnet_app"
+    resource_group          = "rg_eastus"
+    allow_forwarded_traffic = true
   }
   acr_hub = {
-    name                   = "acr-hub"
-    virtual_network        = "vnet_acr"
-    remote_virtual_network = "vnet_hub"
-    resource_group         = "rg_eastus"
+    name                    = "acr-hub"
+    virtual_network         = "vnet_acr"
+    remote_virtual_network  = "vnet_hub"
+    resource_group          = "rg_eastus"
+    allow_forwarded_traffic = true
   }
   hub_acr = {
-    name                   = "hub-acr"
-    virtual_network        = "vnet_hub"
-    remote_virtual_network = "vnet_acr"
-    resource_group         = "rg_eastus"
+    name                    = "hub-acr"
+    virtual_network         = "vnet_hub"
+    remote_virtual_network  = "vnet_acr"
+    resource_group          = "rg_eastus"
+    allow_forwarded_traffic = true
   }
   db_dbeu = {
-    name                   = "db-dbeu"
-    virtual_network        = "vnet_db"
-    remote_virtual_network = "vnet_db_eu"
-    resource_group         = "rg_eastus"
+    name                    = "db-dbeu"
+    virtual_network         = "vnet_db"
+    remote_virtual_network  = "vnet_db_eu"
+    resource_group          = "rg_eastus"
+    allow_forwarded_traffic = true
   }
   dbeu_db = {
-    name                   = "dbeu-db"
-    virtual_network        = "vnet_db_eu"
-    remote_virtual_network = "vnet_db"
-    resource_group         = "rg_westeurope"
+    name                    = "dbeu-db"
+    virtual_network         = "vnet_db_eu"
+    remote_virtual_network  = "vnet_db"
+    resource_group          = "rg_westeurope"
+    allow_forwarded_traffic = true
   }
   appeu_dbeu = {
-    name                   = "appeu-dbeu"
-    virtual_network        = "vnet_app_eu"
-    remote_virtual_network = "vnet_db_eu"
-    resource_group         = "rg_westeurope"
+    name                    = "appeu-dbeu"
+    virtual_network         = "vnet_app_eu"
+    remote_virtual_network  = "vnet_db_eu"
+    resource_group          = "rg_westeurope"
+    allow_forwarded_traffic = true
   }
   dbeu_appeu = {
-    name                   = "dbeu-appeu"
-    virtual_network        = "vnet_db_eu"
-    remote_virtual_network = "vnet_app_eu"
-    resource_group         = "rg_westeurope"
+    name                    = "dbeu-appeu"
+    virtual_network         = "vnet_db_eu"
+    remote_virtual_network  = "vnet_app_eu"
+    resource_group          = "rg_westeurope"
+    allow_forwarded_traffic = true
   }
 }
 
@@ -360,6 +370,33 @@ network_security_groups = {
   }
 }
 
+firewalls = {
+  hub_us = {
+    name           = "hub"
+    resource_group = "rg_eastus"
+    sku_name       = "AZFW_VNet"
+    sku_tier       = "Basic"
+    ip_configuration = {
+      subnet = {
+        name                 = "AzureFirewallSubnet"
+        virtual_network_name = "vnet-hub"
+        resource_group_name  = "rg-eastus"
+      }
+    }
+    management_ip_configuration = {
+      enabled = true
+      subnet = {
+        virtual_network_name = "vnet-hub"
+        resource_group_name  = "rg-eastus"
+      }
+      public_ip_address = {
+        name                = "hub-firewall-management"
+        resource_group_name = "rg-eastus"
+      }
+    }
+  }
+}
+
 linux_virtual_machines = {
   ci_cd_agent = {
     name           = "ci-cd-agent"
@@ -421,8 +458,8 @@ linux_virtual_machines = {
 
 key_vault_access_policies = {
   coy_vault = {
-    name                = "coyvault"
-    resource_group_name = "ssh-key"
+    key_vault_name                = "coyvault"
+    key_vault_resource_group_name = "ssh-key"
     key_permissions = [
       "Get", "List",
     ]
@@ -433,8 +470,8 @@ key_vault_access_policies = {
 }
 
 key_vault_secrets = {
-  mssqlpassword = {
-    name                   = "MSSQLPASSWORD"
+  mssql_password = {
+    name                          = "MSSQLPASSWORD"
     key_vault_resource_group_name = "ssh-key"
     key_vault_name                = "coyvault"
   }
@@ -444,8 +481,9 @@ mssql_servers = {
   # coyhub_db_us = {
   #   name                  = "coyhub-db-us"
   #   resource_group        = "rg_eastus"
+  #   version               = "12.0"
   #   administrator_login   = "azureuser"
-  #   admin_password_secret = "key_vault_secret_mssql_password"
+  #   admin_password_key_vault_secret = "key_vault_secret_mssql_password"
   #   tags = {
   #     name = "coyhub-db-us"
   #   }
@@ -453,8 +491,9 @@ mssql_servers = {
   # coyhub_db_eu = {
   #   name                  = "coyhub-db-eu"
   #   resource_group        = "rg_westeurope"
+  #   version               = "12.0"
   #   administrator_login   = "azureuser"
-  #   admin_password_secret = "key_vault_secret_mssql_password"
+  #   admin_password_key_vault_secret = "key_vault_secret_mssql_password"
   #   tags = {
   #     name = "coyhub-db-eu"
   #   }
@@ -701,6 +740,40 @@ private_endpoints = {
   # }
 }
 
+kubernetes_clusters = {
+  phonebook = {
+    subnet_aks = {
+      name                 = "subnet-aks"
+      virtual_network_name = "vnet-app"
+      resource_group_name  = "rg-eastus"
+    }
+    subnet_appgw = {
+      name                 = "subnet-appgw"
+      virtual_network_name = "vnet-app"
+      resource_group_name  = "rg-eastus"
+    }
+    name                    = "phonebook"
+    resource_group          = "rg_eastus"
+    private_cluster_enabled = true
+    default_node_pool = {
+      name       = "default"
+      node_count = 1
+      vm_size    = "Standard_B2s"
+    }
+    identity = {
+      type = "SystemAssigned"
+    }
+    ingress_application_gateway = {
+      enabled      = true
+      gateway_name = "phonebook"
+    }
+    network_profile = {
+      network_plugin = "azure"
+      outbound_type  = "userDefinedRouting"
+    }
+  }
+}
+
 front_doors = {
   # phonebook = {
   #   name           = "phonebook"
@@ -796,65 +869,4 @@ front_doors = {
   #   #   }
   #   # ]
   # }
-}
-
-kubernetes_clusters = {
-  phonebook = {
-    subnet_aks = {
-      name                 = "subnet-aks"
-      virtual_network_name = "vnet-app"
-      resource_group_name  = "rg-eastus"
-    }
-    subnet_appgw = {
-      name                 = "subnet-appgw"
-      virtual_network_name = "vnet-app"
-      resource_group_name  = "rg-eastus"
-    }
-    name                    = "phonebook"
-    resource_group          = "rg_eastus"
-    private_cluster_enabled = true
-    default_node_pool = {
-      name       = "default"
-      node_count = 1
-      vm_size    = "Standard_B2s"
-    }
-    identity = {
-      type = "SystemAssigned"
-    }
-    ingress_application_gateway = {
-      enabled      = true
-      gateway_name = "phonebook"
-    }
-    network_profile = {
-      network_plugin = "azure"
-      outbound_type  = "userDefinedRouting"
-    }
-  }
-}
-
-firewalls = {
-  hub_us = {
-    name           = "hub"
-    resource_group = "rg_eastus"
-    sku_name       = "AZFW_VNet"
-    sku_tier       = "Basic"
-    ip_configuration = {
-      subnet = {
-        name                 = "AzureFirewallSubnet"
-        virtual_network_name = "vnet-hub"
-        resource_group_name  = "rg-eastus"
-      }
-    }
-    management_ip_configuration = {
-      enabled = true
-      subnet = {
-        virtual_network_name = "vnet-hub"
-        resource_group_name  = "rg-eastus"
-      }
-      public_ip_address = {
-        name                = "hub-firewall-management"
-        resource_group_name = "rg-eastus"
-      }
-    }
-  }
 }

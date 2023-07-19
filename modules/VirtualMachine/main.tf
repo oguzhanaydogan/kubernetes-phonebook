@@ -22,6 +22,7 @@ resource "azurerm_network_interface" "network_interface" {
   name                = "${var.name}-network_interface"
   location            = var.location
   resource_group_name = var.resource_group_name
+
   dynamic "ip_configuration" {
     for_each = var.network_interface.ip_configurations
 
@@ -34,7 +35,7 @@ resource "azurerm_network_interface" "network_interface" {
   }
 }
 
-resource "azurerm_virtual_machine" "vm" {
+resource "azurerm_virtual_machine" "virtual_machine" {
   name                             = var.name
   location                         = var.location
   resource_group_name              = var.resource_group_name

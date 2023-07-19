@@ -10,7 +10,7 @@ data "azurerm_virtual_network" "virtual_networks" {
   resource_group_name = each.value.virtual_network.resource_group_name
 }
 
-resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_virtual_network_link" {
+resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_virtual_network_links" {
   for_each = var.virtual_network_links
 
   name                  = each.value.name

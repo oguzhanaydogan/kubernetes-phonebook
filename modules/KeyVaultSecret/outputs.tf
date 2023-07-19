@@ -1,9 +1,9 @@
 output "id" {
-  value = data.azurerm_key_vault_secret.secret.id
+  value = data.azurerm_key_vault_secret.key_vault_secret.id
 }
 
 output "value" {
-  value = data.azurerm_key_vault_secret.secret.value
+  value = data.azurerm_key_vault_secret.key_vault_secret.value
 }
 
 

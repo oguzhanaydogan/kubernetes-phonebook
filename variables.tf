@@ -15,10 +15,11 @@ variable "virtual_networks" {
 
 variable "vnet_peerings" {
   type = map(object({
-    name                   = string
-    virtual_network        = string
-    remote_virtual_network = string
-    resource_group         = string
+    name                    = string
+    virtual_network         = string
+    remote_virtual_network  = string
+    resource_group          = string
+    allow_forwarded_traffic = bool
   }))
 }
 
@@ -91,6 +92,33 @@ variable "network_security_groups" {
   }))
 }
 
+variable "firewalls" {
+  type = map(object({
+    name           = string
+    resource_group = string
+    sku_name       = string
+    sku_tier       = string
+    ip_configuration = object({
+      subnet = object({
+        name                 = string
+        virtual_network_name = string
+        resource_group_name  = string
+      })
+    })
+    management_ip_configuration = object({
+      enabled = bool
+      subnet = object({
+        virtual_network_name = string
+        resource_group_name  = string
+      })
+      public_ip_address = object({
+        name                = string
+        resource_group_name = string
+      })
+    })
+  }))
+}
+
 variable "linux_virtual_machines" {
   type = map(object({
     name           = string
@@ -153,27 +181,26 @@ variable "key_vault_access_policies" {
   type = map(object({
     key_vault_name                = string
     key_vault_resource_group_name = string
-    key_vault_access_owner        = string
     key_permissions               = list(string)
     secret_permissions            = list(string)
   }))
-
 }
 variable "key_vault_secrets" {
   type = map(object({
+    name                          = string
     key_vault_name                = string
     key_vault_resource_group_name = string
-    secret_name                   = string
   }))
 }
 
 variable "mssql_servers" {
   type = map(object({
-    name                  = string
-    resource_group        = string
-    administrator_login   = string
-    admin_password_secret = string
-    tags                  = map(string)
+    name                            = string
+    resource_group                  = string
+    version                         = string
+    administrator_login             = string
+    admin_password_key_vault_secret = string
+    tags                            = map(string)
   }))
 }
 
@@ -346,6 +373,40 @@ variable "private_endpoints" {
   }))
 }
 
+variable "kubernetes_clusters" {
+  type = map(object({
+    subnet_aks = object({
+      name                 = string
+      virtual_network_name = string
+      resource_group_name  = string
+    })
+    subnet_appgw = object({
+      name                 = string
+      virtual_network_name = string
+      resource_group_name  = string
+    })
+    name                    = string
+    resource_group          = string
+    private_cluster_enabled = bool
+    default_node_pool = object({
+      name       = string
+      node_count = number
+      vm_size    = string
+    })
+    identity = object({
+      type = string
+    })
+    ingress_application_gateway = object({
+      enabled      = bool
+      gateway_name = string
+    })
+    network_profile = object({
+      network_plugin = string
+      outbound_type  = string
+    })
+  }))
+}
+
 variable "front_doors" {
   type = map(object({
     name           = string
@@ -425,42 +486,4 @@ variable "front_doors" {
     #   })
     # }))
   }))
-}
-
-variable "kubernetes_clusters" {
-  type = map(object({
-    subnet_aks = object({
-      name                 = string
-      virtual_network_name = string
-      resource_group_name  = string
-    })
-    subnet_appgw = object({
-      name                 = string
-      virtual_network_name = string
-      resource_group_name  = string
-    })
-    name                    = string
-    resource_group          = string
-    private_cluster_enabled = bool
-    default_node_pool = object({
-      name       = string
-      node_count = number
-      vm_size    = string
-    })
-    identity = object({
-      type = string
-    })
-    ingress_application_gateway = object({
-      enabled      = bool
-      gateway_name = string
-    })
-    network_profile = object({
-      network_plugin = string
-      outbound_type  = string
-    })
-  }))
-}
-
-variable "firewalls" {
-
 }

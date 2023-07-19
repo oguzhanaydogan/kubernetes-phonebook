@@ -9,3 +9,6 @@ variable "virtual_network_name" {
 
 variable "remote_virtual_network_id" {
 }
+
+variable "allow_forwarded_traffic" {
+}
