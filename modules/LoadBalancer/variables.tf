@@ -21,3 +21,6 @@ variable "lb_probes" {
 
 variable "lb_rules" {
 }
+
+variable "private_link_service" {
+}

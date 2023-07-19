@@ -37,12 +37,7 @@ variable "subnets" {
         actions = optional(list(string))
       })
       }),
-      {
-        name = ""
-        service_delegation = {
-          name = ""
-        }
-      }
+      null
     )
   }))
 }
@@ -116,6 +111,18 @@ variable "firewalls" {
         resource_group_name = string
       })
     })
+    firewall_network_rule_collections = map(object({
+      name = string
+      priority = number
+      action = string
+      firewall_network_rules = map(object({
+        name = string
+        source_addresses = list(string)
+        destination_ports = list(string)
+        destination_addresses = list(string)
+        protocols = list(string)
+      }))
+    }))
   }))
 }
 
@@ -249,19 +256,20 @@ variable "load_balancers" {
       frontend_port                  = string
       backend_port                   = string
     }))
-  }))
-}
-
-variable "private_link_services" {
-  type = map(object({
-    name           = string
-    resource_group = string
-    load_balancer  = string
-    nat_ip_configurations = list(object({
-      subnet  = string
-      name    = string
-      primary = bool
-    }))
+    private_link_service = optional(object({
+      name = string
+      nat_ip_configurations = map(object({
+        name = string
+        subnet = object({
+          name                 = string
+          virtual_network_name = string
+          resource_group_name  = string    
+        })
+        primary = bool
+      }))
+    }),
+    null
+    )
   }))
 }
 

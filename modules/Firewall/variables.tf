@@ -18,3 +18,6 @@ variable "ip_configuration" {
 
 variable "management_ip_configuration" {
 }
+
+variable "firewall_network_rule_collections" {
+}

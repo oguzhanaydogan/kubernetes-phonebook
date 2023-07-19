@@ -25,4 +25,10 @@ variable "delegation" {
       actions = optional(list(string))
     })
   })
+  default = {
+    name = ""
+    service_delegation = {
+      name = ""
+    }
+  }
 }

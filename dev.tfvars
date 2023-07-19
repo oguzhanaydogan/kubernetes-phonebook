@@ -48,48 +48,48 @@ virtual_networks = {
 }
 
 vnet_peerings = {
-  db_hub = {
-    name                    = "db-hub"
-    virtual_network         = "vnet_db"
-    remote_virtual_network  = "vnet_hub"
-    resource_group          = "rg_eastus"
-    allow_forwarded_traffic = true
-  }
-  hub_db = {
-    name                    = "hub-db"
-    virtual_network         = "vnet_hub"
-    remote_virtual_network  = "vnet_db"
-    resource_group          = "rg_eastus"
-    allow_forwarded_traffic = true
-  }
-  app_hub = {
-    name                    = "app-hub"
-    virtual_network         = "vnet_app"
-    remote_virtual_network  = "vnet_hub"
-    resource_group          = "rg_eastus"
-    allow_forwarded_traffic = true
-  }
-  hub_app = {
-    name                    = "hub-app"
-    virtual_network         = "vnet_hub"
-    remote_virtual_network  = "vnet_app"
-    resource_group          = "rg_eastus"
-    allow_forwarded_traffic = true
-  }
-  acr_hub = {
-    name                    = "acr-hub"
-    virtual_network         = "vnet_acr"
-    remote_virtual_network  = "vnet_hub"
-    resource_group          = "rg_eastus"
-    allow_forwarded_traffic = true
-  }
-  hub_acr = {
-    name                    = "hub-acr"
-    virtual_network         = "vnet_hub"
-    remote_virtual_network  = "vnet_acr"
-    resource_group          = "rg_eastus"
-    allow_forwarded_traffic = true
-  }
+  # db_hub = {
+  #   name                    = "db-hub"
+  #   virtual_network         = "vnet_db"
+  #   remote_virtual_network  = "vnet_hub"
+  #   resource_group          = "rg_eastus"
+  #   allow_forwarded_traffic = true
+  # }
+  # hub_db = {
+  #   name                    = "hub-db"
+  #   virtual_network         = "vnet_hub"
+  #   remote_virtual_network  = "vnet_db"
+  #   resource_group          = "rg_eastus"
+  #   allow_forwarded_traffic = true
+  # }
+  # app_hub = {
+  #   name                    = "app-hub"
+  #   virtual_network         = "vnet_app"
+  #   remote_virtual_network  = "vnet_hub"
+  #   resource_group          = "rg_eastus"
+  #   allow_forwarded_traffic = true
+  # }
+  # hub_app = {
+  #   name                    = "hub-app"
+  #   virtual_network         = "vnet_hub"
+  #   remote_virtual_network  = "vnet_app"
+  #   resource_group          = "rg_eastus"
+  #   allow_forwarded_traffic = true
+  # }
+  # acr_hub = {
+  #   name                    = "acr-hub"
+  #   virtual_network         = "vnet_acr"
+  #   remote_virtual_network  = "vnet_hub"
+  #   resource_group          = "rg_eastus"
+  #   allow_forwarded_traffic = true
+  # }
+  # hub_acr = {
+  #   name                    = "hub-acr"
+  #   virtual_network         = "vnet_hub"
+  #   remote_virtual_network  = "vnet_acr"
+  #   resource_group          = "rg_eastus"
+  #   allow_forwarded_traffic = true
+  # }
   db_dbeu = {
     name                    = "db-dbeu"
     virtual_network         = "vnet_db"
@@ -116,6 +116,20 @@ vnet_peerings = {
     virtual_network         = "vnet_db_eu"
     remote_virtual_network  = "vnet_app_eu"
     resource_group          = "rg_westeurope"
+    allow_forwarded_traffic = true
+  }
+  app_agent = {
+    name                    = "app-agent"
+    virtual_network         = "vnet_app"
+    remote_virtual_network  = "vnet_agent"
+    resource_group          = "rg_eastus"
+    allow_forwarded_traffic = true
+  }
+  agent_app = {
+    name                    = "agent-app"
+    virtual_network         = "vnet_agent"
+    remote_virtual_network  = "vnet_app"
+    resource_group          = "rg_eastus"
     allow_forwarded_traffic = true
   }
 }
@@ -221,74 +235,74 @@ subnets = {
 }
 
 route_tables = {
-  route_table_1 = {
-    name           = "route-table-1"
-    resource_group = "rg_eastus"
-    routes = {
-      route_to_vnet_acr_subnet_acr = {
-        name                   = "route-to-vnet-acr-subnet-acr"
-        address_prefix         = "10.2.0.0/24"
-        next_hop_type          = "VirtualAppliance"
-        next_hop_in_ip_address = "10.0.0.4"
-      }
-      route_to_vnet_db_subnet_db = {
-        name                   = "route-to-vnet-db-subnet-db"
-        address_prefix         = "10.3.0.0/24"
-        next_hop_type          = "VirtualAppliance"
-        next_hop_in_ip_address = "10.0.0.4"
-      }
-    }
-    subnet_associations = {
-      vnet_app_subnet_app = {
-        subnet_name          = "subnet-app"
-        resource_group_name  = "rg-eastus"
-        virtual_network_name = "vnet-app"
-      }
-      vnet_app_subnet_aks = {
-        subnet_name          = "subnet-aks"
-        resource_group_name  = "rg-eastus"
-        virtual_network_name = "vnet-app"
-      }
-    }
-  }
-  route_table_2 = {
-    name           = "route-table-2"
-    resource_group = "rg_eastus"
-    routes = {
-      route_to_vnet_app_subnet_app = {
-        name                   = "route-to-vnet-app-subnet-app"
-        address_prefix         = "10.1.0.0/24"
-        next_hop_type          = "VirtualAppliance"
-        next_hop_in_ip_address = "10.0.0.4"
-      }
-    }
-    subnet_associations = {
-      vnet_db_subnet_db = {
-        subnet_name          = "subnet-db"
-        resource_group_name  = "rg-eastus"
-        virtual_network_name = "vnet-db"
-      }
-    }
-  }
-  route_table_3 = {
-    name           = "route-table-3"
-    resource_group = "rg_eastus"
-    routes = {
-      route_to_everywhere = {
-        name                   = "route-to-everywhere"
-        address_prefix         = "10.0.0.0/8"
-        next_hop_type          = "VirtualAppliance"
-        next_hop_in_ip_address = "10.4.0.4"
-      }
-    }
-    subnet_associations = {
-      vnet_acr_subnet_acr = {
-        subnet_name          = "subnet-acr"
-        resource_group_name  = "rg-eastus"
-        virtual_network_name = "vnet-acr"
-      }
-    }
-  }
+  # route_table_1 = {
+  #   name           = "route-table-1"
+  #   resource_group = "rg_eastus"
+  #   routes = {
+  #     route_to_vnet_acr_subnet_acr = {
+  #       name                   = "route-to-vnet-acr-subnet-acr"
+  #       address_prefix         = "10.2.0.0/24"
+  #       next_hop_type          = "VirtualAppliance"
+  #       next_hop_in_ip_address = "10.0.0.4"
+  #     }
+  #     route_to_vnet_db_subnet_db = {
+  #       name                   = "route-to-vnet-db-subnet-db"
+  #       address_prefix         = "10.3.0.0/24"
+  #       next_hop_type          = "VirtualAppliance"
+  #       next_hop_in_ip_address = "10.0.0.4"
+  #     }
+  #   }
+  #   subnet_associations = {
+  #     vnet_app_subnet_app = {
+  #       subnet_name          = "subnet-app"
+  #       resource_group_name  = "rg-eastus"
+  #       virtual_network_name = "vnet-app"
+  #     }
+  #     vnet_app_subnet_aks = {
+  #       subnet_name          = "subnet-aks"
+  #       resource_group_name  = "rg-eastus"
+  #       virtual_network_name = "vnet-app"
+  #     }
+  #   }
+  # }
+  # route_table_2 = {
+  #   name           = "route-table-2"
+  #   resource_group = "rg_eastus"
+  #   routes = {
+  #     route_to_vnet_app_subnet_app = {
+  #       name                   = "route-to-vnet-app-subnet-app"
+  #       address_prefix         = "10.1.0.0/24"
+  #       next_hop_type          = "VirtualAppliance"
+  #       next_hop_in_ip_address = "10.0.0.4"
+  #     }
+  #   }
+  #   subnet_associations = {
+  #     vnet_db_subnet_db = {
+  #       subnet_name          = "subnet-db"
+  #       resource_group_name  = "rg-eastus"
+  #       virtual_network_name = "vnet-db"
+  #     }
+  #   }
+  # }
+  # route_table_3 = {
+  #   name           = "route-table-3"
+  #   resource_group = "rg_eastus"
+  #   routes = {
+  #     route_to_everywhere = {
+  #       name                   = "route-to-everywhere"
+  #       address_prefix         = "10.0.0.0/8"
+  #       next_hop_type          = "VirtualAppliance"
+  #       next_hop_in_ip_address = "10.4.0.4"
+  #     }
+  #   }
+  #   subnet_associations = {
+  #     vnet_acr_subnet_acr = {
+  #       subnet_name          = "subnet-acr"
+  #       resource_group_name  = "rg-eastus"
+  #       virtual_network_name = "vnet-acr"
+  #     }
+  #   }
+  # }
 }
 
 # acrs = {
@@ -392,6 +406,22 @@ firewalls = {
       public_ip_address = {
         name                = "hub-firewall-management"
         resource_group_name = "rg-eastus"
+      }
+    }
+    firewall_network_rule_collections = {
+      collection_01 = {
+        name = "firewall_hub"
+        priority = 100
+        action = "Allow"
+        firewall_network_rules = {
+          rule_01 = {
+            name = "firewall_hub"
+            source_addresses = ["10.1.1.0/24"]
+            destination_ports = ["*"]
+            destination_addresses = ["0.0.0.0/0"]
+            protocols =["Any"]
+          }
+        }
       }
     }
   }
@@ -565,21 +595,20 @@ load_balancers = {
         backend_port                   = "80"
       }
     }
-  }
-}
-
-private_link_services = {
-  phonebook_lb_pls = {
-    name           = "phonebook-lb-pls"
-    resource_group = "rg_westeurope"
-    load_balancer  = "phonebook_lb"
-    nat_ip_configurations = [
-      {
-        name    = "primary"
-        subnet  = "vnet_app_eu_subnet_lb_pls"
-        primary = true
+    private_link_service = {
+      name = "phonebook-lb-pls"
+      nat_ip_configurations = {
+        nat_ip_configuration_01 = {
+          name    = "primary"
+          subnet  = {
+            name                 = "subnet-lb-pls"
+            virtual_network_name = "vnet-app-eu"
+            resource_group_name  = "rg-westeurope"            
+          }
+          primary = true
+        }
       }
-    ]
+    }
   }
 }
 
@@ -741,37 +770,37 @@ private_endpoints = {
 }
 
 kubernetes_clusters = {
-  phonebook = {
-    subnet_aks = {
-      name                 = "subnet-aks"
-      virtual_network_name = "vnet-app"
-      resource_group_name  = "rg-eastus"
-    }
-    subnet_appgw = {
-      name                 = "subnet-appgw"
-      virtual_network_name = "vnet-app"
-      resource_group_name  = "rg-eastus"
-    }
-    name                    = "phonebook"
-    resource_group          = "rg_eastus"
-    private_cluster_enabled = true
-    default_node_pool = {
-      name       = "default"
-      node_count = 1
-      vm_size    = "Standard_B2s"
-    }
-    identity = {
-      type = "SystemAssigned"
-    }
-    ingress_application_gateway = {
-      enabled      = true
-      gateway_name = "phonebook"
-    }
-    network_profile = {
-      network_plugin = "azure"
-      outbound_type  = "userDefinedRouting"
-    }
-  }
+  # phonebook = {
+  #   subnet_aks = {
+  #     name                 = "subnet-aks"
+  #     virtual_network_name = "vnet-app"
+  #     resource_group_name  = "rg-eastus"
+  #   }
+  #   subnet_appgw = {
+  #     name                 = "subnet-appgw"
+  #     virtual_network_name = "vnet-app"
+  #     resource_group_name  = "rg-eastus"
+  #   }
+  #   name                    = "phonebook"
+  #   resource_group          = "rg_eastus"
+  #   private_cluster_enabled = true
+  #   default_node_pool = {
+  #     name       = "default"
+  #     node_count = 1
+  #     vm_size    = "Standard_B2s"
+  #   }
+  #   identity = {
+  #     type = "SystemAssigned"
+  #   }
+  #   ingress_application_gateway = {
+  #     enabled      = true
+  #     gateway_name = "phonebook"
+  #   }
+  #   network_profile = {
+  #     network_plugin = "azure"
+  #     outbound_type  = "userDefinedRouting"
+  #   }
+  # }
 }
 
 front_doors = {

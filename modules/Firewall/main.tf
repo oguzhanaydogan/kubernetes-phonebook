@@ -37,3 +37,25 @@ resource "azurerm_firewall" "firewall" {
     }
   }
 }
+
+resource "azurerm_firewall_network_rule_collection" "firewall_network_rule_collection" {
+	for_each            = var.firewall_network_rule_collections
+
+	name                = each.value.name
+	azure_firewall_name = azurerm_firewall.firewall.name
+	resource_group_name = var.resource_group_name
+	priority            = each.value.priority
+	action              = each.value.action
+
+   dynamic "rule" {
+    for_each = each.value.firewall_network_rules
+
+    content {
+        name = rule.value.name
+        source_addresses = rule.value.source_addresses
+        destination_ports = rule.value.destination_ports
+        destination_addresses = rule.value.destination_addresses
+        protocols = rule.value.protocols
+    }    
+  }
+}

@@ -60,7 +60,7 @@ module "subnets" {
   virtual_network_name                          = module.virtual_networks[each.value.virtual_network].name
   address_prefixes                              = each.value.address_prefixes
   private_link_service_network_policies_enabled = each.value.private_link_service_network_policies_enabled
-  delegation                                    = each.value.delegation
+  # delegation                                    = each.value.delegation
 }
 
 module "route_tables" {
@@ -288,26 +288,9 @@ module "load_balancers" {
   lb_backend_address_pools   = each.value.lb_backend_address_pools
   lb_probes                  = each.value.lb_probes
   lb_rules                   = each.value.lb_rules
+  private_link_service       = each.value.private_link_service
+
   depends_on                 = [module.subnets]
-}
-
-module "private_link_services" {
-  source   = "./modules/PrivateLinkService"
-  for_each = var.private_link_services
-
-  name                                        = each.value.name
-  resource_group_name                         = module.resource_groups[each.value.resource_group].name
-  location                                    = module.resource_groups[each.value.resource_group].location
-  auto_approval_subscription_ids              = [data.azurerm_client_config.client_config.subscription_id]
-  visibility_subscription_ids                 = [data.azurerm_client_config.client_config.subscription_id]
-  load_balancer_frontend_ip_configuration_ids = [module.load_balancers[each.value.load_balancer].frontend_ip_configuration_id]
-  nat_ip_configurations = {
-    for nat_ip_config in each.value.nat_ip_configurations : nat_ip_config.name => {
-      name      = nat_ip_config.name
-      primary   = nat_ip_config.primary
-      subnet_id = module.subnets[nat_ip_config.subnet].id
-    }
-  }
 }
 
 module "linux_virtual_machine_scale_sets" {
@@ -414,7 +397,6 @@ module "front_doors" {
 
   depends_on = [
     module.load_balancers,
-    module.private_link_services,
     module.kubernetes_clusters
   ]
 }
@@ -430,6 +412,7 @@ module "firewalls" {
   sku_tier                    = each.value.sku_tier
   ip_configuration            = each.value.ip_configuration
   management_ip_configuration = each.value.management_ip_configuration
+  firewall_network_rule_collections = each.value.firewall_network_rule_collections
 
   depends_on = [
     module.subnets,

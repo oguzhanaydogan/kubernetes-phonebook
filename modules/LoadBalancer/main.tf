@@ -56,3 +56,36 @@ resource "azurerm_lb_rule" "lb_rules" {
     azurerm_lb_backend_address_pool.lb_backend_address_pools
   ]
 }
+
+data "azurerm_client_config" "client_config" {}
+
+data "azurerm_subnet" "subnets_pls" {
+  for_each = var.private_link_service.nat_ip_configurations
+
+  name                 = each.value.subnet.name
+  virtual_network_name = each.value.subnet.virtual_network_name
+  resource_group_name  = each.value.subnet.resource_group_name
+}
+
+resource "azurerm_private_link_service" "private_link_service" {
+  count = var.private_link_service != null ? 1 : 0
+  
+  name                = var.private_link_service.name
+  resource_group_name = var.resource_group_name
+  location            = var.location
+
+  auto_approval_subscription_ids              = [data.azurerm_client_config.client_config.subscription_id]
+  visibility_subscription_ids                 = [data.azurerm_client_config.client_config.subscription_id]
+  load_balancer_frontend_ip_configuration_ids = [azurerm_lb.lb.frontend_ip_configuration[0].id]
+
+  dynamic "nat_ip_configuration" {
+    for_each = var.private_link_service.nat_ip_configurations
+
+    content {
+      name      = nat_ip_configuration.value.name
+      subnet_id = data.azurerm_subnet.subnets_pls[nat_ip_configuration.key].id
+      primary   = nat_ip_configuration.value.primary
+    }
+  }
+}
+
