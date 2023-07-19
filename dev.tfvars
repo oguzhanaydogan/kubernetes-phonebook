@@ -385,46 +385,46 @@ network_security_groups = {
 }
 
 firewalls = {
-  hub_us = {
-    name           = "hub"
-    resource_group = "rg_eastus"
-    sku_name       = "AZFW_VNet"
-    sku_tier       = "Basic"
-    ip_configuration = {
-      subnet = {
-        name                 = "AzureFirewallSubnet"
-        virtual_network_name = "vnet-hub"
-        resource_group_name  = "rg-eastus"
-      }
-    }
-    management_ip_configuration = {
-      enabled = true
-      subnet = {
-        virtual_network_name = "vnet-hub"
-        resource_group_name  = "rg-eastus"
-      }
-      public_ip_address = {
-        name                = "hub-firewall-management"
-        resource_group_name = "rg-eastus"
-      }
-    }
-    firewall_network_rule_collections = {
-      collection_01 = {
-        name = "firewall_hub"
-        priority = 100
-        action = "Allow"
-        firewall_network_rules = {
-          rule_01 = {
-            name = "firewall_hub"
-            source_addresses = ["10.1.1.0/24"]
-            destination_ports = ["*"]
-            destination_addresses = ["0.0.0.0/0"]
-            protocols =["Any"]
-          }
-        }
-      }
-    }
-  }
+  # hub_us = {
+  #   name           = "hub"
+  #   resource_group = "rg_eastus"
+  #   sku_name       = "AZFW_VNet"
+  #   sku_tier       = "Basic"
+  #   ip_configuration = {
+  #     subnet = {
+  #       name                 = "AzureFirewallSubnet"
+  #       virtual_network_name = "vnet-hub"
+  #       resource_group_name  = "rg-eastus"
+  #     }
+  #   }
+  #   management_ip_configuration = {
+  #     enabled = true
+  #     subnet = {
+  #       virtual_network_name = "vnet-hub"
+  #       resource_group_name  = "rg-eastus"
+  #     }
+  #     public_ip_address = {
+  #       name                = "hub-firewall-management"
+  #       resource_group_name = "rg-eastus"
+  #     }
+  #   }
+  #   firewall_network_rule_collections = {
+  #     collection_01 = {
+  #       name = "firewall_hub"
+  #       priority = 100
+  #       action = "Allow"
+  #       firewall_network_rules = {
+  #         rule_01 = {
+  #           name = "firewall_hub"
+  #           source_addresses = ["10.1.1.0/24"]
+  #           destination_ports = ["*"]
+  #           destination_addresses = ["0.0.0.0/0"]
+  #           protocols =["Any"]
+  #         }
+  #       }
+  #     }
+  #   }
+  # }
 }
 
 linux_virtual_machines = {
