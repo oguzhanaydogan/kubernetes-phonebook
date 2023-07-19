@@ -420,10 +420,9 @@ linux_virtual_machines = {
 }
 
 key_vault_access_policies = {
-  key_vault_access_policy_coy_vault = {
-    key_vault_name                = "coyvault"
-    key_vault_resource_group_name = "ssh-key"
-    key_vault_access_owner        = "client_config"
+  coy_vault = {
+    name                = "coyvault"
+    resource_group_name = "ssh-key"
     key_permissions = [
       "Get", "List",
     ]
@@ -434,10 +433,10 @@ key_vault_access_policies = {
 }
 
 key_vault_secrets = {
-  key_vault_secret_mssql_password = {
-    key_vault_name                = "coyvault"
+  mssqlpassword = {
+    name                   = "MSSQLPASSWORD"
     key_vault_resource_group_name = "ssh-key"
-    secret_name                   = "MSSQLPASSWORD"
+    key_vault_name                = "coyvault"
   }
 }
 

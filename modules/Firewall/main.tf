@@ -15,7 +15,7 @@ data "azurerm_public_ip" "public_ip_firewall_management" {
   resource_group_name = var.management_ip_configuration.public_ip_address.resource_group_name
 }
 
-resource "azurerm_firewall" "hub_firewall" {
+resource "azurerm_firewall" "firewall" {
   name                = var.name
   location            = var.location
   resource_group_name = var.resource_group_name

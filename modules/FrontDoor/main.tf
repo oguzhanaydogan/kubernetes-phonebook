@@ -39,7 +39,7 @@ resource "azurerm_cdn_frontdoor_origin_group" "cdn_frontdoor_origin_groups" {
 }
 
 locals {
-  load_balancers = {
+  lbs = {
     for k, v in var.origins : v.host.name => {
       name                = v.host.name
       resource_group_name = v.host.resource_group_name
@@ -66,8 +66,8 @@ locals {
   }
 }
 
-data "azurerm_lb" "load_balancers" {
-  for_each = local.load_balancers
+data "azurerm_lb" "lbs" {
+  for_each = local.lbs
 
   name                = each.value.name
   resource_group_name = each.value.resource_group_name
@@ -105,7 +105,7 @@ resource "azurerm_cdn_frontdoor_origin" "cdn_frontdoor_origins" {
   certificate_name_check_enabled = each.value.certificate_name_check_enabled
 
   host_name = coalesce(
-    try(data.azurerm_lb.load_balancers[each.value.host.name].private_ip_address, ""),
+    try(data.azurerm_lb.lbs[each.value.host.name].private_ip_address, ""),
     try(data.azurerm_storage_blob.storage_blobs[each.value.host.name].url, ""),
     try(data.azurerm_linux_web_app.app_services[each.value.host.name].default_hostname, ""),
     "Coalesce could not find any non empty result!"
@@ -123,7 +123,7 @@ resource "azurerm_cdn_frontdoor_origin" "cdn_frontdoor_origins" {
       location        = each.value.private_link.location
       private_link_target_id = coalesce(
         try(data.azurerm_private_link_service.private_link_services[each.value.private_link.target.name].id, ""),
-        try(data.azurerm_lb.load_balancers[each.value.private_link.target.name].id, ""),
+        try(data.azurerm_lb.lbs[each.value.private_link.target.name].id, ""),
         try(data.azurerm_storage_blob.storage_blobs[each.value.private_link.target.name].id, ""),
         try(data.azurerm_linux_web_app.app_services[each.value.private_link.target.name].id, ""),
         "Coalesce could not find any non empty result!"

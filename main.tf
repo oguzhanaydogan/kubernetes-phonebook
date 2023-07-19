@@ -131,32 +131,35 @@ module "linux_virtual_machines" {
   ]
 }
 
-data "azurerm_key_vault" "example" {
+data "azurerm_key_vault" "key_vault" {
   name                = "coyvault"
   resource_group_name = "ssh-key"
 }
 
-data "azurerm_client_config" "current" {}
+data "azurerm_client_config" "client_config" {}
 
 module "key_vault_access_policies" {
   source   = "./modules/KeyVaultAccessPolicy"
   for_each = var.key_vault_access_policies
 
-  key_vault_name                = each.value.key_vault_name
-  key_vault_resource_group_name = each.value.key_vault_resource_group_name
+  name                = each.value.name
+  resource_group_name = each.value.resource_group_name
   key_permissions               = each.value.key_permissions
   secret_permissions            = each.value.secret_permissions
-  object_id                     = data.azurerm_client_config.current.object_id
+  object_id                     = data.azurerm_client_config.client_config.object_id
 }
 
 module "key_vault_secrets" {
   source   = "./modules/KeyVaultSecret"
   for_each = var.key_vault_secrets
 
-  key_vault_name                = each.value.key_vault_name
-  key_vault_resource_group_name = each.value.key_vault_resource_group_name
-  secret_name                   = each.value.secret_name
-  depends_on                    = [module.key_vault_access_policies]
+  name                = each.value.name
+  key_vault_resource_group_name = each.value.resource_group_name
+  key_vault_name                   = each.value.key_vault_name
+
+  depends_on                    = [
+    module.key_vault_access_policies
+  ]
 }
 
 module "mssql_servers" {
@@ -238,7 +241,7 @@ module "mssql_databases" {
 # }
 #
 # module "azapi_update_phonebook_sync_group" {
-#   source      = "./modules/AzApiUpdate"
+#   source      = "./modules/AzApiUpdateResource"
 #   type        = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
 #   resource_id = "/subscriptions/14528ad0-4c9e-48a9-8ed0-111c1034b033/resourceGroups/rg-eastus/providers/Microsoft.Sql/servers/coyhub-db-us/databases/phonebook/syncGroups/phonebook-sync-group"
 #   depends_on = [

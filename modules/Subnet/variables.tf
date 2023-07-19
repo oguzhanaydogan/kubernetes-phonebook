@@ -22,7 +22,7 @@ variable "delegation" {
     name = string
     service_delegation = object({
       name    = string
-      actions = list(string)
+      actions = optional(list(string))
     })
   })
 }
