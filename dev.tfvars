@@ -487,53 +487,53 @@ key_vault_secrets = {
 }
 
 mssql_servers = {
-  # coyhub_db_us = {
-  #   name                  = "coyhub-db-us"
-  #   resource_group        = "rg_eastus"
-  #   version               = "12.0"
-  #   administrator_login   = "azureuser"
-  #   admin_password_key_vault_secret = "key_vault_secret_mssql_password"
-  #   tags = {
-  #     name = "coyhub-db-us"
-  #   }
-  # }
-  # coyhub_db_eu = {
-  #   name                  = "coyhub-db-eu"
-  #   resource_group        = "rg_westeurope"
-  #   version               = "12.0"
-  #   administrator_login   = "azureuser"
-  #   admin_password_key_vault_secret = "key_vault_secret_mssql_password"
-  #   tags = {
-  #     name = "coyhub-db-eu"
-  #   }
-  # }
-}
+  coyhub_db_us = {
+    name                  = "coyhub-db-us"
+    resource_group        = "rg_eastus"
+    version               = "12.0"
+    administrator_login   = "azureuser"
+    admin_password_key_vault_secret = "key_vault_secret_mssql_password"
+    tags = {
+      name = "coyhub-db-us"
+    }
+    mssql_databases = {
+      phonebook_us = {
+        name                        = "phonebook"
+        collation                   = "SQL_Latin1_General_CP1_CI_AS"
+        max_size_gb                 = 32
+        sku_name                    = "GP_S_Gen5_1"
+        min_capacity                = 0.5
+        auto_pause_delay_in_minutes = 60
+        read_replica_count          = 0
+        read_scale                  = false
+        zone_redundant              = false
+      }
+    }
 
-mssql_databases = {
-  # phonebook_us = {
-  #   name                        = "phonebook"
-  #   server                      = "coyhub_db_us"
-  #   collation                   = "SQL_Latin1_General_CP1_CI_AS"
-  #   max_size_gb                 = 32
-  #   sku_name                    = "GP_S_Gen5_1"
-  #   min_capacity                = 0.5
-  #   auto_pause_delay_in_minutes = 60
-  #   read_replica_count          = 0
-  #   read_scale                  = false
-  #   zone_redundant              = false
-  # }
-  # phonebook_eu = {
-  #   name                        = "phonebook"
-  #   server                      = "coyhub_db_eu"
-  #   collation                   = "SQL_Latin1_General_CP1_CI_AS"
-  #   max_size_gb                 = 32
-  #   sku_name                    = "GP_S_Gen5_1"
-  #   min_capacity                = 0.5
-  #   auto_pause_delay_in_minutes = 60
-  #   read_replica_count          = 0
-  #   read_scale                  = false
-  #   zone_redundant              = false
-  # }
+  }
+  coyhub_db_eu = {
+    name                  = "coyhub-db-eu"
+    resource_group        = "rg_westeurope"
+    version               = "12.0"
+    administrator_login   = "azureuser"
+    admin_password_key_vault_secret = "key_vault_secret_mssql_password"
+    tags = {
+      name = "coyhub-db-eu"
+    }
+    mssql_databases = {
+      phonebook_eu = {
+        name                        = "phonebook"
+        collation                   = "SQL_Latin1_General_CP1_CI_AS"
+        max_size_gb                 = 32
+        sku_name                    = "GP_S_Gen5_1"
+        min_capacity                = 0.5
+        auto_pause_delay_in_minutes = 60
+        read_replica_count          = 0
+        read_scale                  = false
+        zone_redundant              = false
+      }
+    }
+  }
 }
 
 load_balancers = {

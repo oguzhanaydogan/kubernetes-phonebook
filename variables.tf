@@ -201,21 +201,17 @@ variable "mssql_servers" {
     administrator_login             = string
     admin_password_key_vault_secret = string
     tags                            = map(string)
-  }))
-}
-
-variable "mssql_databases" {
-  type = map(object({
-    name                        = string
-    server                      = string
-    collation                   = string
-    max_size_gb                 = number
-    sku_name                    = string
-    min_capacity                = number
-    auto_pause_delay_in_minutes = number
-    read_replica_count          = number
-    read_scale                  = bool
-    zone_redundant              = bool
+    mssql_databases = optional(map(object({
+      name                        = string
+      collation                   = string
+      max_size_gb                 = number
+      sku_name                    = string
+      min_capacity                = number
+      auto_pause_delay_in_minutes = number
+      read_replica_count          = number
+      read_scale                  = bool
+      zone_redundant              = bool
+    })), null)
   }))
 }
 

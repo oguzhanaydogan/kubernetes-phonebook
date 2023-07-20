@@ -18,3 +18,6 @@ variable "administrator_login_password" {
 
 variable "tags" {
 }
+
+variable "mssql_databases" {
+}

@@ -153,7 +153,7 @@ module "key_vault_secrets" {
 }
 
 module "mssql_servers" {
-  source   = "./modules/MSSQLServer"
+  source   = "./modules/MSSQLServerWithDatabases"
   for_each = var.mssql_servers
 
   name                         = each.value.name
@@ -163,22 +163,7 @@ module "mssql_servers" {
   administrator_login          = each.value.administrator_login
   administrator_login_password = module.key_vault_secrets[each.value.admin_password_key_vault_secret].value
   tags                         = each.value.tags
-}
-
-module "mssql_databases" {
-  source   = "./modules/MSSQLDatabase"
-  for_each = var.mssql_databases
-
-  name                        = each.value.name
-  server_id                   = module.mssql_servers[each.value.server].id
-  collation                   = each.value.collation
-  max_size_gb                 = each.value.max_size_gb
-  sku_name                    = each.value.sku_name
-  min_capacity                = each.value.min_capacity
-  auto_pause_delay_in_minutes = each.value.auto_pause_delay_in_minutes
-  read_replica_count          = each.value.read_replica_count
-  read_scale                  = each.value.read_scale
-  zone_redundant              = each.value.zone_redundant
+  mssql_databases = each.value.mssql_databases
 }
 
 # module "azapi_create_phonebook_sync_group" {
