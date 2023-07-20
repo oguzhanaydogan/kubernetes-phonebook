@@ -31,16 +31,17 @@ module "resource_groups" {
 }
 
 module "virtual_networks" {
-  source   = "./modules/VirtualNetwork"
+  source   = "./modules/VirtualNetworkWithSubnets"
   for_each = var.virtual_networks
 
   name                = each.value.name
   resource_group_name = module.resource_groups[each.value.resource_group].name
   location            = module.resource_groups[each.value.resource_group].location
   address_space       = each.value.address_space
+  subnets             = each.value.subnets
 }
 
-module "vnet_peerings" {
+module "virtual_network_peerings" {
   source   = "./modules/VirtualNetworkPeering"
   for_each = var.vnet_peerings
 
@@ -49,18 +50,6 @@ module "vnet_peerings" {
   virtual_network_name      = module.virtual_networks[each.value.virtual_network].name
   remote_virtual_network_id = module.virtual_networks[each.value.remote_virtual_network].id
   allow_forwarded_traffic   = each.value.allow_forwarded_traffic
-}
-
-module "subnets" {
-  source   = "./modules/Subnet"
-  for_each = var.subnets
-
-  name                                          = each.value.name
-  resource_group_name                           = module.resource_groups[each.value.resource_group].name
-  virtual_network_name                          = module.virtual_networks[each.value.virtual_network].name
-  address_prefixes                              = each.value.address_prefixes
-  private_link_service_network_policies_enabled = each.value.private_link_service_network_policies_enabled
-  # delegation                                    = each.value.delegation
 }
 
 module "route_tables" {
@@ -73,7 +62,7 @@ module "route_tables" {
   routes              = each.value.routes
   subnet_associations = each.value.subnet_associations
 
-  depends_on = [module.subnets]
+  depends_on = [module.virtual_networks]
 }
 
 # module "acrs" {
@@ -128,7 +117,7 @@ module "linux_virtual_machines" {
   network_security_group_association = each.value.network_security_group_association
   depends_on = [
     module.network_security_groups,
-    module.subnets
+    module.virtual_networks
   ]
 }
 
@@ -290,7 +279,7 @@ module "load_balancers" {
   lb_rules                   = each.value.lb_rules
   private_link_service       = each.value.private_link_service
 
-  depends_on                 = [module.subnets]
+  depends_on                 = [module.virtual_networks]
 }
 
 module "linux_virtual_machine_scale_sets" {
@@ -324,7 +313,11 @@ module "bastion_hosts" {
   resource_group_name = module.resource_groups[each.value.resource_group].name
   location            = module.resource_groups[each.value.resource_group].location
   ip_configurations   = each.value.ip_configurations
-  depends_on          = [module.public_ip_addresses, module.subnets]
+
+  depends_on          = [
+    module.public_ip_addresses,
+    module.virtual_networks
+  ]
 }
 
 module "private_dns_zones" {
@@ -340,24 +333,25 @@ module "private_dns_zones" {
   ]
 }
 
-module "private_endpoints" {
-  source   = "./modules/PrivateEndpoint"
-  for_each = var.private_endpoints
+# module "private_endpoints" {
+#   source   = "./modules/PrivateEndpoint"
+#   for_each = var.private_endpoints
 
-  attached_resource          = each.value.attached_resource
-  resource_group_name        = module.resource_groups[each.value.resource_group].name
-  location                   = module.resource_groups[each.value.resource_group].location
-  subnet_id                  = module.subnets[each.value.subnet].id
-  private_service_connection = each.value.private_service_connection
-  private_dns_zone_ids = [
-    for private_dns_zone in each.value.private_dns_zone_group.private_dns_zones :
-    module.private_dns_zones[private_dns_zone].id
-  ]
+#   attached_resource          = each.value.attached_resource
+#   resource_group_name        = module.resource_groups[each.value.resource_group].name
+#   location                   = module.resource_groups[each.value.resource_group].location
+#   subnet_id                  = module.subnets[each.value.subnet].id
+#   subnet_id = module.virtual_networks[each.value.subnet.virtual_network_name][name].id
+#   private_service_connection = each.value.private_service_connection
+#   private_dns_zone_ids = [
+#     for private_dns_zone in each.value.private_dns_zone_group.private_dns_zones :
+#     module.private_dns_zones[private_dns_zone].id
+#   ]
 
-  depends_on = [
-    module.mssql_servers
-  ]
-}
+#   depends_on = [
+#     module.mssql_servers
+#   ]
+# }
 
 module "kubernetes_clusters" {
   source   = "./modules/KubernetesCluster"
@@ -375,7 +369,7 @@ module "kubernetes_clusters" {
   network_profile             = each.value.network_profile
 
   depends_on = [
-    module.subnets,
+    module.virtual_networks,
     module.route_tables,
     module.firewalls
   ]
@@ -415,7 +409,7 @@ module "firewalls" {
   firewall_network_rule_collections = each.value.firewall_network_rule_collections
 
   depends_on = [
-    module.subnets,
+    module.virtual_networks,
     module.public_ip_addresses
   ]
 }

@@ -69,7 +69,7 @@ data "azurerm_subnet" "subnets_pls" {
 
 resource "azurerm_private_link_service" "private_link_service" {
   count = var.private_link_service != null ? 1 : 0
-  
+
   name                = var.private_link_service.name
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -88,4 +88,3 @@ resource "azurerm_private_link_service" "private_link_service" {
     }
   }
 }
-

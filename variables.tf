@@ -10,6 +10,18 @@ variable "virtual_networks" {
     name           = string
     resource_group = string
     address_space  = list(string)
+    subnets = optional(map(object({
+      name                                          = string
+      address_prefixes                              = list(string)
+      private_link_service_network_policies_enabled = optional(bool, true)
+      delegation = optional(object({
+        name = string
+        service_delegation = object({
+          name    = string
+          actions = optional(list(string))
+        })
+      }))
+    })))
   }))
 }
 
@@ -20,25 +32,6 @@ variable "vnet_peerings" {
     remote_virtual_network  = string
     resource_group          = string
     allow_forwarded_traffic = bool
-  }))
-}
-
-variable "subnets" {
-  type = map(object({
-    name                                          = string
-    resource_group                                = string
-    virtual_network                               = string
-    address_prefixes                              = list(string)
-    private_link_service_network_policies_enabled = optional(bool, true)
-    delegation = optional(object({
-      name = string
-      service_delegation = object({
-        name    = string
-        actions = optional(list(string))
-      })
-      }),
-      null
-    )
   }))
 }
 
@@ -263,7 +256,7 @@ variable "load_balancers" {
         subnet = object({
           name                 = string
           virtual_network_name = string
-          resource_group_name  = string    
+          resource_group_name  = string
         })
         primary = bool
       }))
@@ -370,7 +363,10 @@ variable "private_endpoints" {
       required_tags = map(string)
     })
     resource_group = string
-    subnet         = string
+    subnet         = object({
+      name = string
+      virtual_network_name = string
+    })
     private_service_connection = object({
       is_manual_connection = bool
       subresource_names    = list(string)

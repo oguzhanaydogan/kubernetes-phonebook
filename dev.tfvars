@@ -14,36 +14,115 @@ virtual_networks = {
     name           = "vnet-hub"
     resource_group = "rg_eastus"
     address_space  = ["10.0.0.0/16"]
+    subnets = {
+      subnet_firewall = {
+        name             = "AzureFirewallSubnet"
+        address_prefixes = ["10.0.0.0/26"]
+      }
+      subnet_firewall_management = {
+        name             = "AzureFirewallManagementSubnet"
+        address_prefixes = ["10.0.1.0/26"]
+      }
+    }
   }
   vnet_app = {
     name           = "vnet-app"
     resource_group = "rg_eastus"
     address_space  = ["10.1.0.0/16"]
+    subnets        = {
+      subnet_app = {
+        name             = "subnet-app"
+        address_prefixes = ["10.1.0.0/24"]
+      }
+      subnet_aks = {
+        name             = "subnet-aks"
+        address_prefixes = ["10.1.1.0/24"]
+      }
+      subnet_appgw = {
+        name             = "subnet-appgw"
+        address_prefixes = ["10.1.2.0/24"]
+      }
+    }
   }
   vnet_acr = {
     name           = "vnet-acr"
     resource_group = "rg_eastus"
     address_space  = ["10.2.0.0/16"]
+    subnets = {
+      subnet_acr = {
+        name             = "subnet-acr"
+        address_prefixes = ["10.2.0.0/24"]
+      }
+    }
   }
   vnet_db = {
     name           = "vnet-db"
     resource_group = "rg_eastus"
     address_space  = ["10.3.0.0/16"]
+    subnets = {
+      subnet_db = {
+        name             = "subnet-db"
+        address_prefixes = ["10.3.0.0/24"]
+      }
+      subnet_db_pep = {
+        name             = "subnet-db-pep"
+        address_prefixes = ["10.3.1.0/24"]
+      }
+    }
   }
   vnet_agent = {
     name           = "vnet-agent"
     resource_group = "rg_eastus"
     address_space  = ["10.4.0.0/16"]
+    subnets = {
+      subnet_agent = {
+        name             = "subnet-agent"
+        address_prefixes = ["10.4.0.0/24"]
+      }
+    }
   }
   vnet_app_eu = {
     name           = "vnet-app-eu"
     resource_group = "rg_westeurope"
     address_space  = ["10.11.0.0/16"]
+    subnets = {
+      subnet_app = {
+        name             = "subnet-app"
+        address_prefixes = ["10.11.0.0/24"]
+      }
+      subnet_lb = {
+        name             = "subnet-lb"
+        address_prefixes = ["10.11.1.0/24"]
+      }
+      subnet_lb_pls = {
+        name                                          = "subnet-lb-pls"
+        address_prefixes                              = ["10.11.2.0/24"]
+        private_link_service_network_policies_enabled = false
+      }
+      subnet_lb_pls_pep = {
+        name             = "subnet-lb-pls-pep"
+        address_prefixes = ["10.11.4.0/24"]
+      }
+      subnet_bastion = {
+        name             = "AzureBastionSubnet"
+        address_prefixes = ["10.11.3.0/24"]
+      }
+    }
   }
   vnet_db_eu = {
     name           = "vnet-db-eu"
     resource_group = "rg_westeurope"
     address_space  = ["10.12.0.0/16"]
+    subnets = {
+      subnet_db = {
+        name             = "subnet-db"
+        address_prefixes = ["10.12.0.0/24"]
+      }
+      subnet_db_pep = {
+        name             = "subnet-db-pep"
+        address_prefixes = ["10.12.1.0/24"]
+      }
+    }
   }
 }
 
@@ -131,106 +210,6 @@ vnet_peerings = {
     remote_virtual_network  = "vnet_app"
     resource_group          = "rg_eastus"
     allow_forwarded_traffic = true
-  }
-}
-
-subnets = {
-  vnet_hub_subnet_firewall = {
-    name             = "AzureFirewallSubnet"
-    resource_group   = "rg_eastus"
-    virtual_network  = "vnet_hub"
-    address_prefixes = ["10.0.0.0/26"]
-  }
-  vnet_hub_subnet_firewall_management = {
-    name             = "AzureFirewallManagementSubnet"
-    resource_group   = "rg_eastus"
-    virtual_network  = "vnet_hub"
-    address_prefixes = ["10.0.1.0/26"]
-  }
-  vnet_app_subnet_app = {
-    name             = "subnet-app"
-    resource_group   = "rg_eastus"
-    virtual_network  = "vnet_app"
-    address_prefixes = ["10.1.0.0/24"]
-  }
-  vnet_app_subnet_aks = {
-    name             = "subnet-aks"
-    resource_group   = "rg_eastus"
-    virtual_network  = "vnet_app"
-    address_prefixes = ["10.1.1.0/24"]
-  }
-  vnet_app_subnet_appgw = {
-    name             = "subnet-appgw"
-    resource_group   = "rg_eastus"
-    virtual_network  = "vnet_app"
-    address_prefixes = ["10.1.2.0/24"]
-  }
-  vnet_acr_subnet_acr = {
-    name             = "subnet-acr"
-    resource_group   = "rg_eastus"
-    virtual_network  = "vnet_acr"
-    address_prefixes = ["10.2.0.0/24"]
-  }
-  vnet_db_subnet_db = {
-    name             = "subnet-db"
-    resource_group   = "rg_eastus"
-    virtual_network  = "vnet_db"
-    address_prefixes = ["10.3.0.0/24"]
-  }
-  vnet_db_subnet_db_pep = {
-    name             = "subnet-db-pep"
-    resource_group   = "rg_eastus"
-    virtual_network  = "vnet_db"
-    address_prefixes = ["10.3.1.0/24"]
-  }
-  vnet_agent_subnet_agent = {
-    name             = "subnet-agent"
-    resource_group   = "rg_eastus"
-    virtual_network  = "vnet_agent"
-    address_prefixes = ["10.4.0.0/24"]
-  }
-  vnet_app_eu_subnet_app = {
-    name             = "subnet-app"
-    resource_group   = "rg_westeurope"
-    virtual_network  = "vnet_app_eu"
-    address_prefixes = ["10.11.0.0/24"]
-  }
-  vnet_app_eu_subnet_lb = {
-    name             = "subnet-lb"
-    resource_group   = "rg_westeurope"
-    virtual_network  = "vnet_app_eu"
-    address_prefixes = ["10.11.1.0/24"]
-  }
-  vnet_app_eu_subnet_lb_pls = {
-    name                                          = "subnet-lb-pls"
-    resource_group                                = "rg_westeurope"
-    virtual_network                               = "vnet_app_eu"
-    address_prefixes                              = ["10.11.2.0/24"]
-    private_link_service_network_policies_enabled = false
-  }
-  vnet_app_eu_subnet_lb_pls_pep = {
-    name             = "subnet-lb-pls-pep"
-    resource_group   = "rg_westeurope"
-    virtual_network  = "vnet_app_eu"
-    address_prefixes = ["10.11.4.0/24"]
-  }
-  vnet_app_eu_subnet_bastion = {
-    name             = "AzureBastionSubnet"
-    resource_group   = "rg_westeurope"
-    virtual_network  = "vnet_app_eu"
-    address_prefixes = ["10.11.3.0/24"]
-  }
-  vnet_db_eu_subnet_db = {
-    name             = "subnet-db"
-    resource_group   = "rg_westeurope"
-    virtual_network  = "vnet_db_eu"
-    address_prefixes = ["10.12.0.0/24"]
-  }
-  vnet_db_eu_subnet_db_pep = {
-    name             = "subnet-db-pep"
-    resource_group   = "rg_westeurope"
-    virtual_network  = "vnet_db_eu"
-    address_prefixes = ["10.12.1.0/24"]
   }
 }
 
@@ -603,7 +582,7 @@ load_balancers = {
           subnet  = {
             name                 = "subnet-lb-pls"
             virtual_network_name = "vnet-app-eu"
-            resource_group_name  = "rg-westeurope"            
+            resource_group_name  = "rg-westeurope"
           }
           primary = true
         }
@@ -731,42 +710,48 @@ private_dns_zones = {
 }
 
 private_endpoints = {
-  # pep_db = {
-  #   attached_resource = {
-  #     name = "coyhub-db-us"
-  #     type = "Microsoft.Sql/servers"
-  #     required_tags = {
-  #       name = "coyhub-db-us"
-  #     }
-  #   }
-  #   resource_group = "rg_eastus"
-  #   subnet         = "vnet_db_subnet_db_pep"
-  #   private_service_connection = {
-  #     is_manual_connection = false
-  #     subresource_names    = ["sqlServer"]
-  #   }
-  #   private_dns_zone_group = {
-  #     private_dns_zones = ["db"]
-  #   }
-  # }
-  # pep_db_eu = {
-  #   attached_resource = {
-  #     name = "coyhub-db-eu"
-  #     type = "Microsoft.Sql/servers"
-  #     required_tags = {
-  #       name = "coyhub-db-eu"
-  #     }
-  #   }
-  #   resource_group = "rg_westeurope"
-  #   subnet         = "vnet_db_eu_subnet_db_pep"
-  #   private_service_connection = {
-  #     is_manual_connection = false
-  #     subresource_names    = ["sqlServer"]
-  #   }
-  #   private_dns_zone_group = {
-  #     private_dns_zones = ["db"]
-  #   }
-  # }
+  pep_db = {
+    attached_resource = {
+      name = "coyhub-db-us"
+      type = "Microsoft.Sql/servers"
+      required_tags = {
+        name = "coyhub-db-us"
+      }
+    }
+    resource_group = "rg_eastus"
+    subnet         = {
+      name = "subnet_db_pep"
+      virtual_network_name = "vnet_db"
+    }
+    private_service_connection = {
+      is_manual_connection = false
+      subresource_names    = ["sqlServer"]
+    }
+    private_dns_zone_group = {
+      private_dns_zones = ["db"]
+    }
+  }
+  pep_db_eu = {
+    attached_resource = {
+      name = "coyhub-db-eu"
+      type = "Microsoft.Sql/servers"
+      required_tags = {
+        name = "coyhub-db-eu"
+      }
+    }
+    resource_group = "rg_westeurope"
+    subnet         = {
+      name = "subnet_db_pep"
+      virtual_network_name = "vnet_db_eu"
+    }
+    private_service_connection = {
+      is_manual_connection = false
+      subresource_names    = ["sqlServer"]
+    }
+    private_dns_zone_group = {
+      private_dns_zones = ["db"]
+    }
+  }
 }
 
 kubernetes_clusters = {
