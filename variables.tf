@@ -360,8 +360,8 @@ variable "private_endpoints" {
     })
     resource_group = string
     subnet         = object({
-      name = string
-      virtual_network_name = string
+      reference_name = string
+      virtual_network_reference_name = string
     })
     private_service_connection = object({
       is_manual_connection = bool

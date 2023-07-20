@@ -10,21 +10,6 @@ resource_groups = {
 }
 
 virtual_networks = {
-  vnet_hub = {
-    name           = "vnet-hub"
-    resource_group = "rg_eastus"
-    address_space  = ["10.0.0.0/16"]
-    subnets = {
-      subnet_firewall = {
-        name             = "AzureFirewallSubnet"
-        address_prefixes = ["10.0.0.0/26"]
-      }
-      subnet_firewall_management = {
-        name             = "AzureFirewallManagementSubnet"
-        address_prefixes = ["10.0.1.0/26"]
-      }
-    }
-  }
   vnet_app = {
     name           = "vnet-app"
     resource_group = "rg_eastus"
@@ -487,168 +472,168 @@ key_vault_secrets = {
 }
 
 mssql_servers = {
-  coyhub_db_us = {
-    name                  = "coyhub-db-us"
-    resource_group        = "rg_eastus"
-    version               = "12.0"
-    administrator_login   = "azureuser"
-    admin_password_key_vault_secret = "key_vault_secret_mssql_password"
-    tags = {
-      name = "coyhub-db-us"
-    }
-    mssql_databases = {
-      phonebook_us = {
-        name                        = "phonebook"
-        collation                   = "SQL_Latin1_General_CP1_CI_AS"
-        max_size_gb                 = 32
-        sku_name                    = "GP_S_Gen5_1"
-        min_capacity                = 0.5
-        auto_pause_delay_in_minutes = 60
-        read_replica_count          = 0
-        read_scale                  = false
-        zone_redundant              = false
-      }
-    }
+  # coyhub_db_us = {
+  #   name                  = "coyhub-db-us"
+  #   resource_group        = "rg_eastus"
+  #   version               = "12.0"
+  #   administrator_login   = "azureuser"
+  #   admin_password_key_vault_secret = "mssql_password"
+  #   tags = {
+  #     name = "coyhub-db-us"
+  #   }
+  #   mssql_databases = {
+  #     phonebook_us = {
+  #       name                        = "phonebook"
+  #       collation                   = "SQL_Latin1_General_CP1_CI_AS"
+  #       max_size_gb                 = 32
+  #       sku_name                    = "GP_S_Gen5_1"
+  #       min_capacity                = 0.5
+  #       auto_pause_delay_in_minutes = 60
+  #       read_replica_count          = 0
+  #       read_scale                  = false
+  #       zone_redundant              = false
+  #     }
+  #   }
 
-  }
-  coyhub_db_eu = {
-    name                  = "coyhub-db-eu"
-    resource_group        = "rg_westeurope"
-    version               = "12.0"
-    administrator_login   = "azureuser"
-    admin_password_key_vault_secret = "key_vault_secret_mssql_password"
-    tags = {
-      name = "coyhub-db-eu"
-    }
-    mssql_databases = {
-      phonebook_eu = {
-        name                        = "phonebook"
-        collation                   = "SQL_Latin1_General_CP1_CI_AS"
-        max_size_gb                 = 32
-        sku_name                    = "GP_S_Gen5_1"
-        min_capacity                = 0.5
-        auto_pause_delay_in_minutes = 60
-        read_replica_count          = 0
-        read_scale                  = false
-        zone_redundant              = false
-      }
-    }
-  }
+  # }
+  # coyhub_db_eu = {
+  #   name                  = "coyhub-db-eu"
+  #   resource_group        = "rg_westeurope"
+  #   version               = "12.0"
+  #   administrator_login   = "azureuser"
+  #   admin_password_key_vault_secret = "mssql_password"
+  #   tags = {
+  #     name = "coyhub-db-eu"
+  #   }
+  #   mssql_databases = {
+  #     phonebook_eu = {
+  #       name                        = "phonebook"
+  #       collation                   = "SQL_Latin1_General_CP1_CI_AS"
+  #       max_size_gb                 = 32
+  #       sku_name                    = "GP_S_Gen5_1"
+  #       min_capacity                = 0.5
+  #       auto_pause_delay_in_minutes = 60
+  #       read_replica_count          = 0
+  #       read_scale                  = false
+  #       zone_redundant              = false
+  #     }
+  #   }
+  # }
 }
 
 load_balancers = {
-  phonebook_lb = {
-    name           = "phonebook-lb"
-    resource_group = "rg_westeurope"
-    sku            = "Standard"
-    frontend_ip_configurations = {
-      internal = {
-        name = "internal"
-        subnet = {
-          name                 = "subnet-lb"
-          virtual_network_name = "vnet-app-eu"
-          resource_group_name  = "rg-westeurope"
-        }
-      }
-    }
-    lb_backend_address_pools = {
-      backend_pool = {
-        name = "backend-pool"
-      }
-    }
-    lb_probes = {
-      http = {
-        name     = "http"
-        protocol = "Tcp"
-        port     = "80"
-      }
-    }
-    lb_rules = {
-      http = {
-        name                           = "http"
-        probe                          = "http"
-        backend_address_pools          = ["backend_pool"]
-        frontend_ip_configuration_name = "internal"
-        protocol                       = "Tcp"
-        frontend_port                  = "80"
-        backend_port                   = "80"
-      }
-    }
-    private_link_service = {
-      name = "phonebook-lb-pls"
-      nat_ip_configurations = {
-        nat_ip_configuration_01 = {
-          name    = "primary"
-          subnet  = {
-            name                 = "subnet-lb-pls"
-            virtual_network_name = "vnet-app-eu"
-            resource_group_name  = "rg-westeurope"
-          }
-          primary = true
-        }
-      }
-    }
-  }
+  # phonebook_lb = {
+  #   name           = "phonebook-lb"
+  #   resource_group = "rg_westeurope"
+  #   sku            = "Standard"
+  #   frontend_ip_configurations = {
+  #     internal = {
+  #       name = "internal"
+  #       subnet = {
+  #         name                 = "subnet-lb"
+  #         virtual_network_name = "vnet-app-eu"
+  #         resource_group_name  = "rg-westeurope"
+  #       }
+  #     }
+  #   }
+  #   lb_backend_address_pools = {
+  #     backend_pool = {
+  #       name = "backend-pool"
+  #     }
+  #   }
+  #   lb_probes = {
+  #     http = {
+  #       name     = "http"
+  #       protocol = "Tcp"
+  #       port     = "80"
+  #     }
+  #   }
+  #   lb_rules = {
+  #     http = {
+  #       name                           = "http"
+  #       probe                          = "http"
+  #       backend_address_pools          = ["backend_pool"]
+  #       frontend_ip_configuration_name = "internal"
+  #       protocol                       = "Tcp"
+  #       frontend_port                  = "80"
+  #       backend_port                   = "80"
+  #     }
+  #   }
+  #   private_link_service = {
+  #     name = "phonebook-lb-pls"
+  #     nat_ip_configurations = {
+  #       nat_ip_configuration_01 = {
+  #         name    = "primary"
+  #         subnet  = {
+  #           name                 = "subnet-lb-pls"
+  #           virtual_network_name = "vnet-app-eu"
+  #           resource_group_name  = "rg-westeurope"
+  #         }
+  #         primary = true
+  #       }
+  #     }
+  #   }
+  # }
 }
 
 linux_virtual_machine_scale_sets = {
-  app_vmss = {
-    name           = "phonebook-vmss"
-    resource_group = "rg_westeurope"
-    sku            = "Standard_B1s"
-    instances      = 1
-    admin_username = "azureuser"
-    shared_image = {
-      name                = "myimagedefinitongen"
-      gallery_name        = "mygallery"
-      resource_group_name = "ssh-key"
-    }
-    upgrade_mode = "Rolling"
-    health_probe = {
-      load_balancer = "phonebook_lb"
-      name          = "http"
-    }
-    admin_ssh_key = {
-      resource_group_name = "ssh-key"
-      name                = "azure"
-    }
-    os_disk = {
-      storage_account_type = "Standard_LRS"
-      caching              = "ReadWrite"
-    }
-    network_interface = {
-      name    = "example"
-      primary = true
-      network_security_group = {
-        name                = "ssh-and-http"
-        resource_group_name = "rg-westeurope"
-      }
-      ip_configurations = {
-        internal = {
-          name    = "internal"
-          primary = true
-          subnet = {
-            name                 = "subnet-app"
-            virtual_network_name = "vnet-app-eu"
-            resource_group_name  = "rg-westeurope"
-          }
-          load_balancer_backend_address_pools = {
-            phonebook_lb_backend_pool = {
-              name                              = "backend-pool"
-              load_balancer_name                = "phonebook-lb"
-              load_balancer_resource_group_name = "rg-westeurope"
-            }
-          }
-        }
-      }
-    }
-    rolling_upgrade_policy = {
-      max_batch_instance_percent              = 20
-      max_unhealthy_instance_percent          = 20
-      max_unhealthy_upgraded_instance_percent = 5
-      pause_time_between_batches              = "PT0S"
-    }
-  }
+  # app_vmss = {
+  #   name           = "phonebook-vmss"
+  #   resource_group = "rg_westeurope"
+  #   sku            = "Standard_B1s"
+  #   instances      = 1
+  #   admin_username = "azureuser"
+  #   shared_image = {
+  #     name                = "myimagedefinitongen"
+  #     gallery_name        = "mygallery"
+  #     resource_group_name = "ssh-key"
+  #   }
+  #   upgrade_mode = "Rolling"
+  #   health_probe = {
+  #     load_balancer = "phonebook_lb"
+  #     name          = "http"
+  #   }
+  #   admin_ssh_key = {
+  #     resource_group_name = "ssh-key"
+  #     name                = "azure"
+  #   }
+  #   os_disk = {
+  #     storage_account_type = "Standard_LRS"
+  #     caching              = "ReadWrite"
+  #   }
+  #   network_interface = {
+  #     name    = "example"
+  #     primary = true
+  #     network_security_group = {
+  #       name                = "ssh-and-http"
+  #       resource_group_name = "rg-westeurope"
+  #     }
+  #     ip_configurations = {
+  #       internal = {
+  #         name    = "internal"
+  #         primary = true
+  #         subnet = {
+  #           name                 = "subnet-app"
+  #           virtual_network_name = "vnet-app-eu"
+  #           resource_group_name  = "rg-westeurope"
+  #         }
+  #         load_balancer_backend_address_pools = {
+  #           phonebook_lb_backend_pool = {
+  #             name                              = "backend-pool"
+  #             load_balancer_name                = "phonebook-lb"
+  #             load_balancer_resource_group_name = "rg-westeurope"
+  #           }
+  #         }
+  #       }
+  #     }
+  #   }
+  #   rolling_upgrade_policy = {
+  #     max_batch_instance_percent              = 20
+  #     max_unhealthy_instance_percent          = 20
+  #     max_unhealthy_upgraded_instance_percent = 5
+  #     pause_time_between_batches              = "PT0S"
+  #   }
+  # }
 }
 
 bastion_hosts = {
@@ -673,85 +658,85 @@ bastion_hosts = {
 }
 
 private_dns_zones = {
-  db = {
-    name           = "privatelink.database.windows.net"
-    resource_group = "rg_eastus"
-    virtual_network_links = {
-      zone_db_to_vnet_db = {
-        name = "zone-db-to-vnet-db"
-        virtual_network = {
-          name                = "vnet-db"
-          resource_group_name = "rg-eastus"
-        }
-      }
-      zone_db_to_vnet_db_eu = {
-        name = "zone-db-to-vnet-db-eu"
-        virtual_network = {
-          name                = "vnet-db-eu"
-          resource_group_name = "rg-westeurope"
-        }
-      }
-      zone_db_to_vnet_app = {
-        name = "zone-db-to-vnet-app"
-        virtual_network = {
-          name                = "vnet-app"
-          resource_group_name = "rg-eastus"
-        }
-      }
-      zone_db_to_vnet_app_eu = {
-        name = "zone-db-to-vnet-app-eu"
-        virtual_network = {
-          name                = "vnet-app-eu"
-          resource_group_name = "rg-westeurope"
-        }
-      }
-    }
-  }
+  # db = {
+  #   name           = "privatelink.database.windows.net"
+  #   resource_group = "rg_eastus"
+  #   virtual_network_links = {
+  #     zone_db_to_vnet_db = {
+  #       name = "zone-db-to-vnet-db"
+  #       virtual_network = {
+  #         name                = "vnet-db"
+  #         resource_group_name = "rg-eastus"
+  #       }
+  #     }
+  #     zone_db_to_vnet_db_eu = {
+  #       name = "zone-db-to-vnet-db-eu"
+  #       virtual_network = {
+  #         name                = "vnet-db-eu"
+  #         resource_group_name = "rg-westeurope"
+  #       }
+  #     }
+  #     zone_db_to_vnet_app = {
+  #       name = "zone-db-to-vnet-app"
+  #       virtual_network = {
+  #         name                = "vnet-app"
+  #         resource_group_name = "rg-eastus"
+  #       }
+  #     }
+  #     zone_db_to_vnet_app_eu = {
+  #       name = "zone-db-to-vnet-app-eu"
+  #       virtual_network = {
+  #         name                = "vnet-app-eu"
+  #         resource_group_name = "rg-westeurope"
+  #       }
+  #     }
+  #   }
+  # }
 }
 
 private_endpoints = {
-  pep_db = {
-    attached_resource = {
-      name = "coyhub-db-us"
-      type = "Microsoft.Sql/servers"
-      required_tags = {
-        name = "coyhub-db-us"
-      }
-    }
-    resource_group = "rg_eastus"
-    subnet         = {
-      name = "subnet_db_pep"
-      virtual_network_name = "vnet_db"
-    }
-    private_service_connection = {
-      is_manual_connection = false
-      subresource_names    = ["sqlServer"]
-    }
-    private_dns_zone_group = {
-      private_dns_zones = ["db"]
-    }
-  }
-  pep_db_eu = {
-    attached_resource = {
-      name = "coyhub-db-eu"
-      type = "Microsoft.Sql/servers"
-      required_tags = {
-        name = "coyhub-db-eu"
-      }
-    }
-    resource_group = "rg_westeurope"
-    subnet         = {
-      name = "subnet_db_pep"
-      virtual_network_name = "vnet_db_eu"
-    }
-    private_service_connection = {
-      is_manual_connection = false
-      subresource_names    = ["sqlServer"]
-    }
-    private_dns_zone_group = {
-      private_dns_zones = ["db"]
-    }
-  }
+  # pep_db = {
+  #   attached_resource = {
+  #     name = "coyhub-db-us"
+  #     type = "Microsoft.Sql/servers"
+  #     required_tags = {
+  #       name = "coyhub-db-us"
+  #     }
+  #   }
+  #   resource_group = "rg_eastus"
+  #   subnet         = {
+  #     reference_name = "subnet_db_pep"
+  #     virtual_network_reference_name = "vnet_db"
+  #   }
+  #   private_service_connection = {
+  #     is_manual_connection = false
+  #     subresource_names    = ["sqlServer"]
+  #   }
+  #   private_dns_zone_group = {
+  #     private_dns_zones = ["db"]
+  #   }
+  # }
+  # pep_db_eu = {
+  #   attached_resource = {
+  #     name = "coyhub-db-eu"
+  #     type = "Microsoft.Sql/servers"
+  #     required_tags = {
+  #       name = "coyhub-db-eu"
+  #     }
+  #   }
+  #   resource_group = "rg_westeurope"
+  #   subnet         = {
+  #     reference_name = "subnet_db_pep"
+  #     virtual_network_reference_name = "vnet_db_eu"
+  #   }
+  #   private_service_connection = {
+  #     is_manual_connection = false
+  #     subresource_names    = ["sqlServer"]
+  #   }
+  #   private_dns_zone_group = {
+  #     private_dns_zones = ["db"]
+  #   }
+  # }
 }
 
 kubernetes_clusters = {

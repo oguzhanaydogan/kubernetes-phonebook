@@ -325,8 +325,7 @@ module "private_dns_zones" {
 #   attached_resource          = each.value.attached_resource
 #   resource_group_name        = module.resource_groups[each.value.resource_group].name
 #   location                   = module.resource_groups[each.value.resource_group].location
-#   subnet_id                  = module.subnets[each.value.subnet].id
-#   subnet_id = module.virtual_networks[each.value.subnet.virtual_network_name][name].id
+#   subnet_id                  = module.virtual_networks[each.value.subnet.virtual_network_reference_name].subnets[each.value.subnet.reference_name].id
 #   private_service_connection = each.value.private_service_connection
 #   private_dns_zone_ids = [
 #     for private_dns_zone in each.value.private_dns_zone_group.private_dns_zones :
