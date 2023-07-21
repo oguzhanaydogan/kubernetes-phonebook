@@ -123,38 +123,56 @@ virtual_wans = {
           connection_01 = {
             name = "acr-connection"
             remote_virtual_network = {
-              name = 
-              resource_group_name =
+              name = "vnet-acr"
+              resource_group_name = "rg-eastus"
             }
             routing = {
               associated_route_table = "Default"
-              propagated_route_tables = ["Default"]                
+              propagated_route_tables = [
+                {
+                  name = "Default"
+                  hub = "eastus_virtual_hub"
+                }
+              ]
             }
           }
           connection_02 = {
-            name = 
+            name = "agent-connection"
             remote_virtual_network = {
-              name = 
-              resource_group_name =
+              name = "vnet-agent"
+              resource_group_name = "rg-eastus"
+            }
+            routing = {
+              associated_route_table = "Default"
+              propagated_route_tables = []
             }
           }
           connection_03 = {
-            name = 
+            name = "db-connection"
             remote_virtual_network = {
-              name = 
-              resource_group_name =
+              name = "vnet-db"
+              resource_group_name = "rg-eastus"
+            }
+            routing = {
+              associated_route_table = "Default"
+              propagated_route_tables = [
+                {
+                  name = "Default"
+                  hub = "eastus_virtual_hub"
+                }
+              ]
             }
           }
         }
-        default_route_table_routes = {
-          route_01 = {
-            name = 
-            destinations_type =
-            destinations = 
-            next_hop_type = 
-            next_hop_connection =
-          } 
-        }
+        # route_table_routes = {
+        #   route_01 = {
+        #     name =
+        #     destinations_type =
+        #     destinations =
+        #     next_hop_type =
+        #     next_hop_connection =
+        #   }
+        # }
       }
     }
   }
@@ -329,12 +347,12 @@ route_tables = {
 # }
 
 public_ip_addresses = {
-  hub_firewall_management = {
-    name              = "hub-firewall-management"
-    allocation_method = "Static"
-    sku               = "Standard"
-    resource_group    = "rg_eastus"
-  }
+  # hub_firewall_management = {
+  #   name              = "hub-firewall-management"
+  #   allocation_method = "Static"
+  #   sku               = "Standard"
+  #   resource_group    = "rg_eastus"
+  # }
   ci_cd_agent = {
     name              = "ci-cd-agent"
     allocation_method = "Static"
@@ -398,46 +416,50 @@ network_security_groups = {
 }
 
 firewalls = {
-  # hub_us = {
-  #   name           = "hub"
-  #   resource_group = "rg_eastus"
-  #   sku_name       = "AZFW_VNet"
-  #   sku_tier       = "Basic"
-  #   ip_configuration = {
-  #     subnet = {
-  #       name                 = "AzureFirewallSubnet"
-  #       virtual_network_name = "vnet-hub"
-  #       resource_group_name  = "rg-eastus"
-  #     }
-  #   }
-  #   management_ip_configuration = {
-  #     enabled = true
-  #     subnet = {
-  #       virtual_network_name = "vnet-hub"
-  #       resource_group_name  = "rg-eastus"
-  #     }
-  #     public_ip_address = {
-  #       name                = "hub-firewall-management"
-  #       resource_group_name = "rg-eastus"
-  #     }
-  #   }
-  #   firewall_network_rule_collections = {
-  #     collection_01 = {
-  #       name = "firewall_hub"
-  #       priority = 100
-  #       action = "Allow"
-  #       firewall_network_rules = {
-  #         rule_01 = {
-  #           name = "firewall_hub"
-  #           source_addresses = ["10.1.1.0/24"]
-  #           destination_ports = ["*"]
-  #           destination_addresses = ["0.0.0.0/0"]
-  #           protocols =["Any"]
-  #         }
-  #       }
-  #     }
-  #   }
-  # }
+  hub_us = {
+    name           = "hub"
+    resource_group = "rg_eastus"
+    sku_name       = "AZFW_Hub"
+    sku_tier       = "Basic"
+    virtual_hub = {
+      name = "eastus-virtual-hub"
+      resource_group_name = "rg-eastus"
+    }
+    ip_configuration = {
+      subnet = {
+        name                 = "AzureFirewallSubnet"
+        virtual_network_name = "vnet-hub"
+        resource_group_name  = "rg-eastus"
+      }
+    }
+    management_ip_configuration = {
+      enabled = true
+      subnet = {
+        virtual_network_name = "vnet-hub"
+        resource_group_name  = "rg-eastus"
+      }
+      public_ip_address = {
+        name                = "hub-firewall-management"
+        resource_group_name = "rg-eastus"
+      }
+    }
+    firewall_network_rule_collections = {
+      collection_01 = {
+        name = "firewall_hub"
+        priority = 100
+        action = "Allow"
+        firewall_network_rules = {
+          rule_01 = {
+            name = "firewall_hub"
+            source_addresses = ["10.1.1.0/24"]
+            destination_ports = ["*"]
+            destination_addresses = ["0.0.0.0/0"]
+            protocols =["Any"]
+          }
+        }
+      }
+    }
+  }
 }
 
 linux_virtual_machines = {

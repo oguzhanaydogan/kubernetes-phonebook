@@ -1,3 +1,7 @@
+https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/firewall_policy
+https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/firewall_policy_rule_collection_group
+
+
 data "azurerm_subnet" "subnet_firewall" {
   name                 = var.ip_configuration.subnet.name
   virtual_network_name = var.ip_configuration.subnet.virtual_network_name
@@ -8,6 +12,11 @@ data "azurerm_subnet" "subnet_firewall_management" {
   name                 = "AzureFirewallManagementSubnet"
   virtual_network_name = var.management_ip_configuration.subnet.virtual_network_name
   resource_group_name  = var.management_ip_configuration.subnet.resource_group_name
+}
+
+data "azurerm_virtual_hub" "virtual_hub" {
+  name                = "example-hub"
+  resource_group_name = "example-resources"
 }
 
 data "azurerm_public_ip" "public_ip_firewall_management" {
@@ -21,6 +30,9 @@ resource "azurerm_firewall" "firewall" {
   resource_group_name = var.resource_group_name
   sku_name            = var.sku_name
   sku_tier            = var.sku_tier
+  virtual_hub {
+    virtual_hub_id = data.azurerm_virtual_hub.virtual_hub.id
+  }
 
   ip_configuration {
     name      = "${var.name}-ip-configuration"
@@ -56,6 +68,6 @@ resource "azurerm_firewall_network_rule_collection" "firewall_network_rule_colle
         destination_ports = rule.value.destination_ports
         destination_addresses = rule.value.destination_addresses
         protocols = rule.value.protocols
-    }    
+    }
   }
 }

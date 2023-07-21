@@ -13,6 +13,9 @@ variable "sku_name" {
 variable "sku_tier" {
 }
 
+variable "virtual_hub" {
+}
+
 variable "ip_configuration" {
 }
 

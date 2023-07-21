@@ -29,16 +29,23 @@ variable "virtual_wans" {
   type = map(object({
     name = string
     resource_group = string
-    virtual_hubs = map(object({
+    virtual_hubs = optional(map(object({
       name = string
       address_prefix = string
       virtual_hub_connections = optional(map(object({
         name = string
         remote_virtual_network = object({
           name = string
-          resource_group_name = string 
+          resource_group_name = string
         })
-      })))
+        routing = object({
+          associated_route_table = string
+          propagated_route_tables = list(object({
+            name = string
+            hub = string
+          }))
+        })
+      })), {})
       route_tables = optional(map(object({
         name = string
         routes = optional(map(object({
@@ -48,15 +55,15 @@ variable "virtual_wans" {
           next_hop_type = string
           next_hop_connection = string
         })))
-      })))
-      default_route_table_routes = optional(map(object({
+      })), {})
+      route_table_routes = optional(map(object({
         name = string
         destinations_type = string
         destinations = list(string)
         next_hop_type = string
         next_hop_connection = string
-      })))
-    }))
+      })), {})
+    })), {})
   }))
 }
 
@@ -121,6 +128,10 @@ variable "firewalls" {
     resource_group = string
     sku_name       = string
     sku_tier       = string
+    virtual_hub = object({
+      name = string
+      resource_group_name = string
+    })
     ip_configuration = object({
       subnet = object({
         name                 = string

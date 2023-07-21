@@ -49,7 +49,7 @@ module "virtual_wans" {
   resource_group_name = module.resource_groups[each.value.resource_group].name
   location = module.resource_groups[each.value.resource_group].location
   virtual_hubs = each.value.virtual_hubs
-  
+
   depends_on = [ module.virtual_networks ]
 }
 
@@ -400,6 +400,7 @@ module "firewalls" {
   resource_group_name         = module.resource_groups[each.value.resource_group].name
   sku_name                    = each.value.sku_name
   sku_tier                    = each.value.sku_tier
+  virtual_hub = each.value.virtual_hub
   ip_configuration            = each.value.ip_configuration
   management_ip_configuration = each.value.management_ip_configuration
   firewall_network_rule_collections = each.value.firewall_network_rule_collections
