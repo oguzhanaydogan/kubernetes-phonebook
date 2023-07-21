@@ -133,8 +133,9 @@ virtual_wans = {
               resource_group_name =
             }} 
         route_tables = {
-          route_table_1 = {
+          route_table_01 = {
             name = 
+            virtual_hub_id = 
             routes = {
               name = 
               destinations_type =
@@ -144,12 +145,18 @@ virtual_wans = {
             }
              }
           }
+        default_route_table_routes = {
+          name = 
+          destinations_type =
+          destinations = 
+          next_hop_type = 
+          next_hop = 
+        }
         }
           }
         }
       }
     }
-  }
   wan-02 = {
     name = 
     resource_group = 

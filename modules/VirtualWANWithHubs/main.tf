@@ -18,46 +18,20 @@ locals {
     virtual_networks = {
       for k, v in local.virtual_hub_connections : k => v.remote_virtual_network
     }
-    r
+    route_tables_flattened = flatten([
+      for k, v in var.virtual_hubs : [
+        for key, route_table in v.route_tables : {
+          name = route_table.name
+          virtual_hub = k
+          routes = route_table.routes
+        }
+      ]
+    ])
+    route_tables = {
+      for route_table in local.route_tables_flattened :
+        "${route_table.virtual_hub}_${route_table.name}" => route_table
+    }
 }
-
-virtual_hub_connections = {
-  hub01_connection_01 = {
-    name = 
-    hub = z
-    remote_virtual_network = {
-      name = 
-      resource_group =
-    }
-  }
-  hub02_connection_02 = {
-    name = 
-    hub = z
-    remote_virtual_network = {
-      name = 
-      resource_group =
-    }
-  }
-} 
-
-virtual_hub_connections_flattened = [{
-  name = 
-  hub = z
-  remote_virtual_network = {
-    name = 
-    resource_group =
-  },
-  {
-  name = 
-  hub = z
-  remote_virtual_network = {
-    name = 
-    resource_group =  
-  }}
-}]
-
-
-
 
 resource "azurerm_virtual_wan" "virtual_wan" {
   name                = var.name
@@ -91,9 +65,10 @@ resource "azurerm_virtual_hub_connection" "virtual_hub_connections" {
 }
 
 resource "azurerm_virtual_hub_route_table" "virtual_hub_route_tables" {
-  for_each = var.virtual_hubs[*].route_tables
+  for_each = local.route_tables
+
   name           = each.value.name
-  virtual_hub_id = azurerm_virtual_hub.virtual_hubs.id
+  virtual_hub_id = azurerm_virtual_hub.virtual_hub[each.value.virtual_hub].id
 
   dynamic "route" {
     for_each = each.value.routes
@@ -103,7 +78,7 @@ resource "azurerm_virtual_hub_route_table" "virtual_hub_route_tables" {
         destinations_type = route.value.destinations_type
         destinations      = route.value.destinations 
         next_hop_type     = route.value.next_hop_type
-        next_hop          = route.value.next_hop
+        next_hop          = azurerm_virtual_hub_connection.virtual_hub_connections.id
     }
   }
 }
@@ -116,6 +91,6 @@ resource "azurerm_virtual_hub_route_table_route" "virtual_hub_route_table_routes
   name              = each.value.name
   destinations_type = each.value.destinations_type
   destinations      = each.value.destinations
-  next_hop_type     = "ResourceId"
-  next_hop          = azurerm_virtual_hub_connection.example.id
+  next_hop_type     = each.value.next_hop_type
+  next_hop          = azurerm_virtual_hub_connection.virtual_hub_connections.id
 }
