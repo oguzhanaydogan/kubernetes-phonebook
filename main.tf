@@ -41,6 +41,17 @@ module "virtual_networks" {
   subnets             = each.value.subnets
 }
 
+module "virtual_wans" {
+  source = "./modules/VirtualWANWithHubs"
+  for_each = var.virtual_wans
+
+  name = each.value.name
+  resource_group_name = module.resource_groups[each.value.resource_group].name
+  location = module.resource_groups[each.value.resource_group].location
+  virtual_hubs = each.value.
+  
+}
+
 module "virtual_network_peerings" {
   source   = "./modules/VirtualNetworkPeering"
   for_each = var.vnet_peerings

@@ -111,6 +111,85 @@ virtual_networks = {
   }
 }
 
+virtual_wans = {
+  wan_01 = {
+    name = 
+    resource_group = 
+    virtual_hubs = {
+      hub_01 = {
+        name = 
+        address_prefix =
+        virtual_hub_connections = {
+          connection_01 = {
+            name = 
+            remote_virtual_network = {
+              name = 
+              resource_group_name =
+            }}
+          connection_02 = {
+            name = 
+            remote_virtual_network = {
+              name = 
+              resource_group_name =
+            }} 
+        route_tables = {
+          route_table_1 = {
+            name = 
+            routes = {
+              name = 
+              destinations_type =
+              destinations = 
+              next_hop_type = 
+              next_hop = 
+            }
+             }
+          }
+        }
+          }
+        }
+      }
+    }
+  }
+  wan-02 = {
+    name = 
+    resource_group = 
+    virtual_hubs = {
+      hub_01 = {
+        name = 
+        address_prefix =
+        virtual_hub_connections = {
+          connection_01 = {
+            name = 
+            remote_virtual_network = {
+              name = 
+              resource_group_name =
+            }
+        route_tables = {
+          route_table_1 = {
+            name = 
+            routes = {
+              name = 
+              destinations_type =
+              destinations = 
+              next_hop_type = 
+              next_hop = 
+            }
+        default_route_table_routes = {
+          name = 
+          destinations_type = 
+          destinations = 
+          next_hop_type = 
+          next_hop =
+        }
+          }
+        }
+          }
+        }
+      }
+    }
+  }
+}
+
 vnet_peerings = {
   # db_hub = {
   #   name                    = "db-hub"
