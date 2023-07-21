@@ -25,6 +25,41 @@ variable "virtual_networks" {
   }))
 }
 
+variable "virtual_wans" {
+  type = map(object({
+    name = string
+    resource_group = string
+    virtual_hubs = map(object({
+      name = string
+      address_prefix = string
+      virtual_hub_connections = optional(map(object({
+        name = string
+        remote_virtual_network = object({
+          name = string
+          resource_group_name = string 
+        })
+      })))
+      route_tables = optional(map(object({
+        name = string
+        routes = optional(map(object({
+          name = string
+          destinations_type = string
+          destinations = list(string)
+          next_hop_type = string
+          next_hop_connection = string
+        })))
+      })))
+      default_route_table_routes = optional(map(object({
+        name = string
+        destinations_type = string
+        destinations = list(string)
+        next_hop_type = string
+        next_hop_connection = string
+      })))
+    }))
+  }))
+}
+
 variable "vnet_peerings" {
   type = map(object({
     name                    = string

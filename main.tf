@@ -48,8 +48,9 @@ module "virtual_wans" {
   name = each.value.name
   resource_group_name = module.resource_groups[each.value.resource_group].name
   location = module.resource_groups[each.value.resource_group].location
-  virtual_hubs = each.value.
+  virtual_hubs = each.value.virtual_hubs
   
+  depends_on = [ module.virtual_networks ]
 }
 
 module "virtual_network_peerings" {

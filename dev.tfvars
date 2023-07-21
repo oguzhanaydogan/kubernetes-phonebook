@@ -112,85 +112,50 @@ virtual_networks = {
 }
 
 virtual_wans = {
-  wan_01 = {
-    name = 
-    resource_group = 
+  project_102_virtual_wan = {
+    name = "project-102-virtual-wan"
+    resource_group = "rg_eastus"
     virtual_hubs = {
-      hub_01 = {
-        name = 
-        address_prefix =
+      eastus_virtual_hub = {
+        name = "eastus-virtual-hub"
+        address_prefix = "10.30.0.0/16"
         virtual_hub_connections = {
           connection_01 = {
             name = 
             remote_virtual_network = {
               name = 
               resource_group_name =
-            }}
+            }
+            routing = {
+              associated_route_table = {
+                name = 
+                hub = 
+              }
+            }
+          }
           connection_02 = {
             name = 
             remote_virtual_network = {
               name = 
               resource_group_name =
-            }} 
-        route_tables = {
-          route_table_01 = {
-            name = 
-            virtual_hub_id = 
-            routes = {
-              name = 
-              destinations_type =
-              destinations = 
-              next_hop_type = 
-              next_hop = 
             }
-             }
           }
-        default_route_table_routes = {
-          name = 
-          destinations_type =
-          destinations = 
-          next_hop_type = 
-          next_hop = 
-        }
-        }
-          }
-        }
-      }
-    }
-  wan-02 = {
-    name = 
-    resource_group = 
-    virtual_hubs = {
-      hub_01 = {
-        name = 
-        address_prefix =
-        virtual_hub_connections = {
-          connection_01 = {
+          connection_03 = {
             name = 
             remote_virtual_network = {
               name = 
               resource_group_name =
             }
-        route_tables = {
-          route_table_1 = {
-            name = 
-            routes = {
-              name = 
-              destinations_type =
-              destinations = 
-              next_hop_type = 
-              next_hop = 
-            }
+          }
+        }
         default_route_table_routes = {
-          name = 
-          destinations_type = 
-          destinations = 
-          next_hop_type = 
-          next_hop =
-        }
-          }
-        }
-          }
+          route_01 = {
+            name = 
+            destinations_type =
+            destinations = 
+            next_hop_type = 
+            next_hop_connection =
+          } 
         }
       }
     }
