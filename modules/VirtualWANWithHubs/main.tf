@@ -80,12 +80,12 @@ resource "azurerm_virtual_hub_connection" "virtual_hub_connections" {
   remote_virtual_network_id = data.azurerm_virtual_network.virtual_networks[each.key].id
 
   routing {
-    associated_route_table_id = 
+    associated_route_table_id = each.value.routing.associated_route_table == "Default" ? azurerm_virtual_hub.virtual_hubs[each.value.hub].default_route_table_id : azurerm_virtual_hub_route_table.virtual_hub_route_tables["${each.value.hub}_${each.value.routing.associated_route_table}"].id
     dynamic "propagated_route_table" {
-      for_each = 
+      for_each = each.value.routing.propagated_route_tables
       
       content {
-        route_table_id = 
+        route_table_id = propagated_route_table.value == "Default" ? azurerm_virtual_hub.virtual_hubs[each.value.hub].default_route_table_id : azurerm_virtual_hub_route_table.virtual_hub_route_tables["${each.value.hub}_${propagated_route_table.value}"].id
       }
     }
   }
@@ -105,7 +105,7 @@ resource "azurerm_virtual_hub_route_table" "virtual_hub_route_tables" {
         destinations_type = route.value.destinations_type
         destinations      = route.value.destinations 
         next_hop_type     = route.value.next_hop_type
-        next_hop          = azurerm_virtual_hub_connection.virtual_hub_connections[each.value.next_hop_connection].id
+        next_hop          = azurerm_virtual_hub_connection.virtual_hub_connections["${each.value.hub}_${each.value.next_hop_connection}"].id
     }
   }
 }
@@ -119,5 +119,5 @@ resource "azurerm_virtual_hub_route_table_route" "virtual_hub_route_table_routes
   destinations_type = each.value.destinations_type
   destinations      = each.value.destinations
   next_hop_type     = each.value.next_hop_type
-  next_hop          = azurerm_virtual_hub_connection.virtual_hub_connections[each.value.next_hop_connection].id
+  next_hop          = azurerm_virtual_hub_connection.virtual_hub_connections["${each.value.hub}_${each.value.next_hop_connection}"].id
 }

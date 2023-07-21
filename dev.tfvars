@@ -121,16 +121,14 @@ virtual_wans = {
         address_prefix = "10.30.0.0/16"
         virtual_hub_connections = {
           connection_01 = {
-            name = 
+            name = "acr-connection"
             remote_virtual_network = {
               name = 
               resource_group_name =
             }
             routing = {
-              associated_route_table = {
-                name = 
-                hub = 
-              }
+              associated_route_table = "Default"
+              propagated_route_tables = ["Default"]                
             }
           }
           connection_02 = {
