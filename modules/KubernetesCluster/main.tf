@@ -4,10 +4,10 @@ data "azurerm_subnet" "subnet_aks" {
   resource_group_name  = var.subnet_aks.resource_group_name
 }
 
-data "azurerm_subnet" "subnet_appgw" {
-  name                 = var.subnet_appgw.name
-  virtual_network_name = var.subnet_appgw.virtual_network_name
-  resource_group_name  = var.subnet_appgw.resource_group_name
+data "azurerm_subnet" "subnet_agw" {
+  name                 = var.subnet_agw.name
+  virtual_network_name = var.subnet_agw.virtual_network_name
+  resource_group_name  = var.subnet_agw.resource_group_name
 }
 
 resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
@@ -34,7 +34,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
 
     content {
       gateway_name = var.ingress_application_gateway.gateway_name
-      subnet_id    = data.azurerm_subnet.subnet_appgw.id
+      subnet_id    = data.azurerm_subnet.subnet_agw.id
     }
   }
 

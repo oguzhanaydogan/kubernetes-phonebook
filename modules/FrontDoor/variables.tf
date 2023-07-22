@@ -19,8 +19,8 @@ variable "origins" {
 variable "routes" {
 }
 
-# variable "rule_sets" {
-# }
+variable "rule_sets" {
+}
 
-# variable "rules" {
-# }
+variable "rules" {
+}

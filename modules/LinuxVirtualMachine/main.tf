@@ -19,7 +19,7 @@ data "azurerm_public_ip" "public_ip_addresses" {
 }
 
 resource "azurerm_network_interface" "network_interface" {
-  name                = "${var.name}-network_interface"
+  name                = var.network_interface.name
   location            = var.location
   resource_group_name = var.resource_group_name
 

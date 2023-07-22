@@ -127,12 +127,12 @@ virtual_wans = {
     name = "vwan-project102-prod-eastus-001"
     resource_group = "rg_project102_prod_eastus_001"
     virtual_hubs = {
-      vhub_project102_prod_eastus_001 = {
-        name = "vhub-project102-prod-eastus-001"
+      vwanvh_project102_prod_eastus_001 = {
+        name = "vwanvh-project102-prod-eastus-001"
         address_prefix = "10.30.0.0/16"
         virtual_hub_connections = {
-          acr_connection = {
-            name = "acr-connection"
+          vwanwhc_project102_prod_eastus_001 = { # acr
+            name = "vwanwhc-project102-prod-eastus-001"
             remote_virtual_network = {
               name = "vnet-project102-prod-eastus-002"
               resource_group_name = "rg-project102-prod-eastus-001"
@@ -142,13 +142,13 @@ virtual_wans = {
               propagated_route_tables = [
                 {
                   name = "Default"
-                  virtual_hub = "vhub_project102_prod_eastus_001"
+                  virtual_hub = "vwanvh_project102_prod_eastus_001"
                 }
               ]
             }
           }
-          agent_connection = {
-            name = "agent-connection"
+          vwanwhc_project102_prod_eastus_002 = { # CI/CD agent
+            name = "vwanwhc-project102-prod-eastus-002"
             remote_virtual_network = {
               name = "vnet_project102_prod_eastus_004"
               resource_group_name = "rg-project102-prod-eastus-001"
@@ -158,8 +158,8 @@ virtual_wans = {
               propagated_route_tables = []
             }
           }
-          sql-connection = {
-            name = "sql-connection"
+          vwanwhc_project102_prod_eastus_003 = { # SQL
+            name = "vwanwhc-project102-prod-eastus-003"
             remote_virtual_network = {
               name = "vnet-project102-prod-eastus-003"
               resource_group_name = "rg-project102-prod-eastus-001"
@@ -169,7 +169,7 @@ virtual_wans = {
               propagated_route_tables = [
                 {
                   name = "Default"
-                  virtual_hub = "vhub_project102_prod_eastus_001"
+                  virtual_hub = "vwanvh_project102_prod_eastus_001"
                 }
               ]
             }
@@ -223,7 +223,7 @@ vnet_peerings = {
 route_tables = {}
 
 public_ip_addresses = {
-  pip_project102_prod_eastus_001 = { # ci/cd agent
+  pip_project102_prod_eastus_001 = { # CI/CD agent
     name              = "pip-project102-prod-eastus-001"
     allocation_method = "Static"
     sku               = "Standard"
@@ -242,8 +242,8 @@ network_security_groups = {
     name           = "nsg-project102-prod-eastus-001"
     resource_group = "rg_project102_prod_eastus_001"
     security_rules = {
-      nsgsr_project102_prod_eastus_001 = {
-        name                       = "nsgsr-project102-prod-eastus-001"
+      allow_ssh = {
+        name                       = "AllowSSH"
         priority                   = 100
         direction                  = "Inbound"
         access                     = "Allow"
@@ -259,8 +259,8 @@ network_security_groups = {
     name           = "nsg-project102-prod-westeurope-001"
     resource_group = "rg_project102_prod_westeurope_001"
     security_rules = {
-      nsgsr_project102_prod_westeurope_001 = { # ssh
-        name                       = "nsgsr-project102-prod-westeurope-001"
+      allow_ssh = {
+        name                       = "AllowSSH"
         priority                   = 100
         direction                  = "Inbound"
         access                     = "Allow"
@@ -270,8 +270,8 @@ network_security_groups = {
         source_address_prefix      = "*"
         destination_address_prefix = "*"
       }
-      nsgsr_project102_prod_westeurope_002 = { # http
-        name                       = "nsgsr-project102-prod-westeurope-002"
+      allow_http = {
+        name                       = "AllowHTTP"
         priority                   = 110
         direction                  = "Inbound"
         access                     = "Allow"
@@ -292,10 +292,11 @@ firewalls = {
     sku_name       = "AZFW_Hub"
     sku_tier       = "Basic"
     virtual_hub = {
-      name = "vhub-project102-prod-eastus-001"
+      name = "vwanvh-project102-prod-eastus-001"
       resource_group_name = "rg-project102-prod-eastus-001"
     }
     ip_configuration = {
+      name = "IPConfiguration"
       subnet = {
         name                 = "AzureFirewallSubnet"
         virtual_network_name = "vnet-project102-prod-eastus-005"
@@ -311,8 +312,8 @@ firewalls = {
         priority = 100
         action = "Allow"
         firewall_network_rules = {
-          fwnr_project102_prod_eastus_001 = {
-            name = "fwnr-project102-prod-eastus-001"
+          allow_acr_to_everywhere = { // TODO: burasi yanlis
+            name = "AllowACRtoEverywhere"
             source_addresses = ["10.1.1.0/24"]
             destination_ports = ["*"]
             destination_addresses = ["0.0.0.0/0"]
@@ -330,9 +331,10 @@ linux_virtual_machines = {
     name           = "vm-project102-prod-eastus-001"
     resource_group = "rg_project102_prod_eastus_001"
     network_interface = {
+      name = "nic-project102-prod-eastus-001"
       ip_configurations = {
-        vmipc_project102_prod_eastus_001 = {
-          name = "vmipc-project102-prod-eastus-001"
+        IPConfiguration1 = {
+          name = "IPConfiguration1"
           subnet = {
             name                 = "snet-project102-prod-eastus-007"
             virtual_network_name = "vnet_project102_prod_eastus_004"
@@ -420,8 +422,8 @@ mssql_servers = {
       name = "sql-project102-prod-eastus-001"
     }
     mssql_databases = {
-      sqldb-project102-prod-eastus-001 = {
-        name                        = "phonebook"
+      sqldb_project102_prod_eastus_001 = {
+        name                        = "sqldb-project102-prod-eastus-001"
         collation                   = "SQL_Latin1_General_CP1_CI_AS"
         max_size_gb                 = 32
         sku_name                    = "GP_S_Gen5_1"
@@ -444,7 +446,7 @@ mssql_servers = {
     }
     mssql_databases = {
       sqldb_project102_prod_westeurope_001 = {
-        name                        = "phonebook"
+        name                        = "sqldb-project102-prod-westeurope-001"
         collation                   = "SQL_Latin1_General_CP1_CI_AS"
         max_size_gb                 = 32
         sku_name                    = "GP_S_Gen5_1"
@@ -464,8 +466,8 @@ load_balancers = {
     resource_group = "rg_project102_prod_westeurope_001"
     sku            = "Standard"
     frontend_ip_configurations = {
-      lbfic_project102_prod_westeurope_001 = {
-        name = "lbfic-project102-prod-westeurope-001"
+      FrontendIPConfiguration1 = {
+        name = "FrontendIPConfiguration1"
         subnet = {
           name                 = "snet-project102-prod-westeurope-002"
           virtual_network_name = "vnet-project102-prod-westeurope-001"
@@ -490,7 +492,7 @@ load_balancers = {
         name                           = "lbr-project102-prod-westeurope-001"
         probe                          = "lbp_project102_prod_westeurope_001"
         backend_address_pools          = ["lbbap_project102_prod_westeurope_001"]
-        frontend_ip_configuration_name = "lbfic-project102-prod-westeurope-001"
+        frontend_ip_configuration_name = "FrontendIPConfiguration1"
         protocol                       = "Tcp"
         frontend_port                  = "80"
         backend_port                   = "80"
@@ -499,8 +501,8 @@ load_balancers = {
     private_link_service = {
       name = "pl-project102-prod-westeurope-001"
       nat_ip_configurations = {
-        plnic_project102_prod_westeurope_001 = {
-          name    = "plnic-project102-prod-westeurope-001"
+        NATIPConfiguration1 = {
+          name    = "NATIPConfiguration1"
           subnet  = {
             name                 = "snet-project102-prod-westeurope-003"
             virtual_network_name = "vnet-project102-prod-westeurope-001"
@@ -539,15 +541,15 @@ linux_virtual_machine_scale_sets = {
       caching              = "ReadWrite"
     }
     network_interface = {
-      name    = "vmssni-project102-prod-westeurope-001"
+      name    = "NetworkInterface1"
       primary = true
       network_security_group = {
         name                = "nsg-project102-prod-westeurope-001"
         resource_group_name = "rg-project102-prod-westeurope-001"
       }
       ip_configurations = {
-        vmssniic_project102_prod_westeurope_001 = {
-          name    = "vmssniic-project102-prod-westeurope-001"
+        IPConfiguration1 = {
+          name    = "IPConfiguration1"
           primary = true
           subnet = {
             name                 = "snet-project102-prod-westeurope-001"
@@ -555,8 +557,7 @@ linux_virtual_machine_scale_sets = {
             resource_group_name  = "rg-project102-prod-westeurope-001"
           }
           load_balancer_backend_address_pools = {
-            vmssniiclbbap_project102_prod_westeurope_001 = {
-              name                              = "vmssniiclbbap-project102-prod-westeurope-001"
+            lb_project102_prod_westeurope_001 = {
               load_balancer_name                = "lb-project102-prod-westeurope-001"
               load_balancer_resource_group_name = "rg-project102-prod-westeurope-001"
             }
@@ -578,8 +579,8 @@ bastion_hosts = {
     name           = "bas-project102-prod-westeurope-001"
     resource_group = "rg_project102_prod_westeurope_001"
     ip_configurations = {
-      basic_project102_prod_westeurope_001 = {
-        name = "basic-project102-prod-westeurope-001"
+      IPConfiguration1 = {
+        name = "IPConfiguration1"
         subnet = {
           name                 = "AzureBastionSubnet"
           virtual_network_name = "vnet-project102-prod-westeurope-001"
@@ -599,29 +600,29 @@ private_dns_zones = {
     name           = "privatelink.database.windows.net"
     resource_group = "rg_project102_prod_eastus_001"
     virtual_network_links = {
-      privatelink_database_windows_net_project102_prod_global_001 = { # sql vnet
-        name = "privatelink_database_windows_net-project102-prod-global-001"
+      vnet_sql_us = {
+        name = "vnet-sql-us"
         virtual_network = {
           name                = "vnet-project102-prod-eastus-003"
           resource_group_name = "rg-project102-prod-eastus-001"
         }
       }
-      privatelink_database_windows_net_project102_prod_global_002 = { # sql vnet eu
-        name = "privatelink_database_windows_net-project102-prod-global-002"
+      vnet_sql_eu = {
+        name = "vnet-sql-eu"
         virtual_network = {
           name                = "vnet-project102-prod-westeurope-002"
           resource_group_name = "rg-project102-prod-westeurope-001"
         }
       }
-      privatelink_database_windows_net_project102_prod_global_003 = { # app vnet
-        name = "privatelink_database_windows_net-project102-prod-global-003"
+      vnet_app_us = {
+        name = "vnet-app-us"
         virtual_network = {
           name                = "vnet-project102-prod-eastus-001"
           resource_group_name = "rg-project102-prod-eastus-001"
         }
       }
-      privatelink_database_windows_net_project102_prod_global_004 = { # app vnet eu
-        name = "privatelink_database_windows_net-project102-prod-global-004"
+      vnet_app_eu = {
+        name = "vnet-app-eu"
         virtual_network = {
           name                = "vnet-project102-prod-westeurope-001"
           resource_group_name = "rg-project102-prod-westeurope-001"
@@ -647,12 +648,12 @@ private_endpoints = {
       virtual_network_name = "vnet-project102-prod-eastus-003"
     }
     private_service_connection = {
-      name = "pep-project102-prod-eastus-001-psc"
+      name = "PrivateServiceConnection"
       is_manual_connection = false
       subresource_names    = ["sqlServer"]
     }
     private_dns_zone_group = {
-      name = "pep-project102-prod-eastus-001-pdzg"
+      name = "PrivateDNSZoneGroup"
       private_dns_zones = [
         {
           name = "privatelink.database.windows.net"
@@ -676,12 +677,12 @@ private_endpoints = {
       virtual_network_name = "vnet-project102-prod-westeurope-001"
     }
     private_service_connection = {
-      name = "pep-project102-prod-westeurope-001-psc"
+      name = "PrivateServiceConnection"
       is_manual_connection = false
       subresource_names    = ["sqlServer"]
     }
     private_dns_zone_group = {
-      name = "pep-project102-prod-westeurope-001-pdzg"
+      name = "PrivateDNSZoneGroup"
       private_dns_zones = [
         {
           name = "privatelink.database.windows.net"
@@ -693,132 +694,136 @@ private_endpoints = {
 }
 
 kubernetes_clusters = {
-  # phonebook = {
-  #   snet_project102_prod_eastus_002 = {
-  #     name                 = "snet-project102-prod-eastus-002"
-  #     virtual_network_name = "vnet-project102-prod-eastus-001"
-  #     resource_group_name  = "rg-project102-prod-eastus-001"
-  #   }
-  #   snet_project102_prod_eastus_003 = {
-  #     name                 = "snet-project102-prod-eastus-003"
-  #     virtual_network_name = "vnet-project102-prod-eastus-001"
-  #     resource_group_name  = "rg-project102-prod-eastus-001"
-  #   }
-  #   name                    = "phonebook"
-  #   resource_group          = "rg_project102_prod_eastus_001"
-  #   private_cluster_enabled = true
-  #   default_node_pool = {
-  #     name       = "default"
-  #     node_count = 1
-  #     vm_size    = "Standard_B2s"
-  #   }
-  #   identity = {
-  #     type = "SystemAssigned"
-  #   }
-  #   ingress_application_gateway = {
-  #     enabled      = true
-  #     gateway_name = "phonebook"
-  #   }
-  #   network_profile = {
-  #     network_plugin = "azure"
-  #     outbound_type  = "userDefinedRouting"
-  #   }
-  # }
+  aks_project102_prod_eastus_001 = {
+    subnet_aks = {
+      name                 = "snet-project102-prod-eastus-002"
+      virtual_network_name = "vnet-project102-prod-eastus-001"
+      resource_group_name  = "rg-project102-prod-eastus-001"
+    }
+    snet_agw = {
+      name                 = "snet-project102-prod-eastus-003"
+      virtual_network_name = "vnet-project102-prod-eastus-001"
+      resource_group_name  = "rg-project102-prod-eastus-001"
+    }
+    name                    = "aks-project102-prod-eastus-001"
+    resource_group          = "rg_project102_prod_eastus_001"
+    private_cluster_enabled = true
+    default_node_pool = {
+      name       = "default-node-pool"
+      node_count = 1
+      vm_size    = "Standard_B2s"
+    }
+    identity = {
+      type = "SystemAssigned"
+    }
+    ingress_application_gateway = {
+      enabled = true
+      name = "agw-project102-prod-eastus-001"
+    }
+    network_profile = {
+      network_plugin = "azure"
+      outbound_type  = "userDefinedRouting"
+    }
+  }
 }
 
 front_doors = {
-  # phonebook = {
-  #   name           = "phonebook"
-  #   resource_group = "rg_project102_prod_eastus_001"
-  #   sku_name       = "Premium_AzureFrontDoor"
-  #   endpoints      = ["phonebook"]
-  #   origin_groups = {
-  #     phonebook_origin_group = {
-  #       name                                                      = "phonebook-origin-group"
-  #       session_affinity_enabled                                  = false
-  #       restore_traffic_time_to_healed_or_new_endpoint_in_minutes = 10
-  #       health_probes = {
-  #         health_probe_http = {
-  #           interval_in_seconds = 240
-  #           path                = "/"
-  #           protocol            = "Http"
-  #           request_type        = "GET"
-  #         }
-  #       }
-  #       load_balancing = {
-  #         additional_latency_in_milliseconds = 0
-  #         sample_size                        = 16
-  #         successful_samples_required        = 3
-  #       }
-  #     }
-  #   }
-  #   origins = {
-  #     phonebook_eu = {
-  #       name                           = "phonebook-eu"
-  #       cdn_frontdoor_origin_group     = "phonebook_origin_group"
-  #       enabled                        = true
-  #       certificate_name_check_enabled = true
-  #       host = {
-  #         resource_group_name = "rg-project102-prod-westeurope-001"
-  #         name                = "lb-project102-prod-westeurope-001"
-  #         type                = "Microsoft.Network/loadBalancers"
-  #         pls_enabled         = true
-  #       }
-  #       http_port  = 80
-  #       https_port = 443
-  #       priority   = 1
-  #       weight     = 500
-  #       private_link = {
-  #         request_message = "Gimme gimme"
-  #         location        = "West Europe"
-  #         target = {
-  #           name                = "lb-project102-prod-westeurope-001-pls"
-  #           resource_group_name = "rg-project102-prod-westeurope-001"
-  #         }
-  #       }
-  #     }
-  #   }
-  #   routes = {
-  #     phonebook_route_http = {
-  #       name                       = "phonebook-route-http"
-  #       cdn_frontdoor_endpoint     = "phonebook"
-  #       cdn_frontdoor_origin_group = "phonebook_origin_group"
-  #       cdn_frontdoor_origins      = ["phonebook_eu"]
-  #       # cdn_frontdoor_rule_sets       = ["phonebookruleset"]
-  #       enabled                = true
-  #       forwarding_protocol    = "HttpOnly"
-  #       https_redirect_enabled = false
-  #       patterns_to_match      = ["/*"]
-  #       supported_protocols    = ["Http", "Https"]
-  #     }
-  #   }
-  #   # rule_sets = {
-  #   #   phonebookruleset = {
-  #   #     name = "phonebookruleset"
-  #   #   }
-  #   # }
-  #   # rules = [
-  #   #   {
-  #   #     name = "httpstohttp"
-  #   #     rule_set = "phonebookruleset"
-  #   #     conditions = {
-  #   #       request_scheme_conditions = {
-  #   #         equal_https = {
-  #   #           operator         = "Equal"
-  #   #           match_values     = ["HTTPS"]
-  #   #         }
-  #   #       }
-  #   #     }
-  #   #     actions = {
-  #   #       url_redirect_actions = {
-  #   #         movedhttp = {
-  #   #           redirect_type        = "Moved"
-  #   #           redirect_protocol    = "Http"
-  #   #           destination_hostname = ""
-  #   #         }
-  #   #       }
-  #   #     }
-  #   #   }
-  #   # ]
-  # }
+  afd_project102_prod_global_001 = { # phonebook
+    name           = "afd-project102-prod-global-001"
+    resource_group = "rg_project102_prod_eastus_001"
+    sku_name       = "Premium_AzureFrontDoor"
+    endpoints      = { # phonebook
+      afde_project102_prod_global_001 = {
+        name = "afde-project102-prod-global-001"
+      }
+    }
+    origin_groups = {
+      afdog_project102_prod_global_001 = {
+        name                                                      = "afdog-project102-prod-global-001"
+        session_affinity_enabled                                  = false
+        restore_traffic_time_to_healed_or_new_endpoint_in_minutes = 10
+        health_probes = {
+          http = {
+            interval_in_seconds = 240
+            path                = "/"
+            protocol            = "Http"
+            request_type        = "GET"
+          }
+        }
+        load_balancing = {
+          additional_latency_in_milliseconds = 0
+          sample_size                        = 16
+          successful_samples_required        = 3
+        }
+      }
+    }
+    origins = {
+      afdo_project102_prod_global_001 = {
+        name                           = "afdo-project102-prod-global-001"
+        cdn_frontdoor_origin_group     = "afdog_project102_prod_global_001"
+        enabled                        = true
+        certificate_name_check_enabled = true
+        host = {
+          resource_group_name = "rg-project102-prod-westeurope-001"
+          name                = "lb-project102-prod-westeurope-001"
+          type                = "Microsoft.Network/loadBalancers"
+          pls_enabled         = true
+        }
+        http_port  = 80
+        https_port = 443
+        priority   = 1
+        weight     = 500
+        private_link = {
+          request_message = "Gimme gimme"
+          location        = "West Europe"
+          target = {
+            name                = "lb-project102-prod-westeurope-001-pls"
+            resource_group_name = "rg-project102-prod-westeurope-001"
+          }
+        }
+      }
+    }
+    routes = {
+      afdr_project102_prod_global_001 = {
+        name                       = "afdr-project102-prod-global-001"
+        cdn_frontdoor_endpoint     = "afde_project102_prod_global_001"
+        cdn_frontdoor_origin_group = "afdog_project102_prod_global_001"
+        cdn_frontdoor_origins      = ["afdo_project102_prod_global_001"]
+        cdn_frontdoor_rule_sets       = ["afdrs_project102_prod_global_001"]
+        enabled                = true
+        forwarding_protocol    = "HttpOnly"
+        https_redirect_enabled = false
+        patterns_to_match      = ["/*"]
+        supported_protocols    = ["Http", "Https"]
+      }
+    }
+    rule_sets = {
+      afdrs_project102_prod_global_001 = {
+        name = "afde-project102-prod-global-001"
+      }
+    }
+    rules = [
+      afdr_project102_prod_global_001 = { # HTTPS to HTTP
+        name = "afdr-project102-prod-global-001"
+        rule_set = "afdrs_project102_prod_global_001"
+        conditions = {
+          request_scheme_conditions = {
+            equal_https = {
+              operator         = "Equal"
+              match_values     = ["HTTPS"]
+            }
+          }
+        }
+        actions = {
+          url_redirect_actions = {
+            movedhttp = {
+              redirect_type        = "Moved"
+              redirect_protocol    = "Http"
+              destination_hostname = ""
+            }
+          }
+        }
+      }
+    ]
+  }
 }

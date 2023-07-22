@@ -111,7 +111,7 @@ module "network_security_groups" {
 }
 
 module "linux_virtual_machines" {
-  source   = "./modules/VirtualMachine"
+  source   = "./modules/LinuxVirtualMachine"
   for_each = var.linux_virtual_machines
 
   name                               = each.value.name
@@ -280,7 +280,7 @@ module "load_balancers" {
 }
 
 module "linux_virtual_machine_scale_sets" {
-  source   = "./modules/VirtualMachineScaleSet"
+  source   = "./modules/LinuxVirtualMachineScaleSet"
   for_each = var.linux_virtual_machine_scale_sets
 
   name                   = each.value.name
@@ -380,8 +380,8 @@ module "front_doors" {
   origin_groups       = each.value.origin_groups
   origins             = each.value.origins
   routes              = each.value.routes
-  # rule_sets = each.value.rule_sets
-  # rules = each.value.rules
+  rule_sets = each.value.rule_sets
+  rules = each.value.rules
 
   depends_on = [
     module.load_balancers,

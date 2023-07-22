@@ -35,7 +35,7 @@ resource "azurerm_firewall" "firewall" {
   }
 
   ip_configuration {
-    name      = "${var.name}-ip-configuration"
+    name      = var.ip_configuration.name
     subnet_id = data.azurerm_subnet.subnet_firewall.id
   }
 
@@ -43,7 +43,7 @@ resource "azurerm_firewall" "firewall" {
     for_each = var.management_ip_configuration.enabled ? [1] : []
 
     content {
-      name                 = "${var.name}-management-ip-configuration"
+      name                 = var.management_ip_configuration.name
       subnet_id            = data.azurerm_subnet.subnet_firewall_management.id
       public_ip_address_id = data.azurerm_public_ip.public_ip_firewall_management.id
     }

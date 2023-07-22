@@ -133,6 +133,7 @@ variable "firewalls" {
       resource_group_name = string
     })
     ip_configuration = object({
+      name = string
       subnet = object({
         name                 = string
         virtual_network_name = string
@@ -141,6 +142,7 @@ variable "firewalls" {
     })
     management_ip_configuration = object({
       enabled = bool
+      name = string
       subnet = object({
         virtual_network_name = string
         resource_group_name  = string
@@ -349,7 +351,6 @@ variable "linux_virtual_machine_scale_sets" {
           resource_group_name  = string
         })
         load_balancer_backend_address_pools = map(object({
-          name                              = string
           load_balancer_name                = string
           load_balancer_resource_group_name = string
         }))
@@ -432,7 +433,7 @@ variable "kubernetes_clusters" {
       virtual_network_name = string
       resource_group_name  = string
     })
-    subnet_appgw = object({
+    subnet_agw = object({
       name                 = string
       virtual_network_name = string
       resource_group_name  = string
@@ -464,7 +465,9 @@ variable "front_doors" {
     name           = string
     resource_group = string
     sku_name       = string
-    endpoints      = list(string)
+    endpoints      = map(object({
+      name = string
+    }))
     origin_groups = map(object({
       name                                                      = string
       session_affinity_enabled                                  = bool
@@ -510,32 +513,32 @@ variable "front_doors" {
       cdn_frontdoor_endpoint     = string
       cdn_frontdoor_origin_group = string
       cdn_frontdoor_origins      = list(string)
-      # cdn_frontdoor_rule_sets       = list(string)
+      cdn_frontdoor_rule_sets       = list(string)
       enabled                = bool
       forwarding_protocol    = string
       https_redirect_enabled = bool
       patterns_to_match      = list(string)
       supported_protocols    = list(string)
     }))
-    # rule_sets = map(object({
-    #   name = string
-    # }))
-    # rules = list(object({
-    #   name = string
-    #   rule_set = string
-    #   conditions = object({
-    #     request_scheme_conditions = map(object({
-    #       operator         = string
-    #       match_values     = list(string)
-    #     }))
-    #   })
-    #   actions = object({
-    #     url_redirect_actions = map(object({
-    #       redirect_type        = string
-    #       redirect_protocol    = string
-    #       destination_hostname = string
-    #     }))
-    #   })
-    # }))
+    rule_sets = map(object({
+      name = string
+    }))
+    rules = map(object({
+      name = string
+      rule_set = string
+      conditions = object({
+        request_scheme_conditions = map(object({
+          operator         = string
+          match_values     = list(string)
+        }))
+      })
+      actions = object({
+        url_redirect_actions = map(object({
+          redirect_type        = string
+          redirect_protocol    = string
+          destination_hostname = string
+        }))
+      })
+    }))
   }))
 }
