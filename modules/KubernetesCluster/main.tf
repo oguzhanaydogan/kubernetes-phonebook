@@ -33,7 +33,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
     for_each = var.ingress_application_gateway.enabled ? [1] : []
 
     content {
-      gateway_name = var.ingress_application_gateway.gateway_name
+      gateway_name = var.ingress_application_gateway.name
       subnet_id    = data.azurerm_subnet.subnet_agw.id
     }
   }

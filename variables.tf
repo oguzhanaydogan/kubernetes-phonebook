@@ -132,26 +132,26 @@ variable "firewalls" {
       name = string
       resource_group_name = string
     })
-    ip_configuration = object({
+    ip_configuration = optional(object({
       name = string
       subnet = object({
         name                 = string
         virtual_network_name = string
         resource_group_name  = string
       })
-    })
-    management_ip_configuration = object({
+    }))
+    management_ip_configuration = optional(object({
       enabled = bool
-      name = string
-      subnet = object({
+      name = optional(string)
+      subnet = optional(object({
         virtual_network_name = string
         resource_group_name  = string
-      })
-      public_ip_address = object({
+      }))
+      public_ip_address = optional(object({
         name                = string
         resource_group_name = string
-      })
-    })
+      }))
+    }))
     firewall_network_rule_collections = map(object({
       name = string
       priority = number
@@ -172,6 +172,7 @@ variable "linux_virtual_machines" {
     name           = string
     resource_group = string
     network_interface = object({
+      name = string
       ip_configurations = map(object({
         name = string
         subnet = object({
@@ -324,8 +325,8 @@ variable "linux_virtual_machine_scale_sets" {
     })
     upgrade_mode = string
     health_probe = object({
-      name          = string
       load_balancer = string
+      reference_name          = string
     })
     admin_ssh_key = object({
       resource_group_name = string
@@ -409,6 +410,7 @@ variable "private_endpoints" {
     resource_group = string
     subnet         = object({
       name = string
+      resource_group_name = string
       virtual_network_name = string
     })
     private_service_connection = object({
@@ -451,7 +453,7 @@ variable "kubernetes_clusters" {
     })
     ingress_application_gateway = object({
       enabled      = bool
-      gateway_name = string
+      name = string
     })
     network_profile = object({
       network_plugin = string

@@ -36,7 +36,7 @@ locals {
   }
   route_table_routes_flattened = flatten([
     for k, virtual_hub in var.virtual_hubs : [
-      for key, route in hub.route_table_routes : {
+      for key, route in virtual_hub.route_table_routes : {
         virtual_hub = k
         name = route.name
         destination_type = route.destination_type
@@ -83,12 +83,12 @@ resource "azurerm_virtual_hub_connection" "virtual_hub_connections" {
   remote_virtual_network_id = data.azurerm_virtual_network.virtual_networks[each.key].id
 
   routing {
-    associated_route_table_id = each.value.routing.associated_route_table == "Default" ? azurerm_virtual_hub.virtual_hubs[each.value.hub].default_route_table_id : azurerm_virtual_hub_route_table.virtual_hub_route_tables["${each.value.hub}_${each.value.routing.associated_route_table}"].id
+    associated_route_table_id = each.value.routing.associated_route_table == "Default" ? azurerm_virtual_hub.virtual_hubs[each.value.virtual_hub].default_route_table_id : azurerm_virtual_hub_route_table.virtual_hub_route_tables["${each.value.virtual_hub}_${each.value.routing.associated_route_table}"].id
 
     propagated_route_table {
       route_table_ids = concat([
         for route_table in each.value.routing.propagated_route_tables :
-          azurerm_virtual_hub.virtual_hubs[route_table.hub].default_route_table_id
+          azurerm_virtual_hub.virtual_hubs[route_table.virtual_hub].default_route_table_id
           if route_table.name == "Default"
       ], [
         for route_table in each.value.routing.propagated_route_tables :

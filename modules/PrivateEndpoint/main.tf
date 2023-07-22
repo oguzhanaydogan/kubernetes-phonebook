@@ -1,5 +1,6 @@
 data "azurerm_subnet" "subnet" {
   name = var.subnet.name
+  resource_group_name = var.subnet.resource_group_name
   virtual_network_name = var.subnet.virtual_network_name
 }
 
@@ -10,7 +11,7 @@ data "azurerm_resources" "resources" {
 
 data "azurerm_private_dns_zone" "private_dns_zones" {
   for_each = {
-    for zone in var.var.private_dns_zone_group.private_dns_zones :
+    for zone in var.private_dns_zone_group.private_dns_zones :
       zone.name => {
         name = zone.name
         resource_group_name = zone.resource_group_name

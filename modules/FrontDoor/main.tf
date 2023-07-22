@@ -166,7 +166,7 @@ resource "azurerm_cdn_frontdoor_rule" "cdn_frontdoor_rules" {
 
 	name                      = each.value.name
 	cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.cdn_frontdoor_rule_sets[each.value.rule_set].id
-	order                     = each.key + 1
+	order                     = index(keys(var.rules), each.key) + 1
 
 	conditions {
 		dynamic "request_scheme_condition" {

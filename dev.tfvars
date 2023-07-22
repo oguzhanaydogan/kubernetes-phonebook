@@ -107,7 +107,7 @@ virtual_networks = {
   }
   vnet_project102_prod_westeurope_002 = { # sql
     name           = "vnet-project102-prod-westeurope-002"
-    resource_group = "rg_project102_prod_westeurope_002"
+    resource_group = "rg_project102_prod_westeurope_001"
     address_space  = ["10.11.0.0/16"]
     subnets = {
       snet_project102_prod_westeurope_006 = { # sql
@@ -286,7 +286,7 @@ network_security_groups = {
 }
 
 firewalls = {
-  fw_project102_prod_eastus_001 = { # hub
+  fw_project102_prod_eastus_001 = { # hub-us
     name           = "fw-project102-prod-eastus-001"
     resource_group = "rg_project102_prod_eastus_001"
     sku_name       = "AZFW_Hub"
@@ -333,7 +333,7 @@ linux_virtual_machines = {
     network_interface = {
       name = "nic-project102-prod-eastus-001"
       ip_configurations = {
-        IPConfiguration1 = {
+        ip_configuration_1 = {
           name = "IPConfiguration1"
           subnet = {
             name                 = "snet-project102-prod-eastus-007"
@@ -370,7 +370,7 @@ linux_virtual_machines = {
     }
     os_profile = {
       admin_username = "azureuser"
-      custom_data    = "modules/VirtualMachine/vm_project102_prod_eastus_001.sh"
+      custom_data    = "modules/LinuxVirtualMachine/vm_project102_prod_eastus_001.sh"
     }
     os_profile_linux_config = {
       disable_password_authentication = true
@@ -466,7 +466,7 @@ load_balancers = {
     resource_group = "rg_project102_prod_westeurope_001"
     sku            = "Standard"
     frontend_ip_configurations = {
-      FrontendIPConfiguration1 = {
+      frontend_ip_configuration_1 = {
         name = "FrontendIPConfiguration1"
         subnet = {
           name                 = "snet-project102-prod-westeurope-002"
@@ -501,7 +501,7 @@ load_balancers = {
     private_link_service = {
       name = "pl-project102-prod-westeurope-001"
       nat_ip_configurations = {
-        NATIPConfiguration1 = {
+        nat_ip_configuration_1 = {
           name    = "NATIPConfiguration1"
           subnet  = {
             name                 = "snet-project102-prod-westeurope-003"
@@ -530,7 +530,7 @@ linux_virtual_machine_scale_sets = {
     upgrade_mode = "Rolling"
     health_probe = {
       load_balancer = "lb_project102_prod_westeurope_001"
-      name          = "lbp-project102-prod-westeurope-001"
+      reference_name          = "lbp_project102_prod_westeurope_001"
     }
     admin_ssh_key = {
       resource_group_name = "ssh-key"
@@ -548,7 +548,7 @@ linux_virtual_machine_scale_sets = {
         resource_group_name = "rg-project102-prod-westeurope-001"
       }
       ip_configurations = {
-        IPConfiguration1 = {
+        ip_configuration_1 = {
           name    = "IPConfiguration1"
           primary = true
           subnet = {
@@ -579,7 +579,7 @@ bastion_hosts = {
     name           = "bas-project102-prod-westeurope-001"
     resource_group = "rg_project102_prod_westeurope_001"
     ip_configurations = {
-      IPConfiguration1 = {
+      ip_configuration_1 = {
         name = "IPConfiguration1"
         subnet = {
           name                 = "AzureBastionSubnet"
@@ -645,6 +645,7 @@ private_endpoints = {
     resource_group = "rg_project102_prod_eastus_001"
     subnet         = {
       name = "snet-project102-prod-eastus-006"
+      resource_group_name = "rg-project102-prod-eastus-001"
       virtual_network_name = "vnet-project102-prod-eastus-003"
     }
     private_service_connection = {
@@ -674,6 +675,7 @@ private_endpoints = {
     resource_group = "rg_project102_prod_westeurope_001"
     subnet         = {
       name = "snet-project102-prod-westeurope-007"
+      resource_group_name = "rg-project102-prod-westeurope-002"
       virtual_network_name = "vnet-project102-prod-westeurope-001"
     }
     private_service_connection = {
@@ -700,7 +702,7 @@ kubernetes_clusters = {
       virtual_network_name = "vnet-project102-prod-eastus-001"
       resource_group_name  = "rg-project102-prod-eastus-001"
     }
-    snet_agw = {
+    subnet_agw = {
       name                 = "snet-project102-prod-eastus-003"
       virtual_network_name = "vnet-project102-prod-eastus-001"
       resource_group_name  = "rg-project102-prod-eastus-001"
@@ -734,7 +736,7 @@ front_doors = {
     sku_name       = "Premium_AzureFrontDoor"
     endpoints      = { # phonebook
       afde_project102_prod_global_001 = {
-        name = "afde-project102-prod-global-001"
+        name = "AFDEProject102ProdGlobal001"
       }
     }
     origin_groups = {
@@ -784,8 +786,8 @@ front_doors = {
       }
     }
     routes = {
-      afdr_project102_prod_global_001 = {
-        name                       = "afdr-project102-prod-global-001"
+      afdroute_project102_prod_global_001 = {
+        name                       = "afdroute-project102-prod-global-001"
         cdn_frontdoor_endpoint     = "afde_project102_prod_global_001"
         cdn_frontdoor_origin_group = "afdog_project102_prod_global_001"
         cdn_frontdoor_origins      = ["afdo_project102_prod_global_001"]
@@ -799,12 +801,12 @@ front_doors = {
     }
     rule_sets = {
       afdrs_project102_prod_global_001 = {
-        name = "afde-project102-prod-global-001"
+        name = "AFDEProject102ProdGlobal001"
       }
     }
-    rules = [
-      afdr_project102_prod_global_001 = { # HTTPS to HTTP
-        name = "afdr-project102-prod-global-001"
+    rules = {
+      afdrule_project102_prod_global_001 = { # HTTPS to HTTP
+        name = "AFDRuleProject102ProdGlobal001"
         rule_set = "afdrs_project102_prod_global_001"
         conditions = {
           request_scheme_conditions = {
@@ -824,6 +826,6 @@ front_doors = {
           }
         }
       }
-    ]
+    }
   }
 }

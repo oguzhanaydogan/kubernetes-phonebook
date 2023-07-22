@@ -42,7 +42,7 @@ module "virtual_networks" {
 }
 
 module "virtual_wans" {
-  source = "./modules/VirtualWANWithHubs"
+  source = "./modules/VirtualWAN"
   for_each = var.virtual_wans
 
   name = each.value.name
@@ -291,7 +291,7 @@ module "linux_virtual_machine_scale_sets" {
   admin_username         = each.value.admin_username
   shared_image           = each.value.shared_image
   upgrade_mode           = each.value.upgrade_mode
-  health_probe_id        = module.load_balancers[each.value.health_probe.load_balancer].health_probes[each.value.health_probe.name].id
+  health_probe_id        = module.load_balancers[each.value.health_probe.load_balancer].health_probes[each.value.health_probe.reference_name].id
   admin_ssh_key          = each.value.admin_ssh_key
   os_disk                = each.value.os_disk
   network_interface      = each.value.network_interface
@@ -352,7 +352,7 @@ module "kubernetes_clusters" {
   for_each = var.kubernetes_clusters
 
   subnet_aks                  = each.value.subnet_aks
-  subnet_appgw                = each.value.subnet_appgw
+  subnet_agw                = each.value.subnet_agw
   name                        = each.value.name
   location                    = module.resource_groups[each.value.resource_group].location
   resource_group_name         = module.resource_groups[each.value.resource_group].name
@@ -365,7 +365,7 @@ module "kubernetes_clusters" {
   depends_on = [
     module.virtual_networks,
     module.route_tables,
-    module.firewalls
+    # module.firewalls
   ]
 }
 
@@ -389,22 +389,22 @@ module "front_doors" {
   ]
 }
 
-module "firewalls" {
-  source   = "./modules/Firewall"
-  for_each = var.firewalls
+# module "firewalls" {
+#   source   = "./modules/Firewall"
+#   for_each = var.firewalls
 
-  name                        = each.value.name
-  location                    = module.resource_groups[each.value.resource_group].location
-  resource_group_name         = module.resource_groups[each.value.resource_group].name
-  sku_name                    = each.value.sku_name
-  sku_tier                    = each.value.sku_tier
-  virtual_hub = each.value.virtual_hub
-  ip_configuration            = each.value.ip_configuration
-  management_ip_configuration = each.value.management_ip_configuration
-  firewall_network_rule_collections = each.value.firewall_network_rule_collections
+#   name                        = each.value.name
+#   location                    = module.resource_groups[each.value.resource_group].location
+#   resource_group_name         = module.resource_groups[each.value.resource_group].name
+#   sku_name                    = each.value.sku_name
+#   sku_tier                    = each.value.sku_tier
+#   virtual_hub = each.value.virtual_hub
+#   ip_configuration            = each.value.ip_configuration
+#   management_ip_configuration = each.value.management_ip_configuration
+#   firewall_network_rule_collections = each.value.firewall_network_rule_collections
 
-  depends_on = [
-    module.virtual_networks,
-    module.public_ip_addresses
-  ]
-}
+#   depends_on = [
+#     module.virtual_networks,
+#     module.public_ip_addresses
+#   ]
+# }

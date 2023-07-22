@@ -26,7 +26,7 @@ locals {
   lb_backend_address_pools_flattened_info = flatten([
     for k, v in var.network_interface.ip_configurations : [
       for key, pool in v.load_balancer_backend_address_pools : {
-        lb_backend_address_pool_name      = pool.name
+        lb_backend_address_pool_name      = pool.load_balancer_name
         load_balancer_name                = pool.load_balancer_name
         load_balancer_resource_group_name = pool.load_balancer_resource_group_name
       }
@@ -96,7 +96,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "linux_virtual_machine_scale_
         primary   = ip_configuration.value.primary
         subnet_id = data.azurerm_subnet.subnets[ip_configuration.key].id
         load_balancer_backend_address_pool_ids = [
-          for k, v in ip_configuration.value.load_balancer_backend_address_pools : data.azurerm_lb_backend_address_pool.lb_backend_address_pools[v.name].id
+          for k, v in ip_configuration.value.load_balancer_backend_address_pools : data.azurerm_lb_backend_address_pool.lb_backend_address_pools[v.load_balancer_name].id
         ]
       }
     }

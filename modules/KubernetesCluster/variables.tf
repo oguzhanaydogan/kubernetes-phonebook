@@ -1,7 +1,7 @@
 variable "subnet_aks" {
 }
 
-variable "subnet_appgw" {
+variable "subnet_agw" {
 }
 
 variable "name" {
