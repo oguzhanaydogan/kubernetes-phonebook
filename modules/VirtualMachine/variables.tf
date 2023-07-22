@@ -34,5 +34,8 @@ variable "os_profile" {
 variable "os_profile_linux_config" {
 }
 
+variable "boot_diagnostics" {
+}
+
 variable "network_security_group_association" {
 }

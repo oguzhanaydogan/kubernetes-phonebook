@@ -144,9 +144,8 @@ module "key_vault_access_policies" {
   source   = "./modules/KeyVaultAccessPolicy"
   for_each = var.key_vault_access_policies
 
-  key_vault_name                = each.value.key_vault_name
-  key_vault_resource_group_name = each.value.key_vault_resource_group_name
-  object_id                     = data.azurerm_client_config.client_config.object_id
+  key_vault                     = each.value.key_vault
+  object                        = each.value.object
   key_permissions               = each.value.key_permissions
   secret_permissions            = each.value.secret_permissions
 }
@@ -172,7 +171,7 @@ module "mssql_servers" {
   resource_group_name          = module.resource_groups[each.value.resource_group].name
   location                     = module.resource_groups[each.value.resource_group].location
   msqql_version                = each.value.version
-  administrator_login          = each.value.administrator_login
+  administrator_login          = module.key_vault_secrets[each.value.admin_key_vault_secret].value
   administrator_login_password = module.key_vault_secrets[each.value.admin_password_key_vault_secret].value
   tags                         = each.value.tags
   mssql_databases = each.value.mssql_databases

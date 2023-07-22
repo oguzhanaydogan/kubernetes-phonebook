@@ -326,7 +326,6 @@ firewalls = {
 
 linux_virtual_machines = {
   vm_project102_prod_eastus_001 = { # ci/cd agent
-  // TODO: boot_diagnosticsi enable et, passwordu enable et
     name           = "vm-project102-prod-eastus-001"
     resource_group = "rg_project102_prod_eastus_001"
     network_interface = {
@@ -351,8 +350,6 @@ linux_virtual_machines = {
     delete_data_disks_on_termination = true
     delete_os_disk_on_termination    = true
     identity = {
-      // TODO: ENABLEDA GEREK YOK
-      enabled = true
       type    = "SystemAssigned"
     }
     storage_image_reference = {
@@ -378,19 +375,26 @@ linux_virtual_machines = {
       }
     }
     network_security_group_association = {
-      // TODO: Enabled?
-      enabled                                    = true
       network_security_group_name                = "nsg-project102-prod-eastus-001"
       network_security_group_resource_group_name = "rg-project102-prod-eastus-001"
+    }    
+    boot_diagnostics = {
+      storage_account_uri = null
     }
   }
 }
 
 key_vault_access_policies = {
-  # TODO: Modularize
   kvap_project102_prod_global_001 = {
-    key_vault_name                = "coyvault"
-    key_vault_resource_group_name = "ssh-key"
+    key_vault = {
+      name                = "coyvault"
+      resource_group_name = "ssh-key"
+    }
+    object = {
+      type = "user"
+      name = "oguzhanaydoganbusiness_gmail.com#EXT#@oguzhanaydoganbusinessgmail.onmicrosoft.com"
+    }
+
     key_permissions = [
       "Get", "List",
     ]
@@ -401,7 +405,12 @@ key_vault_access_policies = {
 }
 
 key_vault_secrets = {
-  kvs_project102_prod_global_001 = {
+    kvs_project102_prod_global_001 = {
+    name                          = "MSSQLADMIN"
+    key_vault_resource_group_name = "ssh-key"
+    key_vault_name                = "coyvault"
+  }
+  kvs_project102_prod_global_002 = {
     name                          = "MSSQLPASSWORD"
     key_vault_resource_group_name = "ssh-key"
     key_vault_name                = "coyvault"
@@ -413,9 +422,8 @@ mssql_servers = {
     name                  = "sql-project102-prod-eastus-001"
     resource_group        = "rg_project102_prod_eastus_001"
     version               = "12.0"
-    administrator_login   = "azureuser"
-    // TODO: Key vaulttan al
-    admin_password_key_vault_secret = "kvs_project102_prod_global_001"
+    admin_key_vault_secret = "kvs_project102_prod_global_001"
+    admin_password_key_vault_secret = "kvs_project102_prod_global_002"
     tags = {
       name = "sql-project102-prod-eastus-001"
     }

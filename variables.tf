@@ -188,10 +188,9 @@ variable "linux_virtual_machines" {
     size                             = string
     delete_data_disks_on_termination = bool
     delete_os_disk_on_termination    = bool
-    identity = object({
-      enabled = bool
+    identity = optional(object({
       type    = string
-    })
+    }))
     storage_image_reference = object({
       publisher = string
       offer     = string
@@ -214,19 +213,27 @@ variable "linux_virtual_machines" {
         resource_group_name = string
       })
     })
-    network_security_group_association = object({
-      enabled                                    = bool
+    boot_diagnostics = optional(object({
+      storage_account_uri = optional(string)
+    }))
+    network_security_group_association = optional(object({
       network_security_group_name                = string
       network_security_group_resource_group_name = string
-    })
+    }))
   }))
 }
 
 variable "key_vault_access_policies" {
   description = "This is for Terraform"
   type = map(object({
-    key_vault_name                = string
-    key_vault_resource_group_name = string
+    key_vault = object({
+      name                        = string
+      resource_group_name         = string
+    })
+    object                        = object({
+      type = string
+      name = string 
+    })
     key_permissions               = list(string)
     secret_permissions            = list(string)
   }))
@@ -244,7 +251,7 @@ variable "mssql_servers" {
     name                            = string
     resource_group                  = string
     version                         = string
-    administrator_login             = string
+    admin_key_vault_secret          = string
     admin_password_key_vault_secret = string
     tags                            = map(string)
     mssql_databases = optional(map(object({
