@@ -1,164 +1,175 @@
 resource_groups = {
-  rg_eastus = {
-    name     = "rg-eastus"
+  rg_project102_prod_eastus_001 = {
+    name     = "rg-project102-prod-eastus-001"
     location = "East Us"
   }
-  rg_westeurope = {
-    name     = "rg-westeurope"
+  rg_project102_prod_westeurope_001 = {
+    name     = "rg-project102-prod-westeurope-001"
     location = "West Europe"
   }
 }
 
 virtual_networks = {
-  vnet_app = {
-    name           = "vnet-app"
-    resource_group = "rg_eastus"
-    address_space  = ["10.1.0.0/16"]
+  vnet_project102_prod_eastus_001 = { # app
+    name           = "vnet-project102-prod-eastus-001"
+    resource_group = "rg_project102_prod_eastus_001"
+    address_space  = ["10.0.0.0/16"]
     subnets        = {
-      subnet_app = {
-        name             = "subnet-app"
+      snet_project102_prod_eastus_001 = { # app
+        name             = "snet-project102-prod-eastus-001"
+        address_prefixes = ["10.0.0.0/24"]
+      }
+      snet_project102_prod_eastus_002 = { # aks
+        name             = "snet-project102-prod-eastus-002"
+        address_prefixes = ["10.0.1.0/24"]
+      }
+      snet_project102_prod_eastus_003 = { # agw
+        name             = "snet-project102-prod-eastus-003"
+        address_prefixes = ["10.0.2.0/24"]
+      }
+    }
+  }
+  vnet_project102_prod_eastus_002 = { # acr
+    name           = "vnet-project102-prod-eastus-002"
+    resource_group = "rg_project102_prod_eastus_001"
+    address_space  = ["10.1.0.0/16"]
+    subnets = {
+      snet_project102_prod_eastus_004 = { # acr
+        name             = "snet-project102-prod-eastus-004"
         address_prefixes = ["10.1.0.0/24"]
       }
-      subnet_aks = {
-        name             = "subnet-aks"
-        address_prefixes = ["10.1.1.0/24"]
-      }
-      subnet_appgw = {
-        name             = "subnet-appgw"
-        address_prefixes = ["10.1.2.0/24"]
-      }
     }
   }
-  vnet_acr = {
-    name           = "vnet-acr"
-    resource_group = "rg_eastus"
+  vnet_project102_prod_eastus_003 = { # sql
+    name           = "vnet-project102-prod-eastus-003"
+    resource_group = "rg_project102_prod_eastus_001"
     address_space  = ["10.2.0.0/16"]
     subnets = {
-      subnet_acr = {
-        name             = "subnet-acr"
+      snet_project102_prod_eastus_005 = { # sql
+        name             = "snet-project102-prod-eastus-005"
         address_prefixes = ["10.2.0.0/24"]
       }
+      snet_project102_prod_eastus_006 = { # pep
+        name             = "snet-project102-prod-eastus-006"
+        address_prefixes = ["10.2.1.0/24"]
+      }
     }
   }
-  vnet_db = {
-    name           = "vnet-db"
-    resource_group = "rg_eastus"
+  vnet_project102_prod_eastus_004 = { # agent
+    name           = "vnet-project102-prod-eastus-004"
+    resource_group = "rg_project102_prod_eastus_001"
     address_space  = ["10.3.0.0/16"]
     subnets = {
-      subnet_db = {
-        name             = "subnet-db"
+      snet_project102_prod_eastus_007 = { # agent
+        name             = "snet-project102-prod-eastus-007"
         address_prefixes = ["10.3.0.0/24"]
-      }
-      subnet_db_pep = {
-        name             = "subnet-db-pep"
-        address_prefixes = ["10.3.1.0/24"]
       }
     }
   }
-  vnet_agent = {
-    name           = "vnet-agent"
-    resource_group = "rg_eastus"
+  vnet_project102_prod_eastus_005 = { # fw
+    name           = "AzureFirewallSubnet"
+    resource_group = "rg_project102_prod_eastus_001"
     address_space  = ["10.4.0.0/16"]
-    subnets = {
-      subnet_agent = {
-        name             = "subnet-agent"
+    subnets        = {
+      snet_project102_prod_eastus_008 = { # fw
+        name             = "snet-project102-prod-eastus-008"
         address_prefixes = ["10.4.0.0/24"]
       }
     }
   }
-  vnet_app_eu = {
-    name           = "vnet-app-eu"
-    resource_group = "rg_westeurope"
-    address_space  = ["10.11.0.0/16"]
+  vnet_project102_prod_westeurope_001 = { # app
+    name           = "vnet-project102-prod-westeurope-001"
+    resource_group = "rg_project102_prod_westeurope_001"
+    address_space  = ["10.10.0.0/16"]
     subnets = {
-      subnet_app = {
-        name             = "subnet-app"
-        address_prefixes = ["10.11.0.0/24"]
+      snet_project102_prod_westeurope_001 = { # app
+        name             = "snet-project102-prod-westeurope-001"
+        address_prefixes = ["10.10.0.0/24"]
       }
-      subnet_lb = {
-        name             = "subnet-lb"
-        address_prefixes = ["10.11.1.0/24"]
+      snet_project102_prod_westeurope_002 = { # lb
+        name             = "snet-project102-prod-westeurope-002"
+        address_prefixes = ["10.10.1.0/24"]
       }
-      subnet_lb_pls = {
-        name                                          = "subnet-lb-pls"
-        address_prefixes                              = ["10.11.2.0/24"]
+      snet_project102_prod_westeurope_003 = { # pls
+        name                                          = "snet-project102-prod-westeurope-003"
+        address_prefixes                              = ["10.10.2.0/24"]
         private_link_service_network_policies_enabled = false
       }
-      subnet_lb_pls_pep = {
-        name             = "subnet-lb-pls-pep"
-        address_prefixes = ["10.11.4.0/24"]
+      snet_project102_prod_westeurope_004 = { # pep
+        name             = "snet-project102-prod-westeurope-004"
+        address_prefixes = ["10.10.3.0/24"]
       }
-      subnet_bastion = {
+      snet_project102_prod_westeurope_005 = { # bastion
         name             = "AzureBastionSubnet"
-        address_prefixes = ["10.11.3.0/24"]
+        address_prefixes = ["10.10.4.0/24"]
       }
     }
   }
-  vnet_db_eu = {
-    name           = "vnet-db-eu"
-    resource_group = "rg_westeurope"
-    address_space  = ["10.12.0.0/16"]
+  vnet_project102_prod_westeurope_002 = { # sql
+    name           = "vnet-project102-prod-westeurope-002"
+    resource_group = "rg_project102_prod_westeurope_002"
+    address_space  = ["10.11.0.0/16"]
     subnets = {
-      subnet_db = {
-        name             = "subnet-db"
-        address_prefixes = ["10.12.0.0/24"]
+      snet_project102_prod_westeurope_006 = { # sql
+        name             = "snet-project102-prod-westeurope-006"
+        address_prefixes = ["10.11.0.0/24"]
       }
-      subnet_db_pep = {
-        name             = "subnet-db-pep"
-        address_prefixes = ["10.12.1.0/24"]
+      snet_project102_prod_westeurope_007 = { # pep
+        name             = "snet-project102-prod-westeurope-007"
+        address_prefixes = ["10.11.1.0/24"]
       }
     }
   }
 }
 
 virtual_wans = {
-  project_102_virtual_wan = {
-    name = "project-102-virtual-wan"
-    resource_group = "rg_eastus"
+  vwan_project102_prod_eastus_001 = {
+    name = "vwan-project102-prod-eastus-001"
+    resource_group = "rg_project102_prod_eastus_001"
     virtual_hubs = {
-      eastus_virtual_hub = {
-        name = "eastus-virtual-hub"
+      vhub_project102_prod_eastus_001 = {
+        name = "vhub-project102-prod-eastus-001"
         address_prefix = "10.30.0.0/16"
         virtual_hub_connections = {
-          connection_01 = {
+          acr_connection = {
             name = "acr-connection"
             remote_virtual_network = {
-              name = "vnet-acr"
-              resource_group_name = "rg-eastus"
+              name = "vnet-project102-prod-eastus-002"
+              resource_group_name = "rg-project102-prod-eastus-001"
             }
             routing = {
               associated_route_table = "Default"
               propagated_route_tables = [
                 {
                   name = "Default"
-                  hub = "eastus_virtual_hub"
+                  virtual_hub = "vhub_project102_prod_eastus_001"
                 }
               ]
             }
           }
-          connection_02 = {
+          agent_connection = {
             name = "agent-connection"
             remote_virtual_network = {
-              name = "vnet-agent"
-              resource_group_name = "rg-eastus"
+              name = "vnet_project102_prod_eastus_004"
+              resource_group_name = "rg-project102-prod-eastus-001"
             }
             routing = {
               associated_route_table = "Default"
               propagated_route_tables = []
             }
           }
-          connection_03 = {
-            name = "db-connection"
+          sql-connection = {
+            name = "sql-connection"
             remote_virtual_network = {
-              name = "vnet-db"
-              resource_group_name = "rg-eastus"
+              name = "vnet-project102-prod-eastus-003"
+              resource_group_name = "rg-project102-prod-eastus-001"
             }
             routing = {
               associated_route_table = "Default"
               propagated_route_tables = [
                 {
                   name = "Default"
-                  hub = "eastus_virtual_hub"
+                  virtual_hub = "vhub_project102_prod_eastus_001"
                 }
               ]
             }
@@ -179,201 +190,60 @@ virtual_wans = {
 }
 
 vnet_peerings = {
-  # db_hub = {
-  #   name                    = "db-hub"
-  #   virtual_network         = "vnet_db"
-  #   remote_virtual_network  = "vnet_hub"
-  #   resource_group          = "rg_eastus"
-  #   allow_forwarded_traffic = true
-  # }
-  # hub_db = {
-  #   name                    = "hub-db"
-  #   virtual_network         = "vnet_hub"
-  #   remote_virtual_network  = "vnet_db"
-  #   resource_group          = "rg_eastus"
-  #   allow_forwarded_traffic = true
-  # }
-  # app_hub = {
-  #   name                    = "app-hub"
-  #   virtual_network         = "vnet_app"
-  #   remote_virtual_network  = "vnet_hub"
-  #   resource_group          = "rg_eastus"
-  #   allow_forwarded_traffic = true
-  # }
-  # hub_app = {
-  #   name                    = "hub-app"
-  #   virtual_network         = "vnet_hub"
-  #   remote_virtual_network  = "vnet_app"
-  #   resource_group          = "rg_eastus"
-  #   allow_forwarded_traffic = true
-  # }
-  # acr_hub = {
-  #   name                    = "acr-hub"
-  #   virtual_network         = "vnet_acr"
-  #   remote_virtual_network  = "vnet_hub"
-  #   resource_group          = "rg_eastus"
-  #   allow_forwarded_traffic = true
-  # }
-  # hub_acr = {
-  #   name                    = "hub-acr"
-  #   virtual_network         = "vnet_hub"
-  #   remote_virtual_network  = "vnet_acr"
-  #   resource_group          = "rg_eastus"
-  #   allow_forwarded_traffic = true
-  # }
-  db_dbeu = {
-    name                    = "db-dbeu"
-    virtual_network         = "vnet_db"
-    remote_virtual_network  = "vnet_db_eu"
-    resource_group          = "rg_eastus"
+  peer_project102_prod_global_001 = { # sql-us_sql-eu
+    name                    = "peer-project102-prod-global-001"
+    virtual_network         = "vnet_project102_prod_eastus_003"
+    remote_virtual_network  = "vnet_project102_prod_westeurope_001"
+    resource_group          = "rg_project102_prod_eastus_001"
     allow_forwarded_traffic = true
   }
-  dbeu_db = {
-    name                    = "dbeu-db"
-    virtual_network         = "vnet_db_eu"
-    remote_virtual_network  = "vnet_db"
-    resource_group          = "rg_westeurope"
+  peer_project102_prod_global_002 = { # sql-eu_sql-us
+    name                    = "peer-project102-prod-global-002"
+    virtual_network         = "vnet_project102_prod_westeurope_001"
+    remote_virtual_network  = "vnet_project102_prod_eastus_003"
+    resource_group          = "rg_project102_prod_westeurope_001"
     allow_forwarded_traffic = true
   }
-  appeu_dbeu = {
-    name                    = "appeu-dbeu"
-    virtual_network         = "vnet_app_eu"
-    remote_virtual_network  = "vnet_db_eu"
-    resource_group          = "rg_westeurope"
+  peer_project102_prod_global_003 = { # app-eu_db_eu
+    name                    = "peer-project102-prod-global-003"
+    virtual_network         = "vnet_project102_prod_westeurope_001"
+    remote_virtual_network  = "vnet_project102_prod_westeurope_002"
+    resource_group          = "rg_project102_prod_westeurope_001"
     allow_forwarded_traffic = true
   }
-  dbeu_appeu = {
-    name                    = "dbeu-appeu"
-    virtual_network         = "vnet_db_eu"
-    remote_virtual_network  = "vnet_app_eu"
-    resource_group          = "rg_westeurope"
-    allow_forwarded_traffic = true
-  }
-  app_agent = {
-    name                    = "app-agent"
-    virtual_network         = "vnet_app"
-    remote_virtual_network  = "vnet_agent"
-    resource_group          = "rg_eastus"
-    allow_forwarded_traffic = true
-  }
-  agent_app = {
-    name                    = "agent-app"
-    virtual_network         = "vnet_agent"
-    remote_virtual_network  = "vnet_app"
-    resource_group          = "rg_eastus"
+  peer_project102_prod_global_004 = { # db-eu_app-eu
+    name                    = "peer-project102-prod-global-004"
+    virtual_network         = "vnet_project102_prod_westeurope_002"
+    remote_virtual_network  = "vnet_project102_prod_westeurope_001"
+    resource_group          = "rg_project102_prod_westeurope_001"
     allow_forwarded_traffic = true
   }
 }
 
-route_tables = {
-  # route_table_1 = {
-  #   name           = "route-table-1"
-  #   resource_group = "rg_eastus"
-  #   routes = {
-  #     route_to_vnet_acr_subnet_acr = {
-  #       name                   = "route-to-vnet-acr-subnet-acr"
-  #       address_prefix         = "10.2.0.0/24"
-  #       next_hop_type          = "VirtualAppliance"
-  #       next_hop_in_ip_address = "10.0.0.4"
-  #     }
-  #     route_to_vnet_db_subnet_db = {
-  #       name                   = "route-to-vnet-db-subnet-db"
-  #       address_prefix         = "10.3.0.0/24"
-  #       next_hop_type          = "VirtualAppliance"
-  #       next_hop_in_ip_address = "10.0.0.4"
-  #     }
-  #   }
-  #   subnet_associations = {
-  #     vnet_app_subnet_app = {
-  #       subnet_name          = "subnet-app"
-  #       resource_group_name  = "rg-eastus"
-  #       virtual_network_name = "vnet-app"
-  #     }
-  #     vnet_app_subnet_aks = {
-  #       subnet_name          = "subnet-aks"
-  #       resource_group_name  = "rg-eastus"
-  #       virtual_network_name = "vnet-app"
-  #     }
-  #   }
-  # }
-  # route_table_2 = {
-  #   name           = "route-table-2"
-  #   resource_group = "rg_eastus"
-  #   routes = {
-  #     route_to_vnet_app_subnet_app = {
-  #       name                   = "route-to-vnet-app-subnet-app"
-  #       address_prefix         = "10.1.0.0/24"
-  #       next_hop_type          = "VirtualAppliance"
-  #       next_hop_in_ip_address = "10.0.0.4"
-  #     }
-  #   }
-  #   subnet_associations = {
-  #     vnet_db_subnet_db = {
-  #       subnet_name          = "subnet-db"
-  #       resource_group_name  = "rg-eastus"
-  #       virtual_network_name = "vnet-db"
-  #     }
-  #   }
-  # }
-  # route_table_3 = {
-  #   name           = "route-table-3"
-  #   resource_group = "rg_eastus"
-  #   routes = {
-  #     route_to_everywhere = {
-  #       name                   = "route-to-everywhere"
-  #       address_prefix         = "10.0.0.0/8"
-  #       next_hop_type          = "VirtualAppliance"
-  #       next_hop_in_ip_address = "10.4.0.4"
-  #     }
-  #   }
-  #   subnet_associations = {
-  #     vnet_acr_subnet_acr = {
-  #       subnet_name          = "subnet-acr"
-  #       resource_group_name  = "rg-eastus"
-  #       virtual_network_name = "vnet-acr"
-  #     }
-  #   }
-  # }
-}
-
-# acrs = {
-#   coyhub = {
-#     sku                           = "Premium"
-#     admin_enabled                 = false
-#     public_network_access_enabled = false
-#     network_rule_bypass_option    = "None"
-#     resource_group                = "rg-eastus"
-#   }
-# }
+route_tables = {}
 
 public_ip_addresses = {
-  # hub_firewall_management = {
-  #   name              = "hub-firewall-management"
-  #   allocation_method = "Static"
-  #   sku               = "Standard"
-  #   resource_group    = "rg_eastus"
-  # }
-  ci_cd_agent = {
-    name              = "ci-cd-agent"
+  pip_project102_prod_eastus_001 = { # ci/cd agent
+    name              = "pip-project102-prod-eastus-001"
     allocation_method = "Static"
     sku               = "Standard"
-    resource_group    = "rg_eastus"
+    resource_group    = "rg_project102_prod_eastus_001"
   }
-  # bastion_host_eu = {
-  #   name              = "bastion-host-eu"
-  #   allocation_method = "Static"
-  #   sku               = "Standard"
-  #   resource_group    = "rg_westeurope"
-  # }
+  pip_project102_prod_westeurope_001 = { # bastion
+    name              = "pip-project102-prod-westeurope-001"
+    allocation_method = "Static"
+    sku               = "Standard"
+    resource_group    = "rg_project102_prod_westeurope_001"
+  }
 }
 
 network_security_groups = {
-  ssh = {
-    name           = "ssh"
-    resource_group = "rg_eastus"
+  nsg_project102_prod_eastus_001 = { # ssh
+    name           = "nsg-project102-prod-eastus-001"
+    resource_group = "rg_project102_prod_eastus_001"
     security_rules = {
-      allowssh = {
-        name                       = "AllowSSH"
+      nsgsr_project102_prod_eastus_001 = {
+        name                       = "nsgsr-project102-prod-eastus-001"
         priority                   = 100
         direction                  = "Inbound"
         access                     = "Allow"
@@ -385,12 +255,12 @@ network_security_groups = {
       }
     }
   }
-  ssh_and_http = {
-    name           = "ssh-and-http"
-    resource_group = "rg_westeurope"
+  nsg_project102_prod_westeurope_001 = { # ssh and http
+    name           = "nsg-project102-prod-westeurope-001"
+    resource_group = "rg_project102_prod_westeurope_001"
     security_rules = {
-      allowssh = {
-        name                       = "AllowSSH"
+      nsgsr_project102_prod_westeurope_001 = { # ssh
+        name                       = "nsgsr-project102-prod-westeurope-001"
         priority                   = 100
         direction                  = "Inbound"
         access                     = "Allow"
@@ -400,8 +270,8 @@ network_security_groups = {
         source_address_prefix      = "*"
         destination_address_prefix = "*"
       }
-      allowhttp = {
-        name                       = "AllowHTTP"
+      nsgsr_project102_prod_westeurope_002 = { # http
+        name                       = "nsgsr-project102-prod-westeurope-002"
         priority                   = 110
         direction                  = "Inbound"
         access                     = "Allow"
@@ -416,41 +286,33 @@ network_security_groups = {
 }
 
 firewalls = {
-  hub_us = {
-    name           = "hub"
-    resource_group = "rg_eastus"
+  fw_project102_prod_eastus_001 = { # hub
+    name           = "fw-project102-prod-eastus-001"
+    resource_group = "rg_project102_prod_eastus_001"
     sku_name       = "AZFW_Hub"
     sku_tier       = "Basic"
     virtual_hub = {
-      name = "eastus-virtual-hub"
-      resource_group_name = "rg-eastus"
+      name = "vhub-project102-prod-eastus-001"
+      resource_group_name = "rg-project102-prod-eastus-001"
     }
     ip_configuration = {
       subnet = {
         name                 = "AzureFirewallSubnet"
-        virtual_network_name = "vnet-hub"
-        resource_group_name  = "rg-eastus"
+        virtual_network_name = "vnet-project102-prod-eastus-005"
+        resource_group_name  = "rg-project102-prod-eastus-001"
       }
     }
     management_ip_configuration = {
-      enabled = true
-      subnet = {
-        virtual_network_name = "vnet-hub"
-        resource_group_name  = "rg-eastus"
-      }
-      public_ip_address = {
-        name                = "hub-firewall-management"
-        resource_group_name = "rg-eastus"
-      }
+      enabled = false
     }
     firewall_network_rule_collections = {
-      collection_01 = {
-        name = "firewall_hub"
+      fwnrc_project102_prod_eastus_001 = {
+        name = "fwnrc-project102-prod-eastus-001"
         priority = 100
         action = "Allow"
         firewall_network_rules = {
-          rule_01 = {
-            name = "firewall_hub"
+          fwnr_project102_prod_eastus_001 = {
+            name = "fwnr-project102-prod-eastus-001"
             source_addresses = ["10.1.1.0/24"]
             destination_ports = ["*"]
             destination_addresses = ["0.0.0.0/0"]
@@ -463,23 +325,24 @@ firewalls = {
 }
 
 linux_virtual_machines = {
-  ci_cd_agent = {
-    name           = "ci-cd-agent"
-    resource_group = "rg_eastus"
+  vm_project102_prod_eastus_001 = { # ci/cd agent
+  // TODO: boot_diagnosticsi enable et, passwordu enable et
+    name           = "vm-project102-prod-eastus-001"
+    resource_group = "rg_project102_prod_eastus_001"
     network_interface = {
       ip_configurations = {
-        ipConfiguration1 = {
-          name = "ipConfiguration1"
+        vmipc_project102_prod_eastus_001 = {
+          name = "vmipc-project102-prod-eastus-001"
           subnet = {
-            name                 = "subnet-agent"
-            virtual_network_name = "vnet-agent"
-            resource_group_name  = "rg-eastus"
+            name                 = "snet-project102-prod-eastus-007"
+            virtual_network_name = "vnet_project102_prod_eastus_004"
+            resource_group_name  = "rg-project102-prod-eastus-001"
           }
           private_ip_address_allocation = "Dynamic"
           public_ip_assigned            = true
           public_ip_address = {
-            name                = "ci-cd-agent"
-            resource_group_name = "rg-eastus"
+            name                = "pip-project102-prod-eastus-001"
+            resource_group_name = "rg-project102-prod-eastus-001"
           }
         }
       }
@@ -488,6 +351,7 @@ linux_virtual_machines = {
     delete_data_disks_on_termination = true
     delete_os_disk_on_termination    = true
     identity = {
+      // TODO: ENABLEDA GEREK YOK
       enabled = true
       type    = "SystemAssigned"
     }
@@ -504,7 +368,7 @@ linux_virtual_machines = {
     }
     os_profile = {
       admin_username = "azureuser"
-      custom_data    = "modules/VirtualMachine/agent.sh"
+      custom_data    = "modules/VirtualMachine/vm_project102_prod_eastus_001.sh"
     }
     os_profile_linux_config = {
       disable_password_authentication = true
@@ -514,15 +378,17 @@ linux_virtual_machines = {
       }
     }
     network_security_group_association = {
+      // TODO: Enabled?
       enabled                                    = true
-      network_security_group_name                = "ssh"
-      network_security_group_resource_group_name = "rg-eastus"
+      network_security_group_name                = "nsg-project102-prod-eastus-001"
+      network_security_group_resource_group_name = "rg-project102-prod-eastus-001"
     }
   }
 }
 
 key_vault_access_policies = {
-  coy_vault = {
+  # TODO: Modularize
+  kvap_project102_prod_global_001 = {
     key_vault_name                = "coyvault"
     key_vault_resource_group_name = "ssh-key"
     key_permissions = [
@@ -535,7 +401,7 @@ key_vault_access_policies = {
 }
 
 key_vault_secrets = {
-  mssql_password = {
+  kvs_project102_prod_global_001 = {
     name                          = "MSSQLPASSWORD"
     key_vault_resource_group_name = "ssh-key"
     key_vault_name                = "coyvault"
@@ -543,114 +409,114 @@ key_vault_secrets = {
 }
 
 mssql_servers = {
-  # coyhub_db_us = {
-  #   name                  = "coyhub-db-us"
-  #   resource_group        = "rg_eastus"
-  #   version               = "12.0"
-  #   administrator_login   = "azureuser"
-  #   admin_password_key_vault_secret = "mssql_password"
-  #   tags = {
-  #     name = "coyhub-db-us"
-  #   }
-  #   mssql_databases = {
-  #     phonebook_us = {
-  #       name                        = "phonebook"
-  #       collation                   = "SQL_Latin1_General_CP1_CI_AS"
-  #       max_size_gb                 = 32
-  #       sku_name                    = "GP_S_Gen5_1"
-  #       min_capacity                = 0.5
-  #       auto_pause_delay_in_minutes = 60
-  #       read_replica_count          = 0
-  #       read_scale                  = false
-  #       zone_redundant              = false
-  #     }
-  #   }
-
-  # }
-  # coyhub_db_eu = {
-  #   name                  = "coyhub-db-eu"
-  #   resource_group        = "rg_westeurope"
-  #   version               = "12.0"
-  #   administrator_login   = "azureuser"
-  #   admin_password_key_vault_secret = "mssql_password"
-  #   tags = {
-  #     name = "coyhub-db-eu"
-  #   }
-  #   mssql_databases = {
-  #     phonebook_eu = {
-  #       name                        = "phonebook"
-  #       collation                   = "SQL_Latin1_General_CP1_CI_AS"
-  #       max_size_gb                 = 32
-  #       sku_name                    = "GP_S_Gen5_1"
-  #       min_capacity                = 0.5
-  #       auto_pause_delay_in_minutes = 60
-  #       read_replica_count          = 0
-  #       read_scale                  = false
-  #       zone_redundant              = false
-  #     }
-  #   }
-  # }
+  sql_project102_prod_eastus_001 = {
+    name                  = "sql-project102-prod-eastus-001"
+    resource_group        = "rg_project102_prod_eastus_001"
+    version               = "12.0"
+    administrator_login   = "azureuser"
+    // TODO: Key vaulttan al
+    admin_password_key_vault_secret = "kvs_project102_prod_global_001"
+    tags = {
+      name = "sql-project102-prod-eastus-001"
+    }
+    mssql_databases = {
+      sqldb-project102-prod-eastus-001 = {
+        name                        = "phonebook"
+        collation                   = "SQL_Latin1_General_CP1_CI_AS"
+        max_size_gb                 = 32
+        sku_name                    = "GP_S_Gen5_1"
+        min_capacity                = 0.5
+        auto_pause_delay_in_minutes = 60
+        read_replica_count          = 0
+        read_scale                  = false
+        zone_redundant              = false
+      }
+    }
+  }
+  sql_project102_prod_westeurope_001 = {
+    name                  = "sql-project102-prod-westeurope-001"
+    resource_group        = "rg_project102_prod_westeurope_001"
+    version               = "12.0"
+    administrator_login   = "azureuser"
+    admin_password_key_vault_secret = "kvs_project102_prod_global_001"
+    tags = {
+      name = "sql-project102-prod-westeurope-001"
+    }
+    mssql_databases = {
+      sqldb_project102_prod_westeurope_001 = {
+        name                        = "phonebook"
+        collation                   = "SQL_Latin1_General_CP1_CI_AS"
+        max_size_gb                 = 32
+        sku_name                    = "GP_S_Gen5_1"
+        min_capacity                = 0.5
+        auto_pause_delay_in_minutes = 60
+        read_replica_count          = 0
+        read_scale                  = false
+        zone_redundant              = false
+      }
+    }
+  }
 }
 
 load_balancers = {
-  # phonebook_lb = {
-  #   name           = "phonebook-lb"
-  #   resource_group = "rg_westeurope"
-  #   sku            = "Standard"
-  #   frontend_ip_configurations = {
-  #     internal = {
-  #       name = "internal"
-  #       subnet = {
-  #         name                 = "subnet-lb"
-  #         virtual_network_name = "vnet-app-eu"
-  #         resource_group_name  = "rg-westeurope"
-  #       }
-  #     }
-  #   }
-  #   lb_backend_address_pools = {
-  #     backend_pool = {
-  #       name = "backend-pool"
-  #     }
-  #   }
-  #   lb_probes = {
-  #     http = {
-  #       name     = "http"
-  #       protocol = "Tcp"
-  #       port     = "80"
-  #     }
-  #   }
-  #   lb_rules = {
-  #     http = {
-  #       name                           = "http"
-  #       probe                          = "http"
-  #       backend_address_pools          = ["backend_pool"]
-  #       frontend_ip_configuration_name = "internal"
-  #       protocol                       = "Tcp"
-  #       frontend_port                  = "80"
-  #       backend_port                   = "80"
-  #     }
-  #   }
-  #   private_link_service = {
-  #     name = "phonebook-lb-pls"
-  #     nat_ip_configurations = {
-  #       nat_ip_configuration_01 = {
-  #         name    = "primary"
-  #         subnet  = {
-  #           name                 = "subnet-lb-pls"
-  #           virtual_network_name = "vnet-app-eu"
-  #           resource_group_name  = "rg-westeurope"
-  #         }
-  #         primary = true
-  #       }
-  #     }
-  #   }
-  # }
+  lb_project102_prod_westeurope_001 = {
+    name           = "lb-project102-prod-westeurope-001"
+    resource_group = "rg_project102_prod_westeurope_001"
+    sku            = "Standard"
+    frontend_ip_configurations = {
+      lbfic_project102_prod_westeurope_001 = {
+        name = "lbfic-project102-prod-westeurope-001"
+        subnet = {
+          name                 = "snet-project102-prod-westeurope-002"
+          virtual_network_name = "vnet-project102-prod-westeurope-001"
+          resource_group_name  = "rg-project102-prod-westeurope-001"
+        }
+      }
+    }
+    lb_backend_address_pools = {
+      backend_pool = {
+        name = "backend-pool"
+      }
+    }
+    lb_probes = {
+      http = {
+        name     = "http"
+        protocol = "Tcp"
+        port     = "80"
+      }
+    }
+    lb_rules = {
+      http = {
+        name                           = "http"
+        probe                          = "http"
+        backend_address_pools          = ["backend_pool"]
+        frontend_ip_configuration_name = "internal"
+        protocol                       = "Tcp"
+        frontend_port                  = "80"
+        backend_port                   = "80"
+      }
+    }
+    private_link_service = {
+      name = "phonebook-lb-pls"
+      nat_ip_configurations = {
+        nat_ip_configuration_01 = {
+          name    = "primary"
+          subnet  = {
+            name                 = "snet-project102-prod-westeurope-002-pls"
+            virtual_network_name = "vnet-project102-prod-westeurope-001"
+            resource_group_name  = "rg-project102-prod-westeurope-001"
+          }
+          primary = true
+        }
+      }
+    }
+  }
 }
 
 linux_virtual_machine_scale_sets = {
   # app_vmss = {
   #   name           = "phonebook-vmss"
-  #   resource_group = "rg_westeurope"
+  #   resource_group = "rg_project102_prod_westeurope_001"
   #   sku            = "Standard_B1s"
   #   instances      = 1
   #   admin_username = "azureuser"
@@ -677,22 +543,22 @@ linux_virtual_machine_scale_sets = {
   #     primary = true
   #     network_security_group = {
   #       name                = "ssh-and-http"
-  #       resource_group_name = "rg-westeurope"
+  #       resource_group_name = "rg-project102-prod-westeurope-001"
   #     }
   #     ip_configurations = {
   #       internal = {
   #         name    = "internal"
   #         primary = true
   #         subnet = {
-  #           name                 = "subnet-app"
-  #           virtual_network_name = "vnet-app-eu"
-  #           resource_group_name  = "rg-westeurope"
+  #           name                 = "snet-project102-prod-eastus-001"
+  #           virtual_network_name = "vnet-project102-prod-westeurope-001"
+  #           resource_group_name  = "rg-project102-prod-westeurope-001"
   #         }
   #         load_balancer_backend_address_pools = {
   #           phonebook_lb_backend_pool = {
   #             name                              = "backend-pool"
   #             load_balancer_name                = "phonebook-lb"
-  #             load_balancer_resource_group_name = "rg-westeurope"
+  #             load_balancer_resource_group_name = "rg-project102-prod-westeurope-001"
   #           }
   #         }
   #       }
@@ -710,18 +576,18 @@ linux_virtual_machine_scale_sets = {
 bastion_hosts = {
   # bastion_eu = {
   #   name           = "bastion-eu"
-  #   resource_group = "rg_westeurope"
+  #   resource_group = "rg_project102_prod_westeurope_001"
   #   ip_configurations = {
   #     ipConfiguration1 = {
   #       name = "ipConfiguration1"
   #       subnet = {
   #         name                 = "AzureBastionSubnet"
-  #         virtual_network_name = "vnet-app-eu"
-  #         resource_group_name  = "rg-westeurope"
+  #         virtual_network_name = "vnet-project102-prod-westeurope-001"
+  #         resource_group_name  = "rg-project102-prod-westeurope-001"
   #       }
   #       public_ip_address = {
   #         name                = "bastion-host-eu"
-  #         resource_group_name = "rg-westeurope"
+  #         resource_group_name = "rg-project102-prod-westeurope-001"
   #       }
   #     }
   #   }
@@ -731,34 +597,34 @@ bastion_hosts = {
 private_dns_zones = {
   # db = {
   #   name           = "privatelink.database.windows.net"
-  #   resource_group = "rg_eastus"
+  #   resource_group = "rg_project102_prod_eastus_001"
   #   virtual_network_links = {
-  #     zone_db_to_vnet_db = {
+  #     zone_db_to_vnet_project102_prod_eastus_003 = {
   #       name = "zone-db-to-vnet-db"
   #       virtual_network = {
-  #         name                = "vnet-db"
-  #         resource_group_name = "rg-eastus"
+  #         name                = "vnet-project102-prod-eastus-003"
+  #         resource_group_name = "rg-project102-prod-eastus-001"
   #       }
   #     }
-  #     zone_db_to_vnet_db_eu = {
-  #       name = "zone-db-to-vnet-db-eu"
+  #     zone_db_to_vnet_project102_prod_westeurope_001 = {
+  #       name = "zone-db-to-vnet-project102-prod-westeurope-002"
   #       virtual_network = {
-  #         name                = "vnet-db-eu"
-  #         resource_group_name = "rg-westeurope"
+  #         name                = "vnet-project102-prod-westeurope-002"
+  #         resource_group_name = "rg-project102-prod-westeurope-001"
   #       }
   #     }
-  #     zone_db_to_vnet_app = {
-  #       name = "zone-db-to-vnet-app"
+  #     zone_db_to_vnet_project102_prod_eastus_001 = {
+  #       name = "zone-db-to-vnet-project102-prod-eastus-001"
   #       virtual_network = {
-  #         name                = "vnet-app"
-  #         resource_group_name = "rg-eastus"
+  #         name                = "vnet-project102-prod-eastus-001"
+  #         resource_group_name = "rg-project102-prod-eastus-001"
   #       }
   #     }
-  #     zone_db_to_vnet_app_eu = {
-  #       name = "zone-db-to-vnet-app-eu"
+  #     zone_db_to_vnet_project102_prod_westeurope_001 = {
+  #       name = "zone-db-to-vnet-project102-prod-westeurope-001"
   #       virtual_network = {
-  #         name                = "vnet-app-eu"
-  #         resource_group_name = "rg-westeurope"
+  #         name                = "vnet-project102-prod-westeurope-001"
+  #         resource_group_name = "rg-project102-prod-westeurope-001"
   #       }
   #     }
   #   }
@@ -774,10 +640,10 @@ private_endpoints = {
   #       name = "coyhub-db-us"
   #     }
   #   }
-  #   resource_group = "rg_eastus"
+  #   resource_group = "rg_project102_prod_eastus_001"
   #   subnet         = {
   #     reference_name = "subnet_db_pep"
-  #     virtual_network_reference_name = "vnet_db"
+  #     virtual_network_reference_name = "vnet_project102_prod_eastus_003"
   #   }
   #   private_service_connection = {
   #     is_manual_connection = false
@@ -795,10 +661,10 @@ private_endpoints = {
   #       name = "coyhub-db-eu"
   #     }
   #   }
-  #   resource_group = "rg_westeurope"
+  #   resource_group = "rg_project102_prod_westeurope_001"
   #   subnet         = {
   #     reference_name = "subnet_db_pep"
-  #     virtual_network_reference_name = "vnet_db_eu"
+  #     virtual_network_reference_name = "vnet_project102_prod_westeurope_001"
   #   }
   #   private_service_connection = {
   #     is_manual_connection = false
@@ -812,18 +678,18 @@ private_endpoints = {
 
 kubernetes_clusters = {
   # phonebook = {
-  #   subnet_aks = {
-  #     name                 = "subnet-aks"
-  #     virtual_network_name = "vnet-app"
-  #     resource_group_name  = "rg-eastus"
+  #   snet_project102_prod_eastus_002 = {
+  #     name                 = "snet-project102-prod-eastus-002"
+  #     virtual_network_name = "vnet-project102-prod-eastus-001"
+  #     resource_group_name  = "rg-project102-prod-eastus-001"
   #   }
-  #   subnet_appgw = {
-  #     name                 = "subnet-appgw"
-  #     virtual_network_name = "vnet-app"
-  #     resource_group_name  = "rg-eastus"
+  #   snet_project102_prod_eastus_003 = {
+  #     name                 = "snet-project102-prod-eastus-003"
+  #     virtual_network_name = "vnet-project102-prod-eastus-001"
+  #     resource_group_name  = "rg-project102-prod-eastus-001"
   #   }
   #   name                    = "phonebook"
-  #   resource_group          = "rg_eastus"
+  #   resource_group          = "rg_project102_prod_eastus_001"
   #   private_cluster_enabled = true
   #   default_node_pool = {
   #     name       = "default"
@@ -847,7 +713,7 @@ kubernetes_clusters = {
 front_doors = {
   # phonebook = {
   #   name           = "phonebook"
-  #   resource_group = "rg_eastus"
+  #   resource_group = "rg_project102_prod_eastus_001"
   #   sku_name       = "Premium_AzureFrontDoor"
   #   endpoints      = ["phonebook"]
   #   origin_groups = {
@@ -877,7 +743,7 @@ front_doors = {
   #       enabled                        = true
   #       certificate_name_check_enabled = true
   #       host = {
-  #         resource_group_name = "rg-westeurope"
+  #         resource_group_name = "rg-project102-prod-westeurope-001"
   #         name                = "phonebook-lb"
   #         type                = "Microsoft.Network/loadBalancers"
   #         pls_enabled         = true
@@ -891,7 +757,7 @@ front_doors = {
   #         location        = "West Europe"
   #         target = {
   #           name                = "phonebook-lb-pls"
-  #           resource_group_name = "rg-westeurope"
+  #           resource_group_name = "rg-project102-prod-westeurope-001"
   #         }
   #       }
   #     }

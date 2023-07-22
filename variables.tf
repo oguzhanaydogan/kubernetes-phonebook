@@ -42,7 +42,7 @@ variable "virtual_wans" {
           associated_route_table = string
           propagated_route_tables = list(object({
             name = string
-            hub = string
+            virtual_hub = string
           }))
         })
       })), {})

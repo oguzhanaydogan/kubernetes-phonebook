@@ -2,10 +2,10 @@
 
 locals {
   virtual_hub_connections_flattened = flatten([
-      for k, hub in var.virtual_hubs : [
-          for key, connection in hub.virtual_hub_connections : {
+      for k, virtual_hub in var.virtual_hubs : [
+          for key, connection in virtual_hub.virtual_hub_connections : {
               name = connection.name
-              hub = k
+              virtual_hub = k
               remote_virtual_network = {
                   name = connection.remote_virtual_network.name
                   resource_group_name = connection.remote_virtual_network.resource_group_name
@@ -16,28 +16,28 @@ locals {
   ])
   virtual_hub_connections = {
     for connection in local.virtual_hub_connections_flattened :
-      "${connection.hub}_${connection.name}" => connection
+      "${connection.virtual_hub}_${connection.name}" => connection
   }
   virtual_networks = {
-    for k, hub in local.virtual_hub_connections : k => hub.remote_virtual_network
+    for k, virtual_hub in local.virtual_hub_connections : k => virtual_hub.remote_virtual_network
   }
   route_tables_flattened = flatten([
-    for k, hub in var.virtual_hubs : [
-      for key, route_table in hub.route_tables : {
+    for k, virtual_hub in var.virtual_hubs : [
+      for key, route_table in virtual_hub.route_tables : {
         name = route_table.name
-        hub = k
+        virtual_hub = k
         routes = route_table.routes
       }
     ]
   ])
   route_tables = {
     for route_table in local.route_tables_flattened :
-      "${route_table.hub}_${route_table.name}" => route_table
+      "${route_table.virtual_hub}_${route_table.name}" => route_table
   }
   route_table_routes_flattened = flatten([
-    for k, hub in var.virtual_hubs : [
+    for k, virtual_hub in var.virtual_hubs : [
       for key, route in hub.route_table_routes : {
-        hub = k
+        virtual_hub = k
         name = route.name
         destination_type = route.destination_type
         destinations = route.destinations
@@ -79,7 +79,7 @@ resource "azurerm_virtual_hub_connection" "virtual_hub_connections" {
   for_each = local.virtual_hub_connections
 
   name                      = each.value.name
-  virtual_hub_id            = azurerm_virtual_hub.virtual_hubs[each.value.hub].id
+  virtual_hub_id            = azurerm_virtual_hub.virtual_hubs[each.value.virtual_hub].id
   remote_virtual_network_id = data.azurerm_virtual_network.virtual_networks[each.key].id
 
   routing {
@@ -103,7 +103,7 @@ resource "azurerm_virtual_hub_route_table" "virtual_hub_route_tables" {
   for_each = local.route_tables
 
   name           = each.value.name
-  virtual_hub_id = azurerm_virtual_hub.virtual_hubs[each.value.hub].id
+  virtual_hub_id = azurerm_virtual_hub.virtual_hubs[each.value.virtual_hub].id
 
   # dynamic "route" {
   #   for_each = each.value.routes
@@ -113,7 +113,7 @@ resource "azurerm_virtual_hub_route_table" "virtual_hub_route_tables" {
   #       destinations_type = route.value.destinations_type
   #       destinations      = route.value.destinations
   #       next_hop_type     = route.value.next_hop_type
-  #       next_hop          = azurerm_virtual_hub_connection.virtual_hub_connections["${each.value.hub}_${each.value.next_hop_connection}"].id
+  #       next_hop          = azurerm_virtual_hub_connection.virtual_hub_connections["${each.value.virtual_hub}_${each.value.next_hop_connection}"].id
   #   }
   # }
 }
@@ -121,11 +121,11 @@ resource "azurerm_virtual_hub_route_table" "virtual_hub_route_tables" {
 # resource "azurerm_virtual_hub_route_table_route" "virtual_hub_route_table_routes" {
 #   for_each = local.route_table_routes
 
-#   route_table_id = azurerm_virtual_hub.virtual_hubs[each.value.hub].route_table_id
+#   route_table_id = azurerm_virtual_hub.virtual_hubs[each.value.virtual_hub].route_table_id
 
 #   name              = each.value.name
 #   destinations_type = each.value.destinations_type
 #   destinations      = each.value.destinations
 #   next_hop_type     = each.value.next_hop_type
-#   next_hop          = azurerm_virtual_hub_connection.virtual_hub_connections["${each.value.hub}_${each.value.next_hop_connection}"].id
+#   next_hop          = azurerm_virtual_hub_connection.virtual_hub_connections["${each.value.virtual_hub}_${each.value.next_hop_connection}"].id
 # }

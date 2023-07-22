@@ -31,7 +31,7 @@ module "resource_groups" {
 }
 
 module "virtual_networks" {
-  source   = "./modules/VirtualNetworkWithSubnets"
+  source   = "./modules/VirtualNetwork"
   for_each = var.virtual_networks
 
   name                = each.value.name
@@ -165,7 +165,7 @@ module "key_vault_secrets" {
 }
 
 module "mssql_servers" {
-  source   = "./modules/MSSQLServerWithDatabases"
+  source   = "./modules/MSSQLServer"
   for_each = var.mssql_servers
 
   name                         = each.value.name

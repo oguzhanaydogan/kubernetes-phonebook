@@ -9,7 +9,8 @@ resource "azurerm_mssql_server" "mssql_server" {
 }
 
 resource "azurerm_mssql_database" "mssql_database" {
-  for_each = var.mssql_databases
+  for_each                    = var.mssql_databases
+
   name                        = each.value.name
   server_id                   = azurerm_mssql_server.mssql_server.id
   collation                   = each.value.collation
