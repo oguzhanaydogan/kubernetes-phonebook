@@ -399,6 +399,7 @@ variable "private_dns_zones" {
 
 variable "private_endpoints" {
   type = map(object({
+    name = string
     attached_resource = object({
       name          = string
       type          = string
@@ -406,15 +407,20 @@ variable "private_endpoints" {
     })
     resource_group = string
     subnet         = object({
-      reference_name = string
-      virtual_network_reference_name = string
+      name = string
+      virtual_network_name = string
     })
     private_service_connection = object({
+      name = string
       is_manual_connection = bool
       subresource_names    = list(string)
     })
     private_dns_zone_group = object({
-      private_dns_zones = list(string)
+      name = string
+      private_dns_zones = list(object({
+        name = string
+        resource_group_name = string
+      }))
     })
   }))
 }

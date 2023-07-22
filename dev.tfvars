@@ -474,35 +474,35 @@ load_balancers = {
       }
     }
     lb_backend_address_pools = {
-      backend_pool = {
-        name = "backend-pool"
+      lbbap_project102_prod_westeurope_001 = {
+        name = "lbbap-project102-prod-westeurope-001"
       }
     }
     lb_probes = {
-      http = {
-        name     = "http"
+      lbp_project102_prod_westeurope_001 = {
+        name     = "lbp-project102-prod-westeurope-001"
         protocol = "Tcp"
         port     = "80"
       }
     }
     lb_rules = {
-      http = {
-        name                           = "http"
-        probe                          = "http"
-        backend_address_pools          = ["backend_pool"]
-        frontend_ip_configuration_name = "internal"
+      lbr_project102_prod_westeurope_001 = {
+        name                           = "lbr-project102-prod-westeurope-001"
+        probe                          = "lbp_project102_prod_westeurope_001"
+        backend_address_pools          = ["lbbap_project102_prod_westeurope_001"]
+        frontend_ip_configuration_name = "lbfic-project102-prod-westeurope-001"
         protocol                       = "Tcp"
         frontend_port                  = "80"
         backend_port                   = "80"
       }
     }
     private_link_service = {
-      name = "phonebook-lb-pls"
+      name = "pl-project102-prod-westeurope-001"
       nat_ip_configurations = {
-        nat_ip_configuration_01 = {
-          name    = "primary"
+        plnic_project102_prod_westeurope_001 = {
+          name    = "plnic-project102-prod-westeurope-001"
           subnet  = {
-            name                 = "snet-project102-prod-westeurope-002-pls"
+            name                 = "snet-project102-prod-westeurope-003"
             virtual_network_name = "vnet-project102-prod-westeurope-001"
             resource_group_name  = "rg-project102-prod-westeurope-001"
           }
@@ -514,166 +514,182 @@ load_balancers = {
 }
 
 linux_virtual_machine_scale_sets = {
-  # app_vmss = {
-  #   name           = "phonebook-vmss"
-  #   resource_group = "rg_project102_prod_westeurope_001"
-  #   sku            = "Standard_B1s"
-  #   instances      = 1
-  #   admin_username = "azureuser"
-  #   shared_image = {
-  #     name                = "myimagedefinitongen"
-  #     gallery_name        = "mygallery"
-  #     resource_group_name = "ssh-key"
-  #   }
-  #   upgrade_mode = "Rolling"
-  #   health_probe = {
-  #     load_balancer = "phonebook_lb"
-  #     name          = "http"
-  #   }
-  #   admin_ssh_key = {
-  #     resource_group_name = "ssh-key"
-  #     name                = "azure"
-  #   }
-  #   os_disk = {
-  #     storage_account_type = "Standard_LRS"
-  #     caching              = "ReadWrite"
-  #   }
-  #   network_interface = {
-  #     name    = "example"
-  #     primary = true
-  #     network_security_group = {
-  #       name                = "ssh-and-http"
-  #       resource_group_name = "rg-project102-prod-westeurope-001"
-  #     }
-  #     ip_configurations = {
-  #       internal = {
-  #         name    = "internal"
-  #         primary = true
-  #         subnet = {
-  #           name                 = "snet-project102-prod-eastus-001"
-  #           virtual_network_name = "vnet-project102-prod-westeurope-001"
-  #           resource_group_name  = "rg-project102-prod-westeurope-001"
-  #         }
-  #         load_balancer_backend_address_pools = {
-  #           phonebook_lb_backend_pool = {
-  #             name                              = "backend-pool"
-  #             load_balancer_name                = "phonebook-lb"
-  #             load_balancer_resource_group_name = "rg-project102-prod-westeurope-001"
-  #           }
-  #         }
-  #       }
-  #     }
-  #   }
-  #   rolling_upgrade_policy = {
-  #     max_batch_instance_percent              = 20
-  #     max_unhealthy_instance_percent          = 20
-  #     max_unhealthy_upgraded_instance_percent = 5
-  #     pause_time_between_batches              = "PT0S"
-  #   }
-  # }
+  vmss_project102_prod_westeurope_001 = { # phonebook
+    name           = "vmss-project102-prod-westeurope-001"
+    resource_group = "rg_project102_prod_westeurope_001"
+    sku            = "Standard_B1s"
+    instances      = 1
+    admin_username = "azureuser" // TODO: Key vault?
+    shared_image = {
+      name                = "myimagedefinitongen"
+      gallery_name        = "mygallery"
+      resource_group_name = "ssh-key"
+    }
+    upgrade_mode = "Rolling"
+    health_probe = {
+      load_balancer = "lb_project102_prod_westeurope_001"
+      name          = "lbp-project102-prod-westeurope-001"
+    }
+    admin_ssh_key = {
+      resource_group_name = "ssh-key"
+      name                = "azure"
+    }
+    os_disk = {
+      storage_account_type = "Standard_LRS"
+      caching              = "ReadWrite"
+    }
+    network_interface = {
+      name    = "vmssni-project102-prod-westeurope-001"
+      primary = true
+      network_security_group = {
+        name                = "nsg-project102-prod-westeurope-001"
+        resource_group_name = "rg-project102-prod-westeurope-001"
+      }
+      ip_configurations = {
+        vmssniic_project102_prod_westeurope_001 = {
+          name    = "vmssniic-project102-prod-westeurope-001"
+          primary = true
+          subnet = {
+            name                 = "snet-project102-prod-westeurope-001"
+            virtual_network_name = "vnet-project102-prod-westeurope-001"
+            resource_group_name  = "rg-project102-prod-westeurope-001"
+          }
+          load_balancer_backend_address_pools = {
+            vmssniiclbbap_project102_prod_westeurope_001 = {
+              name                              = "vmssniiclbbap-project102-prod-westeurope-001"
+              load_balancer_name                = "lb-project102-prod-westeurope-001"
+              load_balancer_resource_group_name = "rg-project102-prod-westeurope-001"
+            }
+          }
+        }
+      }
+    }
+    rolling_upgrade_policy = {
+      max_batch_instance_percent              = 20
+      max_unhealthy_instance_percent          = 20
+      max_unhealthy_upgraded_instance_percent = 5
+      pause_time_between_batches              = "PT0S"
+    }
+  }
 }
 
 bastion_hosts = {
-  # bastion_eu = {
-  #   name           = "bastion-eu"
-  #   resource_group = "rg_project102_prod_westeurope_001"
-  #   ip_configurations = {
-  #     ipConfiguration1 = {
-  #       name = "ipConfiguration1"
-  #       subnet = {
-  #         name                 = "AzureBastionSubnet"
-  #         virtual_network_name = "vnet-project102-prod-westeurope-001"
-  #         resource_group_name  = "rg-project102-prod-westeurope-001"
-  #       }
-  #       public_ip_address = {
-  #         name                = "bastion-host-eu"
-  #         resource_group_name = "rg-project102-prod-westeurope-001"
-  #       }
-  #     }
-  #   }
-  # }
+  bas_project102_prod_westeurope_001 = {
+    name           = "bas-project102-prod-westeurope-001"
+    resource_group = "rg_project102_prod_westeurope_001"
+    ip_configurations = {
+      basic_project102_prod_westeurope_001 = {
+        name = "basic-project102-prod-westeurope-001"
+        subnet = {
+          name                 = "AzureBastionSubnet"
+          virtual_network_name = "vnet-project102-prod-westeurope-001"
+          resource_group_name  = "rg-project102-prod-westeurope-001"
+        }
+        public_ip_address = {
+          name                = "pip-project102-prod-westeurope-001"
+          resource_group_name = "rg-project102-prod-westeurope-001"
+        }
+      }
+    }
+  }
 }
 
 private_dns_zones = {
-  # db = {
-  #   name           = "privatelink.database.windows.net"
-  #   resource_group = "rg_project102_prod_eastus_001"
-  #   virtual_network_links = {
-  #     zone_db_to_vnet_project102_prod_eastus_003 = {
-  #       name = "zone-db-to-vnet-db"
-  #       virtual_network = {
-  #         name                = "vnet-project102-prod-eastus-003"
-  #         resource_group_name = "rg-project102-prod-eastus-001"
-  #       }
-  #     }
-  #     zone_db_to_vnet_project102_prod_westeurope_001 = {
-  #       name = "zone-db-to-vnet-project102-prod-westeurope-002"
-  #       virtual_network = {
-  #         name                = "vnet-project102-prod-westeurope-002"
-  #         resource_group_name = "rg-project102-prod-westeurope-001"
-  #       }
-  #     }
-  #     zone_db_to_vnet_project102_prod_eastus_001 = {
-  #       name = "zone-db-to-vnet-project102-prod-eastus-001"
-  #       virtual_network = {
-  #         name                = "vnet-project102-prod-eastus-001"
-  #         resource_group_name = "rg-project102-prod-eastus-001"
-  #       }
-  #     }
-  #     zone_db_to_vnet_project102_prod_westeurope_001 = {
-  #       name = "zone-db-to-vnet-project102-prod-westeurope-001"
-  #       virtual_network = {
-  #         name                = "vnet-project102-prod-westeurope-001"
-  #         resource_group_name = "rg-project102-prod-westeurope-001"
-  #       }
-  #     }
-  #   }
-  # }
+  privatelink_database_windows_net_project102_prod_global_001 = {
+    name           = "privatelink.database.windows.net"
+    resource_group = "rg_project102_prod_eastus_001"
+    virtual_network_links = {
+      privatelink_database_windows_net_project102_prod_global_001 = { # sql vnet
+        name = "privatelink_database_windows_net-project102-prod-global-001"
+        virtual_network = {
+          name                = "vnet-project102-prod-eastus-003"
+          resource_group_name = "rg-project102-prod-eastus-001"
+        }
+      }
+      privatelink_database_windows_net_project102_prod_global_002 = { # sql vnet eu
+        name = "privatelink_database_windows_net-project102-prod-global-002"
+        virtual_network = {
+          name                = "vnet-project102-prod-westeurope-002"
+          resource_group_name = "rg-project102-prod-westeurope-001"
+        }
+      }
+      privatelink_database_windows_net_project102_prod_global_003 = { # app vnet
+        name = "privatelink_database_windows_net-project102-prod-global-003"
+        virtual_network = {
+          name                = "vnet-project102-prod-eastus-001"
+          resource_group_name = "rg-project102-prod-eastus-001"
+        }
+      }
+      privatelink_database_windows_net_project102_prod_global_004 = { # app vnet eu
+        name = "privatelink_database_windows_net-project102-prod-global-004"
+        virtual_network = {
+          name                = "vnet-project102-prod-westeurope-001"
+          resource_group_name = "rg-project102-prod-westeurope-001"
+        }
+      }
+    }
+  }
 }
 
 private_endpoints = {
-  # pep_db = {
-  #   attached_resource = {
-  #     name = "coyhub-db-us"
-  #     type = "Microsoft.Sql/servers"
-  #     required_tags = {
-  #       name = "coyhub-db-us"
-  #     }
-  #   }
-  #   resource_group = "rg_project102_prod_eastus_001"
-  #   subnet         = {
-  #     reference_name = "subnet_db_pep"
-  #     virtual_network_reference_name = "vnet_project102_prod_eastus_003"
-  #   }
-  #   private_service_connection = {
-  #     is_manual_connection = false
-  #     subresource_names    = ["sqlServer"]
-  #   }
-  #   private_dns_zone_group = {
-  #     private_dns_zones = ["db"]
-  #   }
-  # }
-  # pep_db_eu = {
-  #   attached_resource = {
-  #     name = "coyhub-db-eu"
-  #     type = "Microsoft.Sql/servers"
-  #     required_tags = {
-  #       name = "coyhub-db-eu"
-  #     }
-  #   }
-  #   resource_group = "rg_project102_prod_westeurope_001"
-  #   subnet         = {
-  #     reference_name = "subnet_db_pep"
-  #     virtual_network_reference_name = "vnet_project102_prod_westeurope_001"
-  #   }
-  #   private_service_connection = {
-  #     is_manual_connection = false
-  #     subresource_names    = ["sqlServer"]
-  #   }
-  #   private_dns_zone_group = {
-  #     private_dns_zones = ["db"]
-  #   }
-  # }
+  pep_project102_prod_eastus_001 = { # sql-us
+    name = "pep-project102-prod-eastus-001"
+    attached_resource = {
+      name = "sql-project102-prod-eastus-001"
+      type = "Microsoft.Sql/servers"
+      required_tags = {
+        name = "sql-project102-prod-eastus-001"
+      }
+    }
+    resource_group = "rg_project102_prod_eastus_001"
+    subnet         = {
+      name = "snet-project102-prod-eastus-006"
+      virtual_network_name = "vnet-project102-prod-eastus-003"
+    }
+    private_service_connection = {
+      name = "pep-project102-prod-eastus-001-psc"
+      is_manual_connection = false
+      subresource_names    = ["sqlServer"]
+    }
+    private_dns_zone_group = {
+      name = "pep-project102-prod-eastus-001-pdzg"
+      private_dns_zones = [
+        {
+          name = "privatelink.database.windows.net"
+          resource_group_name = "rg-project102-prod-westeurope-001"
+        }
+      ]
+    }
+  }
+  pep_project102_prod_westeurope_001 = { # sql-eu
+    name = "pep-project102-prod-westeurope-001"
+    attached_resource = {
+      name = "sql-project102-prod-westeurope-001"
+      type = "Microsoft.Sql/servers"
+      required_tags = {
+        name = "sql-project102-prod-westeurope-001"
+      }
+    }
+    resource_group = "rg_project102_prod_westeurope_001"
+    subnet         = {
+      name = "snet-project102-prod-westeurope-007"
+      virtual_network_name = "vnet-project102-prod-westeurope-001"
+    }
+    private_service_connection = {
+      name = "pep-project102-prod-westeurope-001-psc"
+      is_manual_connection = false
+      subresource_names    = ["sqlServer"]
+    }
+    private_dns_zone_group = {
+      name = "pep-project102-prod-westeurope-001-pdzg"
+      private_dns_zones = [
+        {
+          name = "privatelink.database.windows.net"
+          resource_group_name = "rg-project102-prod-westeurope-001"
+        }
+      ]
+    }
+  }
 }
 
 kubernetes_clusters = {
@@ -744,7 +760,7 @@ front_doors = {
   #       certificate_name_check_enabled = true
   #       host = {
   #         resource_group_name = "rg-project102-prod-westeurope-001"
-  #         name                = "phonebook-lb"
+  #         name                = "lb-project102-prod-westeurope-001"
   #         type                = "Microsoft.Network/loadBalancers"
   #         pls_enabled         = true
   #       }
@@ -756,7 +772,7 @@ front_doors = {
   #         request_message = "Gimme gimme"
   #         location        = "West Europe"
   #         target = {
-  #           name                = "phonebook-lb-pls"
+  #           name                = "lb-project102-prod-westeurope-001-pls"
   #           resource_group_name = "rg-project102-prod-westeurope-001"
   #         }
   #       }

@@ -330,24 +330,22 @@ module "private_dns_zones" {
   ]
 }
 
-# module "private_endpoints" {
-#   source   = "./modules/PrivateEndpoint"
-#   for_each = var.private_endpoints
+module "private_endpoints" {
+  source   = "./modules/PrivateEndpoint"
+  for_each = var.private_endpoints
 
-#   attached_resource          = each.value.attached_resource
-#   resource_group_name        = module.resource_groups[each.value.resource_group].name
-#   location                   = module.resource_groups[each.value.resource_group].location
-#   subnet_id                  = module.virtual_networks[each.value.subnet.virtual_network_reference_name].subnets[each.value.subnet.reference_name].id
-#   private_service_connection = each.value.private_service_connection
-#   private_dns_zone_ids = [
-#     for private_dns_zone in each.value.private_dns_zone_group.private_dns_zones :
-#     module.private_dns_zones[private_dns_zone].id
-#   ]
+  name = each.value.name
+  attached_resource          = each.value.attached_resource
+  resource_group_name        = module.resource_groups[each.value.resource_group].name
+  location                   = module.resource_groups[each.value.resource_group].location
+  subnet                  = each.value.subnet
+  private_service_connection = each.value.private_service_connection
+  private_dns_zone_group = each.value.private_dns_zone_group
 
-#   depends_on = [
-#     module.mssql_servers
-#   ]
-# }
+  depends_on = [
+    module.mssql_servers
+  ]
+}
 
 module "kubernetes_clusters" {
   source   = "./modules/KubernetesCluster"
