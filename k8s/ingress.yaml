@@ -4,11 +4,8 @@ metadata:
   name: phonebook-ingress
   namespace: ingress-basic
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    kubernetes.io/ingress.class: azure/application-gateway
 spec:
-  ingressClassName: nginx
   rules:
   - http:
       paths:
@@ -19,5 +16,3 @@ spec:
             name: phonebook-service
             port:
               number: 80
-
-              

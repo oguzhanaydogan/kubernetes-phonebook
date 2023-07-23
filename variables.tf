@@ -8,7 +8,8 @@ variable "resource_groups" {
 variable "virtual_networks" {
   type = map(object({
     name           = string
-    resource_group = string
+    resource_group_name = string
+    location = string
     address_space  = list(string)
     subnets = optional(map(object({
       name                                          = string
@@ -28,7 +29,8 @@ variable "virtual_networks" {
 variable "virtual_wans" {
   type = map(object({
     name = string
-    resource_group = string
+    resource_group_name = string
+    location = string
     virtual_hubs = optional(map(object({
       name = string
       address_prefix = string
@@ -70,9 +72,12 @@ variable "virtual_wans" {
 variable "vnet_peerings" {
   type = map(object({
     name                    = string
-    virtual_network         = string
-    remote_virtual_network  = string
-    resource_group          = string
+    resource_group_name = string
+    virtual_network_name         = string
+    remote_virtual_network  = object({
+      name = string
+      resource_group_name = string
+    })
     allow_forwarded_traffic = bool
   }))
 }
@@ -80,7 +85,8 @@ variable "vnet_peerings" {
 variable "route_tables" {
   type = map(object({
     name           = string
-    resource_group = string
+    resource_group_name = string
+    location = string
     routes = map(object({
       name                   = string
       address_prefix         = string
@@ -98,16 +104,18 @@ variable "route_tables" {
 variable "public_ip_addresses" {
   type = map(object({
     name              = string
+    resource_group_name = string
+    location = string
     allocation_method = string
     sku               = string
-    resource_group    = string
   }))
 }
 
 variable "network_security_groups" {
   type = map(object({
     name           = string
-    resource_group = string
+    resource_group_name = string
+    location = string
     security_rules = map(object({
       name                       = string
       priority                   = number
@@ -122,55 +130,11 @@ variable "network_security_groups" {
   }))
 }
 
-variable "firewalls" {
-  type = map(object({
-    name           = string
-    resource_group = string
-    sku_name       = string
-    sku_tier       = string
-    virtual_hub = object({
-      name = string
-      resource_group_name = string
-    })
-    ip_configuration = optional(object({
-      name = string
-      subnet = object({
-        name                 = string
-        virtual_network_name = string
-        resource_group_name  = string
-      })
-    }))
-    management_ip_configuration = optional(object({
-      enabled = bool
-      name = optional(string)
-      subnet = optional(object({
-        virtual_network_name = string
-        resource_group_name  = string
-      }))
-      public_ip_address = optional(object({
-        name                = string
-        resource_group_name = string
-      }))
-    }))
-    firewall_network_rule_collections = map(object({
-      name = string
-      priority = number
-      action = string
-      firewall_network_rules = map(object({
-        name = string
-        source_addresses = list(string)
-        destination_ports = list(string)
-        destination_addresses = list(string)
-        protocols = list(string)
-      }))
-    }))
-  }))
-}
-
 variable "linux_virtual_machines" {
   type = map(object({
     name           = string
-    resource_group = string
+    resource_group_name = string
+    location = string
     network_interface = object({
       name = string
       ip_configurations = map(object({
@@ -234,6 +198,7 @@ variable "key_vault_access_policies" {
     secret_permissions            = list(string)
   }))
 }
+
 variable "key_vault_secrets" {
   type = map(object({
     name                          = string
@@ -245,7 +210,8 @@ variable "key_vault_secrets" {
 variable "mssql_servers" {
   type = map(object({
     name                            = string
-    resource_group                  = string
+    resource_group_name = string
+    location = string
     version                         = string
     administrator_login             = string
     admin_password_key_vault_secret = string
@@ -267,7 +233,8 @@ variable "mssql_servers" {
 variable "load_balancers" {
   type = map(object({
     name           = string
-    resource_group = string
+    resource_group_name = string
+    location = string
     sku            = string
     frontend_ip_configurations = map(object({
       name = string
@@ -314,7 +281,8 @@ variable "load_balancers" {
 variable "linux_virtual_machine_scale_sets" {
   type = map(object({
     name           = string
-    resource_group = string
+    resource_group_name = string
+    location = string
     sku            = string
     instances      = number
     admin_username = string
@@ -367,8 +335,9 @@ variable "linux_virtual_machine_scale_sets" {
 variable "bastion_hosts" {
   type = map(object({
     name           = string
-    resource_group = string
-    ip_configurations = map(object({
+    resource_group_name = string
+    location = string
+    ip_configuration = object({
       name = string
       subnet = object({
         name                 = string
@@ -379,14 +348,14 @@ variable "bastion_hosts" {
         name                = string
         resource_group_name = string
       })
-    }))
+    })
   }))
 }
 
 variable "private_dns_zones" {
   type = map(object({
     name           = string
-    resource_group = string
+    resource_group_name = string
     virtual_network_links = map(object({
       name = string
       virtual_network = object({
@@ -400,16 +369,17 @@ variable "private_dns_zones" {
 variable "private_endpoints" {
   type = map(object({
     name = string
-    attached_resource = object({
-      name          = string
-      type          = string
-      required_tags = map(string)
-    })
-    resource_group = string
+    resource_group_name = string
+    location = string
     subnet         = object({
       name = string
       resource_group_name = string
       virtual_network_name = string
+    })
+    attached_resource = object({
+      name          = string
+      type          = string
+      required_tags = map(string)
     })
     private_service_connection = object({
       name = string
@@ -428,19 +398,16 @@ variable "private_endpoints" {
 
 variable "kubernetes_clusters" {
   type = map(object({
+    name                    = string
+    resource_group_name = string
+    location = string
+    public_network_access_enabled = bool
+    private_cluster_enabled = bool
     subnet_aks = object({
       name                 = string
       virtual_network_name = string
       resource_group_name  = string
     })
-    subnet_agw = object({
-      name                 = string
-      virtual_network_name = string
-      resource_group_name  = string
-    })
-    name                    = string
-    resource_group          = string
-    private_cluster_enabled = bool
     default_node_pool = object({
       name       = string
       node_count = number
@@ -449,12 +416,21 @@ variable "kubernetes_clusters" {
     identity = object({
       type = string
     })
+    subnet_agw = object({
+      name                 = string
+      virtual_network_name = string
+      resource_group_name  = string
+    })
     ingress_application_gateway = object({
       enabled      = bool
       name = string
     })
     network_profile = object({
       network_plugin = string
+      network_policy = string
+      service_cidr = string
+      dns_service_ip = string
+      docker_bridge_cidr = string
       outbound_type  = string
     })
   }))
@@ -463,7 +439,7 @@ variable "kubernetes_clusters" {
 variable "front_doors" {
   type = map(object({
     name           = string
-    resource_group = string
+    resource_group_name = string
     sku_name       = string
     endpoints      = map(object({
       name = string
@@ -539,6 +515,52 @@ variable "front_doors" {
           destination_hostname = string
         }))
       })
+    }))
+  }))
+}
+
+variable "firewalls" {
+  type = map(object({
+    name           = string
+    resource_group_name = string
+    location = string
+    sku_name       = string
+    sku_tier       = string
+    virtual_hub = optional(object({
+      name = string
+      resource_group_name = string
+    }))
+    ip_configuration = optional(object({
+      name = string
+      subnet = object({
+        name                 = string
+        virtual_network_name = string
+        resource_group_name  = string
+      })
+    }))
+    management_ip_configuration = optional(object({
+      enabled = bool
+      name = optional(string)
+      subnet = optional(object({
+        virtual_network_name = string
+        resource_group_name  = string
+      }))
+      public_ip_address = optional(object({
+        name                = string
+        resource_group_name = string
+      }))
+    }))
+    firewall_network_rule_collections = map(object({
+      name = string
+      priority = number
+      action = string
+      firewall_network_rules = map(object({
+        name = string
+        source_addresses = list(string)
+        destination_ports = list(string)
+        destination_addresses = list(string)
+        protocols = list(string)
+      }))
     }))
   }))
 }

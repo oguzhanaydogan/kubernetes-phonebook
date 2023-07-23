@@ -13,6 +13,9 @@ variable "location" {
 variable "resource_group_name" {
 }
 
+variable "public_network_access_enabled" {
+}
+
 variable "private_cluster_enabled" {
 }
 

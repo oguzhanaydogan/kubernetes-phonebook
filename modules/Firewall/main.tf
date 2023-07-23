@@ -1,6 +1,5 @@
 https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/firewall_policy
 https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/firewall_policy_rule_collection_group
-Asagidaki virtual_hub data blocku her zaman olmaz!
 
 data "azurerm_subnet" "subnet_firewall" {
   name                 = var.ip_configuration.subnet.name
@@ -15,8 +14,8 @@ data "azurerm_subnet" "subnet_firewall_management" {
 }
 
 data "azurerm_virtual_hub" "virtual_hub" {
-  name                = "example-hub"
-  resource_group_name = "example-resources"
+  name                = var.virtual_hub.name
+  resource_group_name = var.virtual_hub.resource_group_name
 }
 
 data "azurerm_public_ip" "public_ip_firewall_management" {

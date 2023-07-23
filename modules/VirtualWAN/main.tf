@@ -1,4 +1,4 @@
-# Routelarin next hopunu halletmemiz lazim!
+// TODO: Routelarin next hopunu halletmemiz lazim!
 
 locals {
   virtual_hub_connections_flattened = flatten([

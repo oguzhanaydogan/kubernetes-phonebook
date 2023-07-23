@@ -16,6 +16,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
   resource_group_name     = var.resource_group_name
   dns_prefix              = "${var.name}-dns"
   node_resource_group     = "${var.name}-node-rg"
+  public_network_access_enabled = var.public_network_access_enabled
   private_cluster_enabled = var.private_cluster_enabled
 
   default_node_pool {
@@ -40,6 +41,10 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
 
   network_profile {
     network_plugin = var.network_profile.network_plugin
+    network_policy = var.network_profile.network_policy
+    service_cidr = var.network_profile.service_cidr
+    dns_service_ip = var.network_profile.dns_service_ip
+    docker_bridge_cidr = var.network_profile.docker_bridge_cidr
     outbound_type  = var.network_profile.outbound_type
   }
 }
