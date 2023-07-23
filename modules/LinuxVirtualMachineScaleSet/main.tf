@@ -36,8 +36,8 @@ data "azurerm_lb" "lb" {
 }
 
 data "azapi_resource" "health_probe" {
-  type = "Microsoft.Network/loadBalancers/probes@2023-02-01"
-  name = var.health_probe_name
+  type      = "Microsoft.Network/loadBalancers/probes@2023-02-01"
+  name      = var.health_probe_name
   parent_id = data.azurerm_lb.lb.id
 }
 

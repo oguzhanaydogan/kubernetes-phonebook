@@ -141,8 +141,8 @@ resource "azurerm_cdn_frontdoor_route" "cdn_frontdoor_routes" {
   cdn_frontdoor_origin_ids = [
     for origin in each.value.cdn_frontdoor_origins : azurerm_cdn_frontdoor_origin.cdn_frontdoor_origins[origin].id
   ]
-  cdn_frontdoor_rule_set_ids    = [
-  	for rule_set in each.value.cdn_frontdoor_rule_sets : azurerm_cdn_frontdoor_rule_set.cdn_frontdoor_rule_sets[rule_set].id
+  cdn_frontdoor_rule_set_ids = [
+    for rule_set in each.value.cdn_frontdoor_rule_sets : azurerm_cdn_frontdoor_rule_set.cdn_frontdoor_rule_sets[rule_set].id
   ]
   enabled = each.value.enabled
 
@@ -153,41 +153,41 @@ resource "azurerm_cdn_frontdoor_route" "cdn_frontdoor_routes" {
 }
 
 resource "azurerm_cdn_frontdoor_rule_set" "cdn_frontdoor_rule_sets" {
-	for_each = var.rule_sets
+  for_each = var.rule_sets
 
-	name                     = each.value.name
-	cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn_frontdoor_profile.id
+  name                     = each.value.name
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn_frontdoor_profile.id
 }
 
 resource "azurerm_cdn_frontdoor_rule" "cdn_frontdoor_rules" {
-	for_each = var.rules
+  for_each = var.rules
 
-	depends_on = [azurerm_cdn_frontdoor_origin_group.cdn_frontdoor_origin_groups, azurerm_cdn_frontdoor_origin.cdn_frontdoor_origins]
+  depends_on = [azurerm_cdn_frontdoor_origin_group.cdn_frontdoor_origin_groups, azurerm_cdn_frontdoor_origin.cdn_frontdoor_origins]
 
-	name                      = each.value.name
-	cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.cdn_frontdoor_rule_sets[each.value.rule_set].id
-	order                     = index(keys(var.rules), each.key) + 1
+  name                      = each.value.name
+  cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.cdn_frontdoor_rule_sets[each.value.rule_set].id
+  order                     = index(keys(var.rules), each.key) + 1
 
-	conditions {
-		dynamic "request_scheme_condition" {
-			for_each = each.value.conditions.request_scheme_conditions
+  conditions {
+    dynamic "request_scheme_condition" {
+      for_each = each.value.conditions.request_scheme_conditions
 
-			content {
-			  operator = request_scheme_condition.value.operator
-			  match_values = request_scheme_condition.value.match_values
-			}
-		}
- 	}
+      content {
+        operator     = request_scheme_condition.value.operator
+        match_values = request_scheme_condition.value.match_values
+      }
+    }
+  }
 
-	actions {
-		dynamic "url_redirect_action" {
-			for_each = each.value.actions.url_redirect_actions
+  actions {
+    dynamic "url_redirect_action" {
+      for_each = each.value.actions.url_redirect_actions
 
-			content {
-			  redirect_type = url_redirect_action.value.redirect_type
-			  redirect_protocol = url_redirect_action.value.redirect_protocol
-			  destination_hostname = url_redirect_action.value.destination_hostname
-			}
-		}
-	}
- }
+      content {
+        redirect_type        = url_redirect_action.value.redirect_type
+        redirect_protocol    = url_redirect_action.value.redirect_protocol
+        destination_hostname = url_redirect_action.value.destination_hostname
+      }
+    }
+  }
+}

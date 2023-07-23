@@ -38,7 +38,7 @@ module "virtual_networks" {
   resource_group_name = each.value.resource_group_name
   location            = each.value.location
   address_space       = each.value.address_space
-  subnets             = each.value.subnets
+  subnets             = try(each.value.subnets, null)
 
   depends_on = [
     module.resource_groups
@@ -46,13 +46,13 @@ module "virtual_networks" {
 }
 
 module "virtual_wans" {
-  source = "./modules/VirtualWAN"
+  source   = "./modules/VirtualWAN"
   for_each = var.virtual_wans
 
-  name = each.value.name
+  name                = each.value.name
   resource_group_name = each.value.resource_group_name
   location            = each.value.location
-  virtual_hubs = each.value.virtual_hubs
+  virtual_hubs        = try(each.value.virtual_hubs, null)
 
   depends_on = [
     module.virtual_networks
@@ -63,11 +63,11 @@ module "virtual_network_peerings" {
   source   = "./modules/VirtualNetworkPeering"
   for_each = var.vnet_peerings
 
-  name                      = each.value.name
-  resource_group_name = each.value.resource_group_name
-  virtual_network_name      = each.value.virtual_network_name
-  remote_virtual_network = each.value.remote_virtual_network
-  allow_forwarded_traffic   = each.value.allow_forwarded_traffic
+  name                    = each.value.name
+  resource_group_name     = each.value.resource_group_name
+  virtual_network_name    = each.value.virtual_network_name
+  remote_virtual_network  = each.value.remote_virtual_network
+  allow_forwarded_traffic = each.value.allow_forwarded_traffic
 
   depends_on = [
     module.virtual_networks
@@ -111,7 +111,7 @@ module "network_security_groups" {
   name                = each.value.name
   resource_group_name = each.value.resource_group_name
   location            = each.value.location
-  security_rules      = each.value.security_rules
+  security_rules      = try(each.value.security_rules, null)
 
   depends_on = [
     module.resource_groups
@@ -123,8 +123,8 @@ module "linux_virtual_machines" {
   for_each = var.linux_virtual_machines
 
   name                               = each.value.name
-  resource_group_name = each.value.resource_group_name
-  location            = each.value.location
+  resource_group_name                = each.value.resource_group_name
+  location                           = each.value.location
   network_interface                  = each.value.network_interface
   size                               = each.value.size
   delete_os_disk_on_termination      = each.value.delete_os_disk_on_termination
@@ -163,6 +163,10 @@ module "key_vault_secrets" {
   name                          = each.value.name
   key_vault_name                = each.value.key_vault_name
   key_vault_resource_group_name = each.value.key_vault_resource_group_name
+
+  depends_on = [
+    module.key_vault_access_policies
+  ]
 }
 
 module "mssql_servers" {
@@ -170,13 +174,13 @@ module "mssql_servers" {
   for_each = var.mssql_servers
 
   name                         = each.value.name
-  resource_group_name = each.value.resource_group_name
-  location            = each.value.location
+  resource_group_name          = each.value.resource_group_name
+  location                     = each.value.location
   msqql_version                = each.value.version
   administrator_login          = each.value.administrator_login
   administrator_login_password = module.key_vault_secrets[each.value.admin_password_key_vault_secret].value // TODO: Bu satiri duzelt
   tags                         = each.value.tags
-  mssql_databases = each.value.mssql_databases
+  mssql_databases              = try(each.value.mssql_databases, null)
 }
 
 # module "azapi_create_sqldb_sync_group" {
@@ -209,8 +213,8 @@ module "mssql_servers" {
 #   {
 #     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
 #     "contentVersion": "1.0.0.0",
-#     "parameters": {},
-#     "variables": {},
+#     "parameters": null,
+#     "variables": null,
 #     "resources": [
 #       {
 #         "type": "Microsoft.Sql/servers/databases/syncGroups/syncMembers",
@@ -276,14 +280,14 @@ module "load_balancers" {
   for_each = var.load_balancers
 
   name                       = each.value.name
-  resource_group_name = each.value.resource_group_name
-  location            = each.value.location
+  resource_group_name        = each.value.resource_group_name
+  location                   = each.value.location
   sku                        = each.value.sku
   frontend_ip_configurations = each.value.frontend_ip_configurations
   lb_backend_address_pools   = each.value.lb_backend_address_pools
   lb_probes                  = each.value.lb_probes
   lb_rules                   = each.value.lb_rules
-  private_link_service       = each.value.private_link_service
+  private_link_service       = try(each.value.private_link_service)
 
   depends_on = [
     module.virtual_networks
@@ -295,19 +299,19 @@ module "linux_virtual_machine_scale_sets" {
   for_each = var.linux_virtual_machine_scale_sets
 
   name                   = each.value.name
-  resource_group_name = each.value.resource_group_name
-  location            = each.value.location
+  resource_group_name    = each.value.resource_group_name
+  location               = each.value.location
   sku                    = each.value.sku
   instances              = each.value.instances
   admin_username         = each.value.admin_username
   shared_image           = each.value.shared_image
   upgrade_mode           = each.value.upgrade_mode
-  load_balancer = each.value.load_balancer
-  health_probe_name = each.value.health_probe_name
+  load_balancer          = try(each.value.load_balancer, null)
+  health_probe_name      = each.value.health_probe_name
   admin_ssh_key          = each.value.admin_ssh_key
   os_disk                = each.value.os_disk
   network_interface      = each.value.network_interface
-  rolling_upgrade_policy = try(each.value.rolling_upgrade_policy, {})
+  rolling_upgrade_policy = try(each.value.rolling_upgrade_policy, null)
 
   depends_on = [
     module.virtual_networks,
@@ -323,7 +327,7 @@ module "bastion_hosts" {
   name                = each.value.name
   resource_group_name = each.value.resource_group_name
   location            = each.value.location
-  ip_configuration   = each.value.ip_configuration
+  ip_configuration    = each.value.ip_configuration
 
   depends_on = [
     module.virtual_networks,
@@ -336,7 +340,7 @@ module "private_dns_zones" {
   for_each = var.private_dns_zones
 
   name                  = each.value.name
-  resource_group_name = each.value.resource_group_name
+  resource_group_name   = each.value.resource_group_name
   virtual_network_links = each.value.virtual_network_links
 
   depends_on = [
@@ -348,13 +352,13 @@ module "private_endpoints" {
   source   = "./modules/PrivateEndpoint"
   for_each = var.private_endpoints
 
-  name = each.value.name
-  resource_group_name = each.value.resource_group_name
-  location            = each.value.location
-  subnet                  = each.value.subnet
+  name                       = each.value.name
+  resource_group_name        = each.value.resource_group_name
+  location                   = each.value.location
+  subnet                     = each.value.subnet
   attached_resource          = each.value.attached_resource
   private_service_connection = each.value.private_service_connection
-  private_dns_zone_group = each.value.private_dns_zone_group
+  private_dns_zone_group     = each.value.private_dns_zone_group
 
   depends_on = [
     module.private_dns_zones,
@@ -366,17 +370,17 @@ module "kubernetes_clusters" {
   source   = "./modules/KubernetesCluster"
   for_each = var.kubernetes_clusters
 
-  name                        = each.value.name
-  resource_group_name = each.value.resource_group_name
-  location            = each.value.location
+  name                          = each.value.name
+  resource_group_name           = each.value.resource_group_name
+  location                      = each.value.location
   public_network_access_enabled = each.value.public_network_access_enabled
-  private_cluster_enabled     = each.value.private_cluster_enabled
-  subnet_aks                  = each.value.subnet_aks
-  default_node_pool           = each.value.default_node_pool
-  identity                    = each.value.identity
-  subnet_agw                = each.value.subnet_agw
-  ingress_application_gateway = each.value.ingress_application_gateway
-  network_profile             = each.value.network_profile
+  private_cluster_enabled       = each.value.private_cluster_enabled
+  subnet_aks                    = each.value.subnet_aks
+  default_node_pool             = each.value.default_node_pool
+  identity                      = each.value.identity
+  subnet_agw                    = each.value.subnet_agw
+  ingress_application_gateway   = each.value.ingress_application_gateway
+  network_profile               = each.value.network_profile
 
   depends_on = [
     module.virtual_networks
@@ -394,8 +398,8 @@ module "front_doors" {
   origin_groups       = each.value.origin_groups
   origins             = each.value.origins
   routes              = each.value.routes
-  rule_sets = each.value.rule_sets
-  rules = each.value.rules
+  rule_sets           = try(each.value.rule_sets, null)
+  rules               = try(each.value.rules, null)
 
   depends_on = [
     module.load_balancers,
@@ -412,10 +416,10 @@ module "front_doors" {
 #   location            = each.value.location
 #   sku_name                    = each.value.sku_name
 #   sku_tier                    = each.value.sku_tier
-#   virtual_hub = each.value.virtual_hub
-#   ip_configuration            = each.value.ip_configuration
-#   management_ip_configuration = each.value.management_ip_configuration
-#   firewall_network_rule_collections = each.value.firewall_network_rule_collections
+#   virtual_hub = try(each.value.virtual_hub, null)
+#   ip_configuration            = try(each.value.ip_configuration, null)
+#   management_ip_configuration = try(each.value.management_ip_configuration, null)
+#   firewall_network_rule_collections = try(each.value.firewall_network_rule_collections, null)
 #
 #   depends_on = [
 #     module.virtual_networks,

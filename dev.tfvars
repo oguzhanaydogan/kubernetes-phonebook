@@ -11,11 +11,11 @@ resource_groups = {
 
 virtual_networks = {
   vnet_project102_prod_eastus_001 = { # app
-    name           = "vnet-project102-prod-eastus-001"
+    name                = "vnet-project102-prod-eastus-001"
     resource_group_name = "rg-project102-prod-eastus-001"
-    location = "East Us"
-    address_space  = ["10.0.0.0/16"]
-    subnets        = {
+    location            = "East Us"
+    address_space       = ["10.0.0.0/16"]
+    subnets = {
       snet_project102_prod_eastus_001 = { # aks
         name             = "snet-project102-prod-eastus-001"
         address_prefixes = ["10.0.1.0/24"]
@@ -27,10 +27,10 @@ virtual_networks = {
     }
   }
   vnet_project102_prod_eastus_002 = { # acr
-    name           = "vnet-project102-prod-eastus-002"
+    name                = "vnet-project102-prod-eastus-002"
     resource_group_name = "rg-project102-prod-eastus-001"
-    location = "East Us"
-    address_space  = ["10.1.0.0/16"]
+    location            = "East Us"
+    address_space       = ["10.1.0.0/16"]
     subnets = {
       snet_project102_prod_eastus_003 = { # acr
         name             = "snet-project102-prod-eastus-004"
@@ -39,10 +39,10 @@ virtual_networks = {
     }
   }
   vnet_project102_prod_eastus_003 = { # sql
-    name           = "vnet-project102-prod-eastus-003"
+    name                = "vnet-project102-prod-eastus-003"
     resource_group_name = "rg-project102-prod-eastus-001"
-    location = "East Us"
-    address_space  = ["10.2.0.0/16"]
+    location            = "East Us"
+    address_space       = ["10.2.0.0/16"]
     subnets = {
       snet_project102_prod_eastus_004 = { # sql
         name             = "snet-project102-prod-eastus-005"
@@ -55,10 +55,10 @@ virtual_networks = {
     }
   }
   vnet_project102_prod_eastus_004 = { # agent
-    name           = "vnet-project102-prod-eastus-004"
+    name                = "vnet-project102-prod-eastus-004"
     resource_group_name = "rg-project102-prod-eastus-001"
-    location = "East Us"
-    address_space  = ["10.3.0.0/16"]
+    location            = "East Us"
+    address_space       = ["10.3.0.0/16"]
     subnets = {
       snet_project102_prod_eastus_006 = { # agent
         name             = "snet-project102-prod-eastus-007"
@@ -67,11 +67,11 @@ virtual_networks = {
     }
   }
   vnet_project102_prod_eastus_005 = { # fw
-    name           = "AzureFirewallSubnet"
+    name                = "AzureFirewallSubnet"
     resource_group_name = "rg-project102-prod-eastus-001"
-    location = "East Us"
-    address_space  = ["10.4.0.0/16"]
-    subnets        = {
+    location            = "East Us"
+    address_space       = ["10.4.0.0/16"]
+    subnets = {
       snet_project102_prod_eastus_007 = { # fw
         name             = "snet-project102-prod-eastus-008"
         address_prefixes = ["10.4.1.0/24"]
@@ -79,10 +79,10 @@ virtual_networks = {
     }
   }
   vnet_project102_prod_westeurope_001 = { # app
-    name           = "vnet-project102-prod-westeurope-001"
+    name                = "vnet-project102-prod-westeurope-001"
     resource_group_name = "rg-project102-prod-westeurope-001"
-    location = "West Europe"
-    address_space  = ["10.10.0.0/16"]
+    location            = "West Europe"
+    address_space       = ["10.10.0.0/16"]
     subnets = {
       snet_project102_prod_westeurope_001 = { # app
         name             = "snet-project102-prod-westeurope-001"
@@ -108,10 +108,10 @@ virtual_networks = {
     }
   }
   vnet_project102_prod_westeurope_002 = { # sql
-    name           = "vnet-project102-prod-westeurope-002"
+    name                = "vnet-project102-prod-westeurope-002"
     resource_group_name = "rg-project102-prod-westeurope-001"
-    location = "West Europe"
-    address_space  = ["10.11.0.0/16"]
+    location            = "West Europe"
+    address_space       = ["10.11.0.0/16"]
     subnets = {
       snet_project102_prod_westeurope_006 = { # sql
         name             = "snet-project102-prod-westeurope-006"
@@ -127,25 +127,25 @@ virtual_networks = {
 
 virtual_wans = {
   vwan_project102_prod_eastus_001 = {
-    name = "vwan-project102-prod-eastus-001"
+    name                = "vwan-project102-prod-eastus-001"
     resource_group_name = "rg-project102-prod-eastus-001"
-    location = "East Us"
+    location            = "East Us"
     virtual_hubs = {
       vwanvh_project102_prod_eastus_001 = {
-        name = "vwanvh-project102-prod-eastus-001"
+        name           = "vwanvh-project102-prod-eastus-001"
         address_prefix = "10.30.0.0/16"
         virtual_hub_connections = {
           vwanvhc_project102_prod_eastus_001 = { # acr
             name = "vwanvhc-project102-prod-eastus-001"
             remote_virtual_network = {
-              name = "vnet-project102-prod-eastus-002"
+              name                = "vnet-project102-prod-eastus-002"
               resource_group_name = "rg-project102-prod-eastus-001"
             }
             routing = {
               associated_route_table = "Default"
               propagated_route_tables = [
                 {
-                  name = "Default"
+                  name        = "Default"
                   virtual_hub = "vwanvh_project102_prod_eastus_001"
                 }
               ]
@@ -154,25 +154,25 @@ virtual_wans = {
           vwanvhc_project102_prod_eastus_002 = { # CI/CD agent
             name = "vwanvhc-project102-prod-eastus-002"
             remote_virtual_network = {
-              name = "vnet-project102-prod-eastus-004"
+              name                = "vnet-project102-prod-eastus-004"
               resource_group_name = "rg-project102-prod-eastus-001"
             }
             routing = {
-              associated_route_table = "Default"
+              associated_route_table  = "Default"
               propagated_route_tables = []
             }
           }
           vwanvhc_project102_prod_eastus_003 = { # SQL
             name = "vwanvhc-project102-prod-eastus-003"
             remote_virtual_network = {
-              name = "vnet-project102-prod-eastus-003"
+              name                = "vnet-project102-prod-eastus-003"
               resource_group_name = "rg-project102-prod-eastus-001"
             }
             routing = {
               associated_route_table = "Default"
               propagated_route_tables = [
                 {
-                  name = "Default"
+                  name        = "Default"
                   virtual_hub = "vwanvh_project102_prod_eastus_001"
                 }
               ]
@@ -195,41 +195,41 @@ virtual_wans = {
 
 vnet_peerings = {
   peer_project102_prod_global_001 = { # sql-us_sql-eu
-    name                    = "peer-project102-prod-global-001"
-    resource_group_name = "rg-project102-prod-eastus-001"
-    virtual_network_name         = "vnet-project102-prod-eastus-003"
-    remote_virtual_network  = {
-      name = "vnet-project102-prod-westeurope-001"
+    name                 = "peer-project102-prod-global-001"
+    resource_group_name  = "rg-project102-prod-eastus-001"
+    virtual_network_name = "vnet-project102-prod-eastus-003"
+    remote_virtual_network = {
+      name                = "vnet-project102-prod-westeurope-001"
       resource_group_name = "rg-project102-prod-westeurope-001"
     }
     allow_forwarded_traffic = true
   }
   peer_project102_prod_global_002 = { # sql-eu_sql-us
-    name                    = "peer-project102-prod-global-002"
-    resource_group_name = "rg-project102-prod-westeurope-001"
-    virtual_network_name         = "vnet-project102-prod-westeurope-001"
-    remote_virtual_network  = {
-      name = "vnet-project102-prod-eastus-003"
+    name                 = "peer-project102-prod-global-002"
+    resource_group_name  = "rg-project102-prod-westeurope-001"
+    virtual_network_name = "vnet-project102-prod-westeurope-001"
+    remote_virtual_network = {
+      name                = "vnet-project102-prod-eastus-003"
       resource_group_name = "rg-project102-prod-eastus-001"
     }
     allow_forwarded_traffic = true
   }
   peer_project102_prod_global_003 = { # app-eu_sql_eu
-    name                    = "peer-project102-prod-global-003"
-    resource_group_name = "rg-project102-prod-westeurope-001"
-    virtual_network_name         = "vnet-project102-prod-westeurope-001"
-    remote_virtual_network  = {
-      name = "vnet-project102-prod-westeurope-002"
+    name                 = "peer-project102-prod-global-003"
+    resource_group_name  = "rg-project102-prod-westeurope-001"
+    virtual_network_name = "vnet-project102-prod-westeurope-001"
+    remote_virtual_network = {
+      name                = "vnet-project102-prod-westeurope-002"
       resource_group_name = "rg-project102-prod-westeurope-001"
     }
     allow_forwarded_traffic = true
   }
   peer_project102_prod_global_004 = { # sql-eu_app-eu
-    name                    = "peer-project102-prod-global-004"
-    resource_group_name = "rg-project102-prod-westeurope-001"
-    virtual_network_name         = "vnet-project102-prod-westeurope-002"
-    remote_virtual_network  = {
-      name = "vnet-project102-prod-westeurope-001"
+    name                 = "peer-project102-prod-global-004"
+    resource_group_name  = "rg-project102-prod-westeurope-001"
+    virtual_network_name = "vnet-project102-prod-westeurope-002"
+    remote_virtual_network = {
+      name                = "vnet-project102-prod-westeurope-001"
       resource_group_name = "rg-project102-prod-westeurope-001"
     }
     allow_forwarded_traffic = true
@@ -240,26 +240,26 @@ route_tables = {}
 
 public_ip_addresses = {
   pip_project102_prod_eastus_001 = { # CI/CD agent
-    name              = "pip-project102-prod-eastus-001"
+    name                = "pip-project102-prod-eastus-001"
     resource_group_name = "rg-project102-prod-eastus-001"
-    location = "East Us"
-    allocation_method = "Static"
-    sku               = "Standard"
+    location            = "East Us"
+    allocation_method   = "Static"
+    sku                 = "Standard"
   }
   pip_project102_prod_westeurope_001 = { # bastion
-    name              = "pip-project102-prod-westeurope-001"
+    name                = "pip-project102-prod-westeurope-001"
     resource_group_name = "rg-project102-prod-westeurope-001"
-    location = "West Europe"
-    allocation_method = "Static"
-    sku               = "Standard"
+    location            = "West Europe"
+    allocation_method   = "Static"
+    sku                 = "Standard"
   }
 }
 
 network_security_groups = {
   nsg_project102_prod_eastus_001 = { # ssh
-    name           = "nsg-project102-prod-eastus-001"
+    name                = "nsg-project102-prod-eastus-001"
     resource_group_name = "rg-project102-prod-eastus-001"
-    location = "East Us"
+    location            = "East Us"
     security_rules = {
       allow_ssh = {
         name                       = "AllowSSH"
@@ -275,9 +275,9 @@ network_security_groups = {
     }
   }
   nsg_project102_prod_westeurope_001 = { # ssh and http
-    name           = "nsg-project102-prod-westeurope-001"
+    name                = "nsg-project102-prod-westeurope-001"
     resource_group_name = "rg-project102-prod-westeurope-001"
-    location = "West Europe"
+    location            = "West Europe"
     security_rules = {
       allow_ssh = {
         name                       = "AllowSSH"
@@ -307,10 +307,10 @@ network_security_groups = {
 
 linux_virtual_machines = {
   vm_project102_prod_eastus_001 = { # ci/cd agent
-  // TODO: boot_diagnosticsi enable et, passwordu enable et
-    name           = "vm-project102-prod-eastus-001"
+    // TODO: boot_diagnosticsi enable et, passwordu enable et
+    name                = "vm-project102-prod-eastus-001"
     resource_group_name = "rg-project102-prod-eastus-001"
-    location = "East Us"
+    location            = "East Us"
     network_interface = {
       name = "nic-project102-prod-eastus-001"
       ip_configurations = {
@@ -393,11 +393,11 @@ key_vault_secrets = {
 
 mssql_servers = {
   sql_project102_prod_eastus_001 = {
-    name                  = "sql-project102-prod-eastus-001"
+    name                = "sql-project102-prod-eastus-001"
     resource_group_name = "rg-project102-prod-eastus-001"
-    location = "East Us"
-    version               = "12.0"
-    administrator_login   = "azureuser"
+    location            = "East Us"
+    version             = "12.0"
+    administrator_login = "azureuser"
     // TODO: Key vaulttan al
     admin_password_key_vault_secret = "kvs_project102_prod_global_001"
     tags = {
@@ -418,11 +418,11 @@ mssql_servers = {
     }
   }
   sql_project102_prod_westeurope_001 = {
-    name                  = "sql-project102-prod-westeurope-001"
-    resource_group_name = "rg-project102-prod-westeurope-001"
-    location = "West Europe"
-    version               = "12.0"
-    administrator_login   = "azureuser"
+    name                            = "sql-project102-prod-westeurope-001"
+    resource_group_name             = "rg-project102-prod-westeurope-001"
+    location                        = "West Europe"
+    version                         = "12.0"
+    administrator_login             = "azureuser"
     admin_password_key_vault_secret = "kvs_project102_prod_global_001"
     tags = {
       name = "sql-project102-prod-westeurope-001"
@@ -445,10 +445,10 @@ mssql_servers = {
 
 load_balancers = {
   lb_project102_prod_westeurope_001 = {
-    name           = "lb-project102-prod-westeurope-001"
+    name                = "lb-project102-prod-westeurope-001"
     resource_group_name = "rg-project102-prod-westeurope-001"
-    location = "West Europe"
-    sku            = "Standard"
+    location            = "West Europe"
+    sku                 = "Standard"
     frontend_ip_configurations = {
       frontend_ip_configuration_1 = {
         name = "FrontendIPConfiguration1"
@@ -486,8 +486,8 @@ load_balancers = {
       name = "pl-project102-prod-westeurope-001"
       nat_ip_configurations = {
         nat_ip_configuration_1 = {
-          name    = "NATIPConfiguration1"
-          subnet  = {
+          name = "NATIPConfiguration1"
+          subnet = {
             name                 = "snet-project102-prod-westeurope-003"
             virtual_network_name = "vnet-project102-prod-westeurope-001"
             resource_group_name  = "rg-project102-prod-westeurope-001"
@@ -501,12 +501,12 @@ load_balancers = {
 
 linux_virtual_machine_scale_sets = {
   vmss_project102_prod_westeurope_001 = { # phonebook
-    name           = "vmss-project102-prod-westeurope-001"
+    name                = "vmss-project102-prod-westeurope-001"
     resource_group_name = "rg-project102-prod-westeurope-001"
-    location = "West Europe"
-    sku            = "Standard_B1s"
-    instances      = 1
-    admin_username = "azureuser" // TODO: Key vault?
+    location            = "West Europe"
+    sku                 = "Standard_B1s"
+    instances           = 1
+    admin_username      = "azureuser" // TODO: Key vault?
     shared_image = {
       name                = "myimagedefinitongen"
       gallery_name        = "mygallery"
@@ -514,7 +514,7 @@ linux_virtual_machine_scale_sets = {
     }
     upgrade_mode = "Rolling"
     load_balancer = {
-      name = "lb-project102-prod-westeurope-001"
+      name                = "lb-project102-prod-westeurope-001"
       resource_group_name = "rg-project102-prod-westeurope-001"
     }
     health_probe_name = "lbp-project102-prod-westeurope-001"
@@ -559,9 +559,9 @@ linux_virtual_machine_scale_sets = {
 
 bastion_hosts = {
   bas_project102_prod_westeurope_001 = {
-    name           = "bas-project102-prod-westeurope-001"
+    name                = "bas-project102-prod-westeurope-001"
     resource_group_name = "rg-project102-prod-westeurope-001"
-    location = "West Europe"
+    location            = "West Europe"
     ip_configuration = {
       name = "IPConfiguration"
       subnet = {
@@ -579,7 +579,7 @@ bastion_hosts = {
 
 private_dns_zones = {
   privatelink_database_windows_net_project102_prod_global_001 = {
-    name           = "privatelink.database.windows.net"
+    name                = "privatelink.database.windows.net"
     resource_group_name = "rg-project102-prod-eastus-001"
     virtual_network_links = {
       virtual_network_link_1 = {
@@ -616,12 +616,12 @@ private_dns_zones = {
 
 private_endpoints = {
   pep_project102_prod_eastus_001 = { # sql-us
-    name = "pep-project102-prod-eastus-001"
+    name                = "pep-project102-prod-eastus-001"
     resource_group_name = "rg-project102-prod-eastus-001"
-    location = "East Us"
-    subnet         = {
-      name = "snet-project102-prod-eastus-006"
-      resource_group_name = "rg-project102-prod-eastus-001"
+    location            = "East Us"
+    subnet = {
+      name                 = "snet-project102-prod-eastus-006"
+      resource_group_name  = "rg-project102-prod-eastus-001"
       virtual_network_name = "vnet-project102-prod-eastus-003"
     }
     attached_resource = {
@@ -632,7 +632,7 @@ private_endpoints = {
       }
     }
     private_service_connection = {
-      name = "PrivateServiceConnection"
+      name                 = "PrivateServiceConnection"
       is_manual_connection = false
       subresource_names    = ["sqlServer"]
     }
@@ -640,19 +640,19 @@ private_endpoints = {
       name = "PrivateDNSZoneGroup"
       private_dns_zones = [
         {
-          name = "privatelink.database.windows.net"
+          name                = "privatelink.database.windows.net"
           resource_group_name = "rg-project102-prod-eastus-001"
         }
       ]
     }
   }
   pep_project102_prod_westeurope_001 = { # sql-eu
-    name = "pep-project102-prod-westeurope-001"
+    name                = "pep-project102-prod-westeurope-001"
     resource_group_name = "rg-project102-prod-westeurope-001"
-    location = "West Europe"
-    subnet         = {
-      name = "snet-project102-prod-westeurope-007"
-      resource_group_name = "rg-project102-prod-westeurope-001"
+    location            = "West Europe"
+    subnet = {
+      name                 = "snet-project102-prod-westeurope-007"
+      resource_group_name  = "rg-project102-prod-westeurope-001"
       virtual_network_name = "vnet-project102-prod-westeurope-002"
     }
     attached_resource = {
@@ -663,7 +663,7 @@ private_endpoints = {
       }
     }
     private_service_connection = {
-      name = "PrivateServiceConnection"
+      name                 = "PrivateServiceConnection"
       is_manual_connection = false
       subresource_names    = ["sqlServer"]
     }
@@ -671,7 +671,7 @@ private_endpoints = {
       name = "PrivateDNSZoneGroup"
       private_dns_zones = [
         {
-          name = "privatelink.database.windows.net"
+          name                = "privatelink.database.windows.net"
           resource_group_name = "rg-project102-prod-eastus-001"
         }
       ]
@@ -681,11 +681,11 @@ private_endpoints = {
 
 kubernetes_clusters = {
   aks_project102_prod_eastus_001 = {
-    name                    = "aks-project102-prod-eastus-001"
-    resource_group_name = "rg-project102-prod-eastus-001"
-    location = "East Us"
+    name                          = "aks-project102-prod-eastus-001"
+    resource_group_name           = "rg-project102-prod-eastus-001"
+    location                      = "East Us"
     public_network_access_enabled = false
-    private_cluster_enabled = true
+    private_cluster_enabled       = true
     subnet_aks = {
       name                 = "snet-project102-prod-eastus-001"
       virtual_network_name = "vnet-project102-prod-eastus-001"
@@ -706,25 +706,25 @@ kubernetes_clusters = {
     }
     ingress_application_gateway = {
       enabled = true
-      name = "agw-project102-prod-eastus-001"
+      name    = "agw-project102-prod-eastus-001"
     }
     network_profile = {
-      network_plugin = "azure"
-      network_policy = "azure"
-      service_cidr = "10.0.3.0/24"
-      dns_service_ip = "10.0.3.4"
+      network_plugin     = "azure"
+      network_policy     = "azure"
+      service_cidr       = "10.0.3.0/24"
+      dns_service_ip     = "10.0.3.4"
       docker_bridge_cidr = "172.17.0.1/16"
-      outbound_type  = "userDefinedRouting"
+      outbound_type      = "userDefinedRouting"
     }
   }
 }
 
 front_doors = {
   afd_project102_prod_global_001 = { # phonebook
-    name           = "afd-project102-prod-global-001"
+    name                = "afd-project102-prod-global-001"
     resource_group_name = "rg-project102-prod-eastus-001"
-    sku_name       = "Premium_AzureFrontDoor"
-    endpoints      = { # phonebook
+    sku_name            = "Premium_AzureFrontDoor"
+    endpoints = { # phonebook
       afde_project102_prod_global_001 = {
         name = "AFDEProject102ProdGlobal001"
       }
@@ -781,12 +781,12 @@ front_doors = {
         cdn_frontdoor_endpoint     = "afde_project102_prod_global_001"
         cdn_frontdoor_origin_group = "afdog_project102_prod_global_001"
         cdn_frontdoor_origins      = ["afdo_project102_prod_global_001"]
-        cdn_frontdoor_rule_sets       = ["afdrs_project102_prod_global_001"]
-        enabled                = true
-        forwarding_protocol    = "HttpOnly"
-        https_redirect_enabled = false
-        patterns_to_match      = ["/*"]
-        supported_protocols    = ["Http", "Https"]
+        cdn_frontdoor_rule_sets    = ["afdrs_project102_prod_global_001"]
+        enabled                    = true
+        forwarding_protocol        = "HttpOnly"
+        https_redirect_enabled     = false
+        patterns_to_match          = ["/*"]
+        supported_protocols        = ["Http", "Https"]
       }
     }
     rule_sets = {
@@ -796,13 +796,13 @@ front_doors = {
     }
     rules = {
       afdrule_project102_prod_global_001 = { # HTTPS to HTTP
-        name = "AFDRuleProject102ProdGlobal001"
+        name     = "AFDRuleProject102ProdGlobal001"
         rule_set = "afdrs_project102_prod_global_001"
         conditions = {
           request_scheme_conditions = {
             equal_https = {
-              operator         = "Equal"
-              match_values     = ["HTTPS"]
+              operator     = "Equal"
+              match_values = ["HTTPS"]
             }
           }
         }
@@ -822,13 +822,13 @@ front_doors = {
 
 firewalls = {
   fw_project102_prod_eastus_001 = { # hub-us
-    name           = "fw-project102-prod-eastus-001"
+    name                = "fw-project102-prod-eastus-001"
     resource_group_name = "rg-project102-prod-eastus-001"
-    location = "East Us"
-    sku_name       = "AZFW_Hub"
-    sku_tier       = "Basic"
+    location            = "East Us"
+    sku_name            = "AZFW_Hub"
+    sku_tier            = "Basic"
     virtual_hub = {
-      name = "vwanvh-project102-prod-eastus-001"
+      name                = "vwanvh-project102-prod-eastus-001"
       resource_group_name = "rg-project102-prod-eastus-001"
     }
     ip_configuration = {
@@ -844,16 +844,16 @@ firewalls = {
     }
     firewall_network_rule_collections = {
       fwnrc_project102_prod_eastus_001 = {
-        name = "fwnrc-project102-prod-eastus-001"
+        name     = "fwnrc-project102-prod-eastus-001"
         priority = 100
-        action = "Allow"
+        action   = "Allow"
         firewall_network_rules = {
           allow_acr_to_everywhere = { // TODO: burasi yanlis
-            name = "AllowACRtoEverywhere"
-            source_addresses = ["10.1.1.0/24"]
-            destination_ports = ["*"]
+            name                  = "AllowACRtoEverywhere"
+            source_addresses      = ["10.1.1.0/24"]
+            destination_ports     = ["*"]
             destination_addresses = ["0.0.0.0/0"]
-            protocols =["Any"]
+            protocols             = ["Any"]
           }
         }
       }

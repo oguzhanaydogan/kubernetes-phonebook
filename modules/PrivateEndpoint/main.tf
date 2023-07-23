@@ -1,6 +1,6 @@
 data "azurerm_subnet" "subnet" {
-  name = var.subnet.name
-  resource_group_name = var.subnet.resource_group_name
+  name                 = var.subnet.name
+  resource_group_name  = var.subnet.resource_group_name
   virtual_network_name = var.subnet.virtual_network_name
 }
 
@@ -17,10 +17,10 @@ data "azurerm_resources" "private_connection_resource" {
 data "azurerm_private_dns_zone" "private_dns_zones" {
   for_each = {
     for zone in var.private_dns_zone_group.private_dns_zones :
-      zone.name => {
-        name = zone.name
-        resource_group_name = zone.resource_group_name
-      }
+    zone.name => {
+      name                = zone.name
+      resource_group_name = zone.resource_group_name
+    }
   }
 
   name                = each.value.name
@@ -41,7 +41,7 @@ resource "azurerm_private_endpoint" "private_endpoint" {
   }
 
   private_dns_zone_group {
-    name                 = var.private_dns_zone_group.name
+    name = var.private_dns_zone_group.name
     private_dns_zone_ids = [
       for k, zone in data.azurerm_private_dns_zone.private_dns_zones : zone.id
     ]
