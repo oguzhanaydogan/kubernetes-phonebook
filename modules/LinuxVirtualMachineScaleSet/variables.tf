@@ -22,7 +22,10 @@ variable "shared_image" {
 variable "upgrade_mode" {
 }
 
-variable "health_probe_id" {
+variable "load_balancer" {
+}
+
+variable "health_probe_name" {
 }
 
 variable "admin_ssh_key" {

@@ -324,10 +324,11 @@ variable "linux_virtual_machine_scale_sets" {
       resource_group_name = string
     })
     upgrade_mode = string
-    health_probe = object({
-      load_balancer = string
-      reference_name          = string
-    })
+    load_balancer = optional(object({
+      name = string
+      resource_group_name = string
+    }))
+    health_probe_name = string
     admin_ssh_key = object({
       resource_group_name = string
       name                = string
@@ -351,10 +352,7 @@ variable "linux_virtual_machine_scale_sets" {
           virtual_network_name = string
           resource_group_name  = string
         })
-        load_balancer_backend_address_pools = map(object({
-          load_balancer_name                = string
-          load_balancer_resource_group_name = string
-        }))
+        load_balancer_backend_address_pool_names = list(string)
       }))
     })
     rolling_upgrade_policy = object({

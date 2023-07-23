@@ -15,17 +15,13 @@ virtual_networks = {
     resource_group = "rg_project102_prod_eastus_001"
     address_space  = ["10.0.0.0/16"]
     subnets        = {
-      snet_project102_prod_eastus_001 = { # app
+      snet_project102_prod_eastus_001 = { # aks
         name             = "snet-project102-prod-eastus-001"
         address_prefixes = ["10.0.0.0/24"]
       }
-      snet_project102_prod_eastus_002 = { # aks
+      snet_project102_prod_eastus_002 = { # agw
         name             = "snet-project102-prod-eastus-002"
         address_prefixes = ["10.0.1.0/24"]
-      }
-      snet_project102_prod_eastus_003 = { # agw
-        name             = "snet-project102-prod-eastus-003"
-        address_prefixes = ["10.0.2.0/24"]
       }
     }
   }
@@ -150,7 +146,7 @@ virtual_wans = {
           vwanwhc_project102_prod_eastus_002 = { # CI/CD agent
             name = "vwanwhc-project102-prod-eastus-002"
             remote_virtual_network = {
-              name = "vnet_project102_prod_eastus_004"
+              name = "vnet-project102-prod-eastus-004"
               resource_group_name = "rg-project102-prod-eastus-001"
             }
             routing = {
@@ -337,7 +333,7 @@ linux_virtual_machines = {
           name = "IPConfiguration1"
           subnet = {
             name                 = "snet-project102-prod-eastus-007"
-            virtual_network_name = "vnet_project102_prod_eastus_004"
+            virtual_network_name = "vnet-project102-prod-eastus-004"
             resource_group_name  = "rg-project102-prod-eastus-001"
           }
           private_ip_address_allocation = "Dynamic"
@@ -528,10 +524,11 @@ linux_virtual_machine_scale_sets = {
       resource_group_name = "ssh-key"
     }
     upgrade_mode = "Rolling"
-    health_probe = {
-      load_balancer = "lb_project102_prod_westeurope_001"
-      reference_name          = "lbp_project102_prod_westeurope_001"
+    load_balancer = {
+      name = "lb-project102-prod-westeurope-001"
+      resource_group_name = "rg-project102-prod-westeurope-001"
     }
+    health_probe_name = "lbp-project102-prod-westeurope-001"
     admin_ssh_key = {
       resource_group_name = "ssh-key"
       name                = "azure"
@@ -556,12 +553,9 @@ linux_virtual_machine_scale_sets = {
             virtual_network_name = "vnet-project102-prod-westeurope-001"
             resource_group_name  = "rg-project102-prod-westeurope-001"
           }
-          load_balancer_backend_address_pools = {
-            lb_project102_prod_westeurope_001 = {
-              load_balancer_name                = "lb-project102-prod-westeurope-001"
-              load_balancer_resource_group_name = "rg-project102-prod-westeurope-001"
-            }
-          }
+          load_balancer_backend_address_pool_names = [
+            "lbbap-project102-prod-westeurope-001"
+          ]
         }
       }
     }
@@ -658,7 +652,7 @@ private_endpoints = {
       private_dns_zones = [
         {
           name = "privatelink.database.windows.net"
-          resource_group_name = "rg-project102-prod-westeurope-001"
+          resource_group_name = "rg-project102-prod-eastus-001"
         }
       ]
     }
@@ -675,8 +669,8 @@ private_endpoints = {
     resource_group = "rg_project102_prod_westeurope_001"
     subnet         = {
       name = "snet-project102-prod-westeurope-007"
-      resource_group_name = "rg-project102-prod-westeurope-002"
-      virtual_network_name = "vnet-project102-prod-westeurope-001"
+      resource_group_name = "rg-project102-prod-westeurope-001"
+      virtual_network_name = "vnet-project102-prod-westeurope-002"
     }
     private_service_connection = {
       name = "PrivateServiceConnection"
@@ -688,7 +682,7 @@ private_endpoints = {
       private_dns_zones = [
         {
           name = "privatelink.database.windows.net"
-          resource_group_name = "rg-project102-prod-westeurope-001"
+          resource_group_name = "rg-project102-prod-eastus-001"
         }
       ]
     }
@@ -698,12 +692,12 @@ private_endpoints = {
 kubernetes_clusters = {
   aks_project102_prod_eastus_001 = {
     subnet_aks = {
-      name                 = "snet-project102-prod-eastus-002"
+      name                 = "snet-project102-prod-eastus-001"
       virtual_network_name = "vnet-project102-prod-eastus-001"
       resource_group_name  = "rg-project102-prod-eastus-001"
     }
     subnet_agw = {
-      name                 = "snet-project102-prod-eastus-003"
+      name                 = "snet-project102-prod-eastus-002"
       virtual_network_name = "vnet-project102-prod-eastus-001"
       resource_group_name  = "rg-project102-prod-eastus-001"
     }
@@ -711,7 +705,7 @@ kubernetes_clusters = {
     resource_group          = "rg_project102_prod_eastus_001"
     private_cluster_enabled = true
     default_node_pool = {
-      name       = "default-node-pool"
+      name       = "default"
       node_count = 1
       vm_size    = "Standard_B2s"
     }
@@ -779,7 +773,7 @@ front_doors = {
           request_message = "Gimme gimme"
           location        = "West Europe"
           target = {
-            name                = "lb-project102-prod-westeurope-001-pls"
+            name                = "pl-project102-prod-westeurope-001"
             resource_group_name = "rg-project102-prod-westeurope-001"
           }
         }
@@ -818,7 +812,7 @@ front_doors = {
         }
         actions = {
           url_redirect_actions = {
-            movedhttp = {
+            moved_http = {
               redirect_type        = "Moved"
               redirect_protocol    = "Http"
               destination_hostname = ""

@@ -4,11 +4,16 @@ data "azurerm_subnet" "subnet" {
   virtual_network_name = var.subnet.virtual_network_name
 }
 
-data "azurerm_resources" "resources" {
+# This block is going to give us an object.
+# We need to access to the resources attribute's first element when calling.
+data "azurerm_resources" "private_connection_resources" {
   type          = var.attached_resource.type
   required_tags = var.attached_resource.required_tags
 }
 
+# This block will give an object of which attributes are private DNS zone names.
+# Values will be private DNZ zone data's regular output.
+# Hence we need to create a for loop to access each of their ids.
 data "azurerm_private_dns_zone" "private_dns_zones" {
   for_each = {
     for zone in var.private_dns_zone_group.private_dns_zones :
@@ -30,13 +35,15 @@ resource "azurerm_private_endpoint" "private_endpoint" {
 
   private_service_connection {
     name                           = var.private_service_connection.name
-    private_connection_resource_id = data.azurerm_resources.resources.resources.0.id
+    private_connection_resource_id = data.azurerm_resources.private_connection_resources.resources[0].id
     is_manual_connection           = var.private_service_connection.is_manual_connection
     subresource_names              = var.private_service_connection.subresource_names
   }
 
   private_dns_zone_group {
     name                 = var.private_dns_zone_group.name
-    private_dns_zone_ids = data.azurerm_subnet.subnet[*].id
+    private_dns_zone_ids = [
+      for k, zone in data.azurerm_private_dns_zone.private_dns_zones : zone.id
+    ]
   }
 }

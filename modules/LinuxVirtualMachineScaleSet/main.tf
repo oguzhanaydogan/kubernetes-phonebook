@@ -23,43 +23,29 @@ data "azurerm_network_security_group" "network_security_group" {
 }
 
 locals {
-  lb_backend_address_pools_flattened_info = flatten([
-    for k, v in var.network_interface.ip_configurations : [
-      for key, pool in v.load_balancer_backend_address_pools : {
-        lb_backend_address_pool_name      = pool.load_balancer_name
-        load_balancer_name                = pool.load_balancer_name
-        load_balancer_resource_group_name = pool.load_balancer_resource_group_name
-      }
-    ]
-  ])
-
-  load_balancers = {
-    for info in local.lb_backend_address_pools_flattened_info : info.load_balancer_name => {
-      name                = info.load_balancer_name
-      resource_group_name = info.load_balancer_resource_group_name
-    }...
-  }
-
-  lb_backend_address_pools = {
-    for info in local.lb_backend_address_pools_flattened_info : info.lb_backend_address_pool_name => {
-      name               = info.lb_backend_address_pool_name
-      load_balancer_name = info.load_balancer_name
-    }
-  }
+  # Collect all load balancer backend address pool names from all ip configurations
+  # Apply toset to cancel the duplicates
+  lb_backend_address_pool_names_from_all_ip_configurations = toset(flatten([
+    for k, ip_configuration in var.network_interface.ip_configurations : ip_configuration.load_balancer_backend_address_pool_names
+  ]))
 }
 
 data "azurerm_lb" "lb" {
-  for_each = local.load_balancers
+  name                = var.load_balancer.name
+  resource_group_name = var.load_balancer.resource_group_name
+}
 
-  name                = each.value[0].name
-  resource_group_name = each.value[0].resource_group_name
+data "azapi_resource" "health_probe" {
+  type = "Microsoft.Network/loadBalancers/probes@2023-02-01"
+  name = var.health_probe_name
+  parent_id = data.azurerm_lb.lb.id
 }
 
 data "azurerm_lb_backend_address_pool" "lb_backend_address_pools" {
-  for_each = local.lb_backend_address_pools
+  for_each = local.lb_backend_address_pool_names_from_all_ip_configurations
 
-  name            = each.value.name
-  loadbalancer_id = data.azurerm_lb.lb[each.value.load_balancer_name].id
+  name            = each.value
+  loadbalancer_id = data.azurerm_lb.lb.id
 }
 
 resource "azurerm_linux_virtual_machine_scale_set" "linux_virtual_machine_scale_set" {
@@ -71,7 +57,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "linux_virtual_machine_scale_
   admin_username      = var.admin_username
   source_image_id     = data.azurerm_shared_image.shared_image.id
   upgrade_mode        = var.upgrade_mode
-  health_probe_id     = var.health_probe_id
+  health_probe_id     = data.azapi_resource.health_probe.id
 
   admin_ssh_key {
     username   = var.admin_username
@@ -96,7 +82,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "linux_virtual_machine_scale_
         primary   = ip_configuration.value.primary
         subnet_id = data.azurerm_subnet.subnets[ip_configuration.key].id
         load_balancer_backend_address_pool_ids = [
-          for k, v in ip_configuration.value.load_balancer_backend_address_pools : data.azurerm_lb_backend_address_pool.lb_backend_address_pools[v.load_balancer_name].id
+          for pool_name in ip_configuration.value.load_balancer_backend_address_pool_names : data.azurerm_lb_backend_address_pool.lb_backend_address_pools[pool_name].id
         ]
       }
     }

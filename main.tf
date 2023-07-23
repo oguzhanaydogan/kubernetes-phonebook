@@ -178,7 +178,7 @@ module "mssql_servers" {
   mssql_databases = each.value.mssql_databases
 }
 
-# module "azapi_create_phonebook_sync_group" {
+# module "azapi_create_sqldb_sync_group" {
 #   source    = "./modules/AzAPI"
 #   name      = "phonebook-sync-group"
 #   type      = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
@@ -193,6 +193,10 @@ module "mssql_servers" {
 #       usePrivateLinkConnection = false
 #     }
 #   }
+#
+#   depends_on = [
+#     module.mssql_databases
+#   ]
 # }
 
 # module "arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu" {
@@ -227,7 +231,7 @@ module "mssql_servers" {
 #   }
 #   TEMPLATE
 # }
-#
+
 # module "azapi_update_phonebook_sync_group" {
 #   source      = "./modules/AzAPIUpdateResource"
 #   type        = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
@@ -291,7 +295,8 @@ module "linux_virtual_machine_scale_sets" {
   admin_username         = each.value.admin_username
   shared_image           = each.value.shared_image
   upgrade_mode           = each.value.upgrade_mode
-  health_probe_id        = module.load_balancers[each.value.health_probe.load_balancer].health_probes[each.value.health_probe.reference_name].id
+  load_balancer = each.value.load_balancer
+  health_probe_name = each.value.health_probe_name
   admin_ssh_key          = each.value.admin_ssh_key
   os_disk                = each.value.os_disk
   network_interface      = each.value.network_interface
