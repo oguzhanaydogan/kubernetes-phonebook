@@ -23,7 +23,7 @@ provider "azurerm" {
 }
 
 # module "azapi_create_sqldb_sync_group" {
-#   source    = "./modules/AzAPI"
+#   source    = "./modules/azapi"
 #   name      = "phonebook-sync-group"
 #   type      = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
 #   parent_id = module.mssql_databases["phonebook_us"].id
@@ -44,7 +44,7 @@ provider "azurerm" {
 # }
 
 # module "arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu" {
-#   source              = "./modules/ARMTemplateDeployment"
+#   source              = "./modules/arm_template_deployment"
 #   name                = "create-phonebook-sync-group-member-phonebook-eu"
 #   resource_group_name = module.resource_groups["rg_eastus"].name
 #   deployment_mode     = "Incremental"
@@ -80,7 +80,7 @@ provider "azurerm" {
 # }
 
 # module "azapi_update_phonebook_sync_group" {
-#   source      = "./modules/AzAPIUpdateResource"
+#   source      = "./modules/azapi_update_resource"
 #   type        = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
 #   resource_id = "/subscriptions/14528ad0-4c9e-48a9-8ed0-111c1034b033/resourceGroups/rg-eastus/providers/Microsoft.Sql/servers/coyhub-db-us/databases/phonebook/syncGroups/phonebook-sync-group"
 #   body = {
@@ -115,7 +115,7 @@ provider "azurerm" {
 # }
 
 module "bastion_hosts" {
-  source   = "./modules/BastionHost"
+  source   = "./modules/bastion_host"
   for_each = var.bastion_hosts
 
   name                = each.value.name
@@ -130,7 +130,7 @@ module "bastion_hosts" {
 }
 
 # module "firewalls" {
-#   source   = "./modules/Firewall"
+#   source   = "./modules/firewall"
 #   for_each = var.firewalls
 
 #   name                        = each.value.name
@@ -151,7 +151,7 @@ module "bastion_hosts" {
 # }
 
 module "front_doors" {
-  source   = "./modules/FrontDoor"
+  source   = "./modules/front_door"
   for_each = var.front_doors
 
   name                = each.value.name
@@ -173,7 +173,7 @@ module "front_doors" {
 data "azurerm_client_config" "client_config" {} // TODO: Object olayini halledince sil, modulun icinde var zaten
 
 module "key_vault_access_policies" {
-  source   = "./modules/KeyVaultAccessPolicy"
+  source   = "./modules/key_vault_access_policy"
   for_each = var.key_vault_access_policies
 
   key_vault_name                = each.value.key_vault_name
@@ -184,7 +184,7 @@ module "key_vault_access_policies" {
 }
 
 module "key_vault_secrets" {
-  source   = "./modules/KeyVaultSecret"
+  source   = "./modules/key_vault_secret"
   for_each = var.key_vault_secrets
 
   name                          = each.value.name
@@ -197,7 +197,7 @@ module "key_vault_secrets" {
 }
 
 module "kubernetes_clusters" {
-  source   = "./modules/KubernetesCluster"
+  source   = "./modules/kubernetes_cluster"
   for_each = var.kubernetes_clusters
 
   name                          = each.value.name
@@ -218,7 +218,7 @@ module "kubernetes_clusters" {
 }
 
 module "linux_virtual_machines" {
-  source   = "./modules/LinuxVirtualMachine"
+  source   = "./modules/linux_virtual_machine"
   for_each = var.linux_virtual_machines
 
   name                               = each.value.name
@@ -243,7 +243,7 @@ module "linux_virtual_machines" {
 }
 
 module "linux_virtual_machine_scale_sets" {
-  source   = "./modules/LinuxVirtualMachineScaleSet"
+  source   = "./modules/linux_virtual_machine_scale_set"
   for_each = var.linux_virtual_machine_scale_sets
 
   name                   = each.value.name
@@ -269,7 +269,7 @@ module "linux_virtual_machine_scale_sets" {
 }
 
 module "load_balancers" {
-  source   = "./modules/LoadBalancer"
+  source   = "./modules/load_balancer"
   for_each = var.load_balancers
 
   name                       = each.value.name
@@ -288,7 +288,7 @@ module "load_balancers" {
 }
 
 module "mssql_servers" {
-  source   = "./modules/MSSQLServer"
+  source   = "./modules/mssql_server"
   for_each = var.mssql_servers
 
   name                         = each.value.name
@@ -302,7 +302,7 @@ module "mssql_servers" {
 }
 
 module "network_security_groups" {
-  source   = "./modules/NetworkSecurityGroup"
+  source   = "./modules/network_security_group"
   for_each = var.network_security_groups
 
   name                = each.value.name
@@ -316,7 +316,7 @@ module "network_security_groups" {
 }
 
 module "private_dns_zones" {
-  source   = "./modules/PrivateDNSZone"
+  source   = "./modules/private_dns_zone"
   for_each = var.private_dns_zones
 
   name                  = each.value.name
@@ -329,7 +329,7 @@ module "private_dns_zones" {
 }
 
 module "private_endpoints" {
-  source   = "./modules/PrivateEndpoint"
+  source   = "./modules/private_endpoint"
   for_each = var.private_endpoints
 
   name                       = each.value.name
@@ -347,7 +347,7 @@ module "private_endpoints" {
 }
 
 module "public_ip_addresses" {
-  source   = "./modules/PublicIPAddress"
+  source   = "./modules/public_ip_address"
   for_each = var.public_ip_addresses
 
   name                = each.value.name
@@ -362,7 +362,7 @@ module "public_ip_addresses" {
 }
 
 module "resource_groups" {
-  source   = "./modules/ResourceGroup"
+  source   = "./modules/resource_group"
   for_each = var.resource_groups
 
   name     = each.value.name
@@ -370,7 +370,7 @@ module "resource_groups" {
 }
 
 module "route_tables" {
-  source   = "./modules/RouteTable"
+  source   = "./modules/route_table"
   for_each = var.route_tables
 
   name                = each.value.name
@@ -385,7 +385,7 @@ module "route_tables" {
 }
 
 module "virtual_networks" {
-  source   = "./modules/VirtualNetwork"
+  source   = "./modules/virtual_network"
   for_each = var.virtual_networks
 
   name                = each.value.name
@@ -400,7 +400,7 @@ module "virtual_networks" {
 }
 
 module "virtual_network_peerings" {
-  source   = "./modules/VirtualNetworkPeering"
+  source   = "./modules/virtual_network_peering"
   for_each = var.vnet_peerings
 
   name                    = each.value.name
@@ -415,7 +415,7 @@ module "virtual_network_peerings" {
 }
 
 module "virtual_wans" {
-  source   = "./modules/VirtualWAN"
+  source   = "./modules/virtual_wan"
   for_each = var.virtual_wans
 
   name                = each.value.name

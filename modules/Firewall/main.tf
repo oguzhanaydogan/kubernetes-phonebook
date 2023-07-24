@@ -1,6 +1,7 @@
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/firewall_policy
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/firewall_policy_rule_collection_group
 
+
 data "azurerm_subnet" "subnet_firewall" {
   name                 = var.ip_configuration.subnet.name
   virtual_network_name = var.ip_configuration.subnet.virtual_network_name
