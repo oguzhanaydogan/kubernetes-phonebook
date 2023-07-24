@@ -25,11 +25,6 @@ variable "subnets" {
       service_delegation = object({
         name    = string
         actions = optional(list(string), [])
-      }) }), {
-      name = ""
-      service_delegation = {
-        name = ""
-      }
-    })
+    }) }), null)
   }))
 }

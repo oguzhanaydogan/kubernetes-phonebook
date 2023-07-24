@@ -15,7 +15,7 @@ resource "azurerm_subnet" "subnets" {
   private_link_service_network_policies_enabled = each.value.private_link_service_network_policies_enabled
 
   dynamic "delegation" {
-    for_each = each.value.delegation.name != "" ? [1] : []
+    for_each = each.value.delegation != null ? [1] : []
 
     content {
       name = delegation.value.name

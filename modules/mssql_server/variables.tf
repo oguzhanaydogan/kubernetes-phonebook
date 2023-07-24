@@ -24,11 +24,7 @@ variable "administrator_login" {
         name                = string
         resource_group_name = string
         secret_name         = string
-        }), {
-        name                = ""
-        resource_group_name = ""
-        secret_name         = ""
-      })
+      }), null)
     })
     password = object({
       source  = string
@@ -37,11 +33,7 @@ variable "administrator_login" {
         name                = string
         resource_group_name = string
         secret_name         = string
-        }), {
-        name                = ""
-        resource_group_name = ""
-        secret_name         = ""
-      })
+      }), null)
     })
   })
 }
@@ -62,5 +54,12 @@ variable "mssql_databases" {
     read_replica_count          = number
     read_scale                  = bool
     zone_redundant              = bool
+    sync_groups = optional({
+      name = string
+      type = string
+      conflictResolutionPolicy = string
+      interval                 = number
+      usePrivateLinkConnection = bool
+    }, null)
   }))
 }

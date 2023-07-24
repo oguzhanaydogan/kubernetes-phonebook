@@ -86,7 +86,7 @@ resource "azurerm_virtual_machine" "virtual_machine" {
 
     content {
       storage_uri = var.boot_diagnostics.storage_uri
-      enabled = true
+      enabled     = true
     }
   }
 }

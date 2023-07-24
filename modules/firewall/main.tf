@@ -31,7 +31,7 @@ data "azurerm_public_ip" "public_ip_firewall_management" {
 data "azurerm_firewall_policy" "firewall_policy" {
   count = var.firewall_policy != null ? 1 : 0
 
-  name = var.firewall_policy.name
+  name                = var.firewall_policy.name
   resource_group_name = var.firewall_policy.resource_group_name
 }
 
@@ -41,18 +41,18 @@ resource "azurerm_firewall" "firewall" {
   location            = var.location
   sku_name            = var.sku_name
   sku_tier            = var.sku_tier
-  firewall_policy_id = try(data.azurerm_firewall_policy.firewall_policy.id, null)
+  firewall_policy_id  = try(data.azurerm_firewall_policy.firewall_policy[0].id, null)
 
   dynamic "virtual_hub" {
-    count = var.virtual_hub != null ? 1 : 0
+    for_each = var.virtual_hub != null ? [1] : []
 
     content {
-     virtual_hub_id = data.azurerm_virtual_hub.virtual_hub.id
+      virtual_hub_id = data.azurerm_virtual_hub.virtual_hub[0].id
     }
   }
 
   dynamic "ip_configuration" {
-    count = var.ip_configuration != null ? 1 : 0
+    for_each = var.ip_configuration != null ? [1] : []
 
     content {
       name      = var.ip_configuration.name
@@ -61,7 +61,7 @@ resource "azurerm_firewall" "firewall" {
   }
 
   dynamic "management_ip_configuration" {
-    count = var.management_ip_configuration != null ? 1 : 0
+    for_each = var.management_ip_configuration != null ? [1] : []
 
     content {
       name                 = var.management_ip_configuration.name
@@ -72,7 +72,7 @@ resource "azurerm_firewall" "firewall" {
 }
 
 resource "azurerm_firewall_network_rule_collection" "firewall_network_rule_collection" {
-  for_each = var.firewall_network_rule_collections
+  for_each = var.firewall_network_rule_collections != null ? var.firewall_network_rule_collections : {}
 
   name                = each.value.name
   azure_firewall_name = azurerm_firewall.firewall.name

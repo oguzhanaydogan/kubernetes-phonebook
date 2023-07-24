@@ -22,27 +22,6 @@ provider "azurerm" {
   }
 }
 
-# module "azapi_create_sqldb_sync_group" {
-#   source    = "./modules/azapi"
-#   name      = "phonebook-sync-group"
-#   type      = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
-#   parent_id = module.mssql_databases["phonebook_us"].id
-#   body = {
-#     properties = {
-#       conflictResolutionPolicy = "HubWin"
-#       hubDatabasePassword      = "Test1234."
-#       hubDatabaseUserName      = "azureuser"
-#       interval                 = 60
-#       syncDatabaseId           = "${module.mssql_databases["phonebook_us"].id}"
-#       usePrivateLinkConnection = false
-#     }
-#   }
-#
-#   depends_on = [
-#     module.mssql_databases
-#   ]
-# }
-
 # module "arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu" {
 #   source              = "./modules/arm_template_deployment"
 #   name                = "create-phonebook-sync-group-member-phonebook-eu"
@@ -133,34 +112,36 @@ module "firewalls" {
   source   = "./modules/firewall"
   for_each = var.firewalls
 
-  name                        = each.value.name
-  resource_group_name = each.value.resource_group_name
-  location            = each.value.location
-  sku_name                    = each.value.sku_name
-  sku_tier                    = each.value.sku_tier
-  firewall_policy = try(each.value.fireall_policy, null)
-  virtual_hub = try(each.value.virtual_hub, null)
-  ip_configuration            = try(each.value.ip_configuration, null)
-  management_ip_configuration = try(each.value.management_ip_configuration, null)
+  name                              = each.value.name
+  resource_group_name               = each.value.resource_group_name
+  location                          = each.value.location
+  sku_name                          = each.value.sku_name
+  sku_tier                          = each.value.sku_tier
+  firewall_policy                   = try(each.value.fireall_policy, null)
+  virtual_hub                       = try(each.value.virtual_hub, null)
+  ip_configuration                  = try(each.value.ip_configuration, null)
+  management_ip_configuration       = try(each.value.management_ip_configuration, null)
   firewall_network_rule_collections = try(each.value.firewall_network_rule_collections, null)
 
   depends_on = [
     module.virtual_networks,
     module.public_ip_addresses,
+    module.firewall_policies,
     module.virtual_wans
   ]
 }
 
 module "firewall_policies" {
-  source = "./modules/firewall_policy"
+  source   = "./modules/firewall_policy"
   for_each = var.firewall_policies
 
-  name = each.value.name
-  resource_group_name = each.value.resource_group_name
-  location            = each.value.location
+  name                   = each.value.name
+  resource_group_name    = each.value.resource_group_name
+  location               = each.value.location
+  sku = each.value.sku
   rule_collection_groups = each.value.rule_collection_groups
 
-  depends_on = [ module.resource_groups ]
+  depends_on = [module.resource_groups]
 }
 
 module "front_doors" {
@@ -201,7 +182,7 @@ module "key_vault_secrets" {
   key_vault_name                = each.value.key_vault_name
   key_vault_resource_group_name = each.value.key_vault_resource_group_name
 
-  depends_on = [ module.key_vault_access_policies ]
+  depends_on = [module.key_vault_access_policies]
 }
 
 module "kubernetes_clusters" {
@@ -289,7 +270,7 @@ module "load_balancers" {
   lb_rules                   = each.value.lb_rules
   private_link_service       = try(each.value.private_link_service)
 
-  depends_on = [ module.virtual_networks ]
+  depends_on = [module.virtual_networks]
 }
 
 module "mssql_servers" {
@@ -304,7 +285,7 @@ module "mssql_servers" {
   tags                = each.value.tags
   mssql_databases     = each.value.mssql_databases
 
-  depends_on = [ module.key_vault_access_policies ]
+  depends_on = [module.key_vault_access_policies]
 }
 
 module "network_security_groups" {
@@ -316,7 +297,7 @@ module "network_security_groups" {
   location            = each.value.location
   security_rules      = try(each.value.security_rules, null)
 
-  depends_on = [ module.resource_groups ]
+  depends_on = [module.resource_groups]
 }
 
 module "private_dns_zones" {
@@ -327,7 +308,7 @@ module "private_dns_zones" {
   resource_group_name   = each.value.resource_group_name
   virtual_network_links = each.value.virtual_network_links
 
-  depends_on = [ module.virtual_networks ]
+  depends_on = [module.virtual_networks]
 }
 
 module "private_endpoints" {
@@ -358,7 +339,7 @@ module "public_ip_addresses" {
   allocation_method   = each.value.allocation_method
   sku                 = each.value.sku
 
-  depends_on = [ module.resource_groups ]
+  depends_on = [module.resource_groups]
 }
 
 module "resource_groups" {
@@ -379,7 +360,7 @@ module "route_tables" {
   routes              = each.value.routes
   subnet_associations = each.value.subnet_associations
 
-  depends_on = [ module.virtual_networks ]
+  depends_on = [module.virtual_networks]
 }
 
 module "virtual_networks" {
@@ -392,7 +373,7 @@ module "virtual_networks" {
   address_space       = each.value.address_space
   subnets             = try(each.value.subnets, null)
 
-  depends_on = [ module.resource_groups ]
+  depends_on = [module.resource_groups]
 }
 
 module "virtual_network_peerings" {
@@ -405,7 +386,7 @@ module "virtual_network_peerings" {
   remote_virtual_network  = each.value.remote_virtual_network
   allow_forwarded_traffic = each.value.allow_forwarded_traffic
 
-  depends_on = [ module.virtual_networks ]
+  depends_on = [module.virtual_networks]
 }
 
 module "virtual_wans" {
@@ -417,5 +398,5 @@ module "virtual_wans" {
   location            = each.value.location
   virtual_hubs        = try(each.value.virtual_hubs, null)
 
-  depends_on = [ module.virtual_networks ]
+  depends_on = [module.virtual_networks]
 }

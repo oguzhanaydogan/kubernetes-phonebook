@@ -35,6 +35,7 @@ data "azurerm_lb" "lb" {
   resource_group_name = var.load_balancer.resource_group_name
 }
 
+# For there is no Terraform data resource readily available, we need to use the azapi data.
 data "azapi_resource" "health_probe" {
   type      = "Microsoft.Network/loadBalancers/probes@2023-02-01"
   name      = var.health_probe_name
