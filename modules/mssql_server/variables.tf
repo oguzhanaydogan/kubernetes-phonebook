@@ -16,12 +16,34 @@ variable "msqql_version" {
 
 variable "administrator_login" {
   sensitive = true
-  type      = string
-}
-
-variable "administrator_login_password" {
-  sensitive = true
-  type      = string
+  type = object({
+    username = object({
+      source  = string
+      literal = optional(string, "")
+      key_vault = optional(object({
+        name                = string
+        resource_group_name = string
+        secret_name         = string
+        }), {
+        name                = ""
+        resource_group_name = ""
+        secret_name         = ""
+      })
+    })
+    password = object({
+      source  = string
+      literal = optional(string, "")
+      key_vault = optional(object({
+        name                = string
+        resource_group_name = string
+        secret_name         = string
+        }), {
+        name                = ""
+        resource_group_name = ""
+        secret_name         = ""
+      })
+    })
+  })
 }
 
 variable "tags" {

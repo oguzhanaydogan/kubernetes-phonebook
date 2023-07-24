@@ -1,11 +1,11 @@
 variable "type" {
-	type = string
+  type = string
 }
 
 variable "resource_id" {
-	type = string // TODO: Halledilmesi lazim
+  type = string // TODO: Halledilmesi lazim
 }
 
 variable "body" {
-	type = object
+  type = object
 }

@@ -161,10 +161,15 @@ front_doors = {
 }
 
 key_vault_access_policies = {
-  # TODO: Modularize
   kvap_project102_prod_global_001 = {
-    key_vault_name                = "coyvault"
-    key_vault_resource_group_name = "ssh-key"
+    key_vault = {
+      name                = "coyvault"
+      resource_group_name = "ssh-key"
+    }
+    object = {
+      type = "user"
+      name = "oguzhanaydoganbusiness_gmail.com#EXT#@oguzhanaydoganbusinessgmail.onmicrosoft.com"
+    }
     key_permissions = [
       "Get", "List",
     ]
@@ -173,6 +178,7 @@ key_vault_access_policies = {
     ]
   }
 }
+
 
 key_vault_secrets = {
   kvs_project102_prod_global_001 = {
@@ -224,7 +230,6 @@ kubernetes_clusters = {
 
 linux_virtual_machines = {
   vm_project102_prod_eastus_001 = { # ci/cd agent
-    // TODO: boot_diagnosticsi enable et, passwordu enable et
     name                = "vm-project102-prod-eastus-001"
     resource_group_name = "rg-project102-prod-eastus-001"
     location            = "East Us"
@@ -251,9 +256,7 @@ linux_virtual_machines = {
     delete_data_disks_on_termination = true
     delete_os_disk_on_termination    = true
     identity = {
-      // TODO: ENABLEDA GEREK YOK
-      enabled = true
-      type    = "SystemAssigned"
+      type = "SystemAssigned"
     }
     storage_image_reference = {
       publisher = "Canonical"
@@ -268,7 +271,7 @@ linux_virtual_machines = {
     }
     os_profile = {
       admin_username = "azureuser"
-      custom_data    = "modules/LinuxVirtualMachine/vm_project102_prod_eastus_001.sh"
+      custom_data    = "sh_files/vm_project102_prod_eastus_001.sh"
     }
     os_profile_linux_config = {
       disable_password_authentication = true
@@ -278,10 +281,11 @@ linux_virtual_machines = {
       }
     }
     network_security_group_association = {
-      // TODO: Enabled?
-      enabled                                    = true
       network_security_group_name                = "nsg-project102-prod-eastus-001"
       network_security_group_resource_group_name = "rg-project102-prod-eastus-001"
+    }
+    boot_diagnostics = {
+      storage_uri = null
     }
   }
 }
@@ -293,7 +297,7 @@ linux_virtual_machine_scale_sets = {
     location            = "West Europe"
     sku                 = "Standard_B1s"
     instances           = 1
-    admin_username      = "azureuser" // TODO: Key vault?
+    admin_username      = "azureuser"
     shared_image = {
       name                = "myimagedefinitongen"
       gallery_name        = "mygallery"
@@ -404,17 +408,32 @@ mssql_servers = {
   sql_project102_prod_eastus_001 = {
     name                = "sql-project102-prod-eastus-001"
     resource_group_name = "rg-project102-prod-eastus-001"
-    location            = "East Us"
+    location            = "East US"
     version             = "12.0"
-    administrator_login = "azureuser"
-    // TODO: Key vaulttan al
-    admin_password_key_vault_secret = "kvs_project102_prod_global_001"
+    administrator_login = {
+      username = {
+        source = "key_vault"
+        key_vault = {
+          name                = "coyvault"
+          resource_group_name = "ssh-key"
+          secret_name         = "kvs-project102-prod-global-001"
+        }
+      }
+      password = {
+        source = "key_vault"
+        key_vault = {
+          name                = "coyvault"
+          resource_group_name = "ssh-key"
+          secret_name         = "kvs-project102-prod-global-002"
+        }
+      }
+    }
     tags = {
       name = "sql-project102-prod-eastus-001"
     }
     mssql_databases = {
-      sqldb_project102_prod_eastus_001 = {
-        name                        = "sqldb-project102-prod-eastus-001"
+      sqldb-project102-prod-eastus-001 = {
+        name                        = "phonebook"
         collation                   = "SQL_Latin1_General_CP1_CI_AS"
         max_size_gb                 = 32
         sku_name                    = "GP_S_Gen5_1"
@@ -431,14 +450,30 @@ mssql_servers = {
     resource_group_name             = "rg-project102-prod-westeurope-001"
     location                        = "West Europe"
     version                         = "12.0"
-    administrator_login             = "azureuser"
-    admin_password_key_vault_secret = "kvs_project102_prod_global_001"
+    administrator_login             = {
+      username = {
+        source = "key_vault"
+        key_vault = {
+          name                = "coyvault"
+          resource_group_name = "ssh-key"
+          secret_name         = "kvs-project102-prod-global-001"
+        }
+      }
+      password = {
+        source = "key_vault"
+        key_vault = {
+          name                = "coyvault"
+          resource_group_name = "ssh-key"
+          secret_name         = "kvs-project102-prod-global-002"
+        }
+      }
+    }
     tags = {
       name = "sql-project102-prod-westeurope-001"
     }
     mssql_databases = {
       sqldb_project102_prod_westeurope_001 = {
-        name                        = "sqldb-project102-prod-westeurope-001"
+        name                        = "phonebook"
         collation                   = "SQL_Latin1_General_CP1_CI_AS"
         max_size_gb                 = 32
         sku_name                    = "GP_S_Gen5_1"
@@ -451,6 +486,7 @@ mssql_servers = {
     }
   }
 }
+
 
 network_security_groups = {
   nsg_project102_prod_eastus_001 = { # ssh

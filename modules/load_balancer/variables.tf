@@ -53,7 +53,7 @@ variable "lb_rules" {
 
 variable "private_link_service" {
   default = {
-    name = ""
+    name                  = ""
     nat_ip_configurations = {}
   }
   type = object({

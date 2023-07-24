@@ -170,17 +170,14 @@ module "front_doors" {
   ]
 }
 
-data "azurerm_client_config" "client_config" {} // TODO: Object olayini halledince sil, modulun icinde var zaten
-
 module "key_vault_access_policies" {
   source   = "./modules/key_vault_access_policy"
   for_each = var.key_vault_access_policies
 
-  key_vault_name                = each.value.key_vault_name
-  key_vault_resource_group_name = each.value.key_vault_resource_group_name
-  object_id                     = data.azurerm_client_config.client_config.object_id
-  key_permissions               = each.value.key_permissions
-  secret_permissions            = each.value.secret_permissions
+  key_vault          = each.value.key_vault
+  object             = each.value.object
+  key_permissions    = each.value.key_permissions
+  secret_permissions = each.value.secret_permissions
 }
 
 module "key_vault_secrets" {
@@ -233,6 +230,7 @@ module "linux_virtual_machines" {
   storage_os_disk                    = each.value.storage_os_disk
   os_profile                         = each.value.os_profile
   os_profile_linux_config            = each.value.os_profile_linux_config
+  boot_diagnostics                   = each.value.boot_diagnostics
   network_security_group_association = each.value.network_security_group_association
 
   depends_on = [
@@ -291,14 +289,15 @@ module "mssql_servers" {
   source   = "./modules/mssql_server"
   for_each = var.mssql_servers
 
-  name                         = each.value.name
-  resource_group_name          = each.value.resource_group_name
-  location                     = each.value.location
-  msqql_version                = each.value.version
-  administrator_login          = each.value.administrator_login
-  administrator_login_password = module.key_vault_secrets[each.value.admin_password_key_vault_secret].value // TODO: Bu satiri duzelt
-  tags                         = each.value.tags
-  mssql_databases              = try(each.value.mssql_databases, null)
+  name                = each.value.name
+  resource_group_name = each.value.resource_group_name
+  location            = each.value.location
+  msqql_version       = each.value.version
+  administrator_login = each.value.administrator_login
+  tags                = each.value.tags
+  mssql_databases     = each.value.mssql_databases
+
+  depends_on = [ module.key_vault_access_policies ]
 }
 
 module "network_security_groups" {

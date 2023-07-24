@@ -44,12 +44,10 @@ variable "delete_data_disks_on_termination" {
 
 variable "identity" {
   default = {
-    enabled = false
     type = ""
   }
   type = object({
-    enabled = bool
-    type    = string
+    type = string
   })
 }
 
@@ -87,9 +85,15 @@ variable "os_profile_linux_config" {
   })
 }
 
+variable "boot_diagnostics" {
+  type = object({
+    storage_uri = optional(string, "")
+  })
+  default = {}
+}
+
 variable "network_security_group_association" {
   type = object({
-    enabled                                    = bool
     network_security_group_name                = string
     network_security_group_resource_group_name = string
   })

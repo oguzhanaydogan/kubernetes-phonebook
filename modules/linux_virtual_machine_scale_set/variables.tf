@@ -36,7 +36,7 @@ variable "upgrade_mode" {
 
 variable "load_balancer" {
   default = {
-    name = ""
+    name                = ""
     resource_group_name = ""
   }
   type = object({

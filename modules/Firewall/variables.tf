@@ -55,15 +55,15 @@ variable "management_ip_configuration" {
     subnet = optional(object({
       virtual_network_name = string
       resource_group_name  = string
-    }), {
+      }), {
       virtual_network_name = ""
-      resource_group_name = ""
+      resource_group_name  = ""
     })
     public_ip_address = optional(object({
       name                = string
       resource_group_name = string
-    }), {
-      name = ""
+      }), {
+      name                = ""
       resource_group_name = ""
     })
   })
@@ -71,9 +71,9 @@ variable "management_ip_configuration" {
 
 variable "firewall_network_rule_collections" {
   default = {
-    name = ""
-    priority = 0
-    action = ""
+    name                   = ""
+    priority               = 0
+    action                 = ""
     firewall_network_rules = {}
   }
   type = map(object({

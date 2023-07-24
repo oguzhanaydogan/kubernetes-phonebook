@@ -45,7 +45,7 @@ resource "azurerm_virtual_machine" "virtual_machine" {
   delete_data_disks_on_termination = var.delete_data_disks_on_termination
 
   dynamic "identity" {
-    for_each = var.identity.enabled ? [1] : []
+    for_each = var.identity != null ? [1] : []
 
     content {
       type = var.identity.type
@@ -69,7 +69,7 @@ resource "azurerm_virtual_machine" "virtual_machine" {
   os_profile {
     computer_name  = var.name
     admin_username = var.os_profile.admin_username
-    custom_data    = file("${var.os_profile.custom_data}")
+    custom_data    = file(var.os_profile.custom_data)
   }
 
   os_profile_linux_config {
@@ -80,6 +80,15 @@ resource "azurerm_virtual_machine" "virtual_machine" {
       key_data = data.azurerm_ssh_public_key.ssh_public_key.public_key
     }
   }
+
+  dynamic "boot_diagnostics" {
+    for_each = var.boot_diagnostics != null ? [1] : []
+
+    content {
+      storage_uri = var.boot_diagnostics.storage_uri
+      enabled = true
+    }
+  }
 }
 
 data "azurerm_network_security_group" "network_security_group" {
@@ -88,7 +97,8 @@ data "azurerm_network_security_group" "network_security_group" {
 }
 
 resource "azurerm_network_interface_security_group_association" "nic_nsg_association" {
-  count                     = var.network_security_group_association.enabled ? 1 : 0
+  count = var.network_security_group_association != null ? 1 : 0
+
   network_interface_id      = azurerm_network_interface.network_interface.id
   network_security_group_id = data.azurerm_network_security_group.network_security_group.id
 }

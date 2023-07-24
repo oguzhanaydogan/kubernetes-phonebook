@@ -1,9 +1,8 @@
-variable "key_vault_name" {
-  type = string
-}
-
-variable "key_vault_resource_group_name" {
-  type = string
+variable "key_vault" {
+  type = object({
+    name                = string
+    resource_group_name = string
+  })
 }
 
 variable "key_permissions" {
@@ -14,6 +13,10 @@ variable "secret_permissions" {
   type = list(string)
 }
 
-variable "object_id" {
-  type = string // TODO: Hallet
+variable "object" {
+  type = object({
+    type = string
+    name = string
+  })
+  description = "Possible type values are 'security-group', 'service-principal', 'user'"
 }
