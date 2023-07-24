@@ -2,6 +2,8 @@ variable "bastion_hosts" {}
 
 variable "firewalls" {}
 
+variable "firewall_policies" {}
+
 variable "front_doors" {}
 
 variable "key_vault_access_policies" {}

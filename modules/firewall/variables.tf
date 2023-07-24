@@ -18,6 +18,14 @@ variable "sku_tier" {
   type = string
 }
 
+variable "firewall_policy" {
+  default = {}
+  type = object({
+    name = string
+    resource_group_name = string
+  })
+}
+
 variable "virtual_hub" {
   default = {}
   type = object({

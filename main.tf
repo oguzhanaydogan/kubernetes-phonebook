@@ -129,26 +129,39 @@ module "bastion_hosts" {
   ]
 }
 
-# module "firewalls" {
-#   source   = "./modules/firewall"
-#   for_each = var.firewalls
+module "firewalls" {
+  source   = "./modules/firewall"
+  for_each = var.firewalls
 
-#   name                        = each.value.name
-#   resource_group_name = each.value.resource_group_name
-#   location            = each.value.location
-#   sku_name                    = each.value.sku_name
-#   sku_tier                    = each.value.sku_tier
-#   virtual_hub = try(each.value.virtual_hub, null)
-#   ip_configuration            = try(each.value.ip_configuration, null)
-#   management_ip_configuration = try(each.value.management_ip_configuration, null)
-#   firewall_network_rule_collections = try(each.value.firewall_network_rule_collections, null)
-#
-#   depends_on = [
-#     module.virtual_networks,
-#     module.public_ip_addresses,
-#     module.virtual_wans
-#   ]
-# }
+  name                        = each.value.name
+  resource_group_name = each.value.resource_group_name
+  location            = each.value.location
+  sku_name                    = each.value.sku_name
+  sku_tier                    = each.value.sku_tier
+  firewall_policy = try(each.value.fireall_policy, null)
+  virtual_hub = try(each.value.virtual_hub, null)
+  ip_configuration            = try(each.value.ip_configuration, null)
+  management_ip_configuration = try(each.value.management_ip_configuration, null)
+  firewall_network_rule_collections = try(each.value.firewall_network_rule_collections, null)
+
+  depends_on = [
+    module.virtual_networks,
+    module.public_ip_addresses,
+    module.virtual_wans
+  ]
+}
+
+module "firewall_policies" {
+  source = "./modules/firewall_policy"
+  for_each = var.firewall_policies
+
+  name = each.value.name
+  resource_group_name = each.value.resource_group_name
+  location            = each.value.location
+  rule_collection_groups = each.value.rule_collection_groups
+
+  depends_on = [ module.resource_groups ]
+}
 
 module "front_doors" {
   source   = "./modules/front_door"
@@ -188,9 +201,7 @@ module "key_vault_secrets" {
   key_vault_name                = each.value.key_vault_name
   key_vault_resource_group_name = each.value.key_vault_resource_group_name
 
-  depends_on = [
-    module.key_vault_access_policies
-  ]
+  depends_on = [ module.key_vault_access_policies ]
 }
 
 module "kubernetes_clusters" {
@@ -209,9 +220,7 @@ module "kubernetes_clusters" {
   ingress_application_gateway   = each.value.ingress_application_gateway
   network_profile               = each.value.network_profile
 
-  depends_on = [
-    module.virtual_networks
-  ]
+  depends_on = [ module.virtual_networks ]
 }
 
 module "linux_virtual_machines" {
@@ -280,9 +289,7 @@ module "load_balancers" {
   lb_rules                   = each.value.lb_rules
   private_link_service       = try(each.value.private_link_service)
 
-  depends_on = [
-    module.virtual_networks
-  ]
+  depends_on = [ module.virtual_networks ]
 }
 
 module "mssql_servers" {
@@ -309,9 +316,7 @@ module "network_security_groups" {
   location            = each.value.location
   security_rules      = try(each.value.security_rules, null)
 
-  depends_on = [
-    module.resource_groups
-  ]
+  depends_on = [ module.resource_groups ]
 }
 
 module "private_dns_zones" {
@@ -322,9 +327,7 @@ module "private_dns_zones" {
   resource_group_name   = each.value.resource_group_name
   virtual_network_links = each.value.virtual_network_links
 
-  depends_on = [
-    module.virtual_networks
-  ]
+  depends_on = [ module.virtual_networks ]
 }
 
 module "private_endpoints" {
@@ -355,9 +358,7 @@ module "public_ip_addresses" {
   allocation_method   = each.value.allocation_method
   sku                 = each.value.sku
 
-  depends_on = [
-    module.resource_groups
-  ]
+  depends_on = [ module.resource_groups ]
 }
 
 module "resource_groups" {
@@ -378,9 +379,7 @@ module "route_tables" {
   routes              = each.value.routes
   subnet_associations = each.value.subnet_associations
 
-  depends_on = [
-    module.virtual_networks
-  ]
+  depends_on = [ module.virtual_networks ]
 }
 
 module "virtual_networks" {
@@ -393,9 +392,7 @@ module "virtual_networks" {
   address_space       = each.value.address_space
   subnets             = try(each.value.subnets, null)
 
-  depends_on = [
-    module.resource_groups
-  ]
+  depends_on = [ module.resource_groups ]
 }
 
 module "virtual_network_peerings" {
@@ -408,9 +405,7 @@ module "virtual_network_peerings" {
   remote_virtual_network  = each.value.remote_virtual_network
   allow_forwarded_traffic = each.value.allow_forwarded_traffic
 
-  depends_on = [
-    module.virtual_networks
-  ]
+  depends_on = [ module.virtual_networks ]
 }
 
 module "virtual_wans" {
@@ -422,7 +417,5 @@ module "virtual_wans" {
   location            = each.value.location
   virtual_hubs        = try(each.value.virtual_hubs, null)
 
-  depends_on = [
-    module.virtual_networks
-  ]
+  depends_on = [ module.virtual_networks ]
 }

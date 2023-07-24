@@ -1,46 +1,67 @@
-# https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/firewall_policy
-# https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/firewall_policy_rule_collection_group
-
-
 data "azurerm_subnet" "subnet_firewall" {
+  count = var.ip_configuration != null ? 1 : 0
+
   name                 = var.ip_configuration.subnet.name
   virtual_network_name = var.ip_configuration.subnet.virtual_network_name
   resource_group_name  = var.ip_configuration.subnet.resource_group_name
 }
 
 data "azurerm_subnet" "subnet_firewall_management" {
+  count = var.management_ip_configuration != null ? 1 : 0
+
   name                 = "AzureFirewallManagementSubnet"
   virtual_network_name = var.management_ip_configuration.subnet.virtual_network_name
   resource_group_name  = var.management_ip_configuration.subnet.resource_group_name
 }
 
 data "azurerm_virtual_hub" "virtual_hub" {
+  count = var.virtual_hub != null ? 1 : 0
+
   name                = var.virtual_hub.name
   resource_group_name = var.virtual_hub.resource_group_name
 }
 
 data "azurerm_public_ip" "public_ip_firewall_management" {
+  count = var.management_ip_configuration != null ? 1 : 0
+
   name                = var.management_ip_configuration.public_ip_address.name
   resource_group_name = var.management_ip_configuration.public_ip_address.resource_group_name
 }
 
+data "azurerm_firewall_policy" "firewall_policy" {
+  count = var.firewall_policy != null ? 1 : 0
+
+  name = var.firewall_policy.name
+  resource_group_name = var.firewall_policy.resource_group_name
+}
+
 resource "azurerm_firewall" "firewall" {
   name                = var.name
-  location            = var.location
   resource_group_name = var.resource_group_name
+  location            = var.location
   sku_name            = var.sku_name
   sku_tier            = var.sku_tier
-  virtual_hub {
-    virtual_hub_id = data.azurerm_virtual_hub.virtual_hub.id
+  firewall_policy_id = try(data.azurerm_firewall_policy.firewall_policy.id, null)
+
+  dynamic "virtual_hub" {
+    count = var.virtual_hub != null ? 1 : 0
+
+    content {
+     virtual_hub_id = data.azurerm_virtual_hub.virtual_hub.id
+    }
   }
 
-  ip_configuration {
-    name      = var.ip_configuration.name
-    subnet_id = data.azurerm_subnet.subnet_firewall.id
+  dynamic "ip_configuration" {
+    count = var.ip_configuration != null ? 1 : 0
+
+    content {
+      name      = var.ip_configuration.name
+      subnet_id = data.azurerm_subnet.subnet_firewall.id
+    }
   }
 
   dynamic "management_ip_configuration" {
-    for_each = var.management_ip_configuration.enabled ? [1] : []
+    count = var.management_ip_configuration != null ? 1 : 0
 
     content {
       name                 = var.management_ip_configuration.name

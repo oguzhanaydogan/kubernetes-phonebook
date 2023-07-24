@@ -25,6 +25,10 @@ firewalls = {
     location            = "East Us"
     sku_name            = "AZFW_Hub"
     sku_tier            = "Basic"
+    firewall_policy = {
+      name                = "fwp-project102-prod-eastus-001"
+      resource_group_name = "rg-project102-prod-eastus-001"
+    }
     virtual_hub = {
       name                = "vwanvh-project102-prod-eastus-001"
       resource_group_name = "rg-project102-prod-eastus-001"
@@ -36,9 +40,6 @@ firewalls = {
         virtual_network_name = "vnet-project102-prod-eastus-005"
         resource_group_name  = "rg-project102-prod-eastus-001"
       }
-    }
-    management_ip_configuration = {
-      enabled = false
     }
     firewall_network_rule_collections = {
       fwnrc_project102_prod_eastus_001 = {
@@ -52,6 +53,37 @@ firewalls = {
             destination_ports     = ["*"]
             destination_addresses = ["0.0.0.0/0"]
             protocols             = ["Any"]
+          }
+        }
+      }
+    }
+  }
+}
+
+firewall_policies = {
+  fwp_project102_prod_eastus_001 = {
+    name = "fwp-project102-prod-eastus-001"
+    resource_group_name = "rg-project102-prod-eastus-001"
+    location = "East US"
+
+    rule_collection_groups = {
+      fwp_project102_prod_eastus_001 = {
+        name = "fwp-project102-prod-eastus-001"
+        priority = 100
+        network_rule_collections = {
+          network_rule_collection_1 = {
+            name     = "network-rule-collection-1"
+            priority = 100
+            action   = "Allow"
+            rules = {
+              network_rule_collection_1_rule_1 = { // TODO: Asagisi yanlis
+                name                  = "network-rule-collection-1-rule-1"
+                protocols             = ["TCP", "UDP"]
+                source_addresses      = ["10.0.0.1"]
+                destination_addresses = ["192.168.1.1", "192.168.1.2"]
+                destination_ports     = ["80", "1000-2000"]
+              }
+            }
           }
         }
       }
