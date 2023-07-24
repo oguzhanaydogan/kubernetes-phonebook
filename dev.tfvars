@@ -448,7 +448,7 @@ mssql_servers = {
         key_vault = {
           name                = "coyvault"
           resource_group_name = "ssh-key"
-          secret_name         = "kvs-project102-prod-global-001"
+          secret_name         = "MSSQLADMIN"
         }
       }
       password = {
@@ -456,7 +456,7 @@ mssql_servers = {
         key_vault = {
           name                = "coyvault"
           resource_group_name = "ssh-key"
-          secret_name         = "kvs-project102-prod-global-002"
+          secret_name         = "MSSQLPASSWORD"
         }
       }
     }
@@ -488,7 +488,7 @@ mssql_servers = {
         key_vault = {
           name                = "coyvault"
           resource_group_name = "ssh-key"
-          secret_name         = "kvs-project102-prod-global-001"
+          secret_name         = "MSSQLADMIN"
         }
       }
       password = {
@@ -496,7 +496,7 @@ mssql_servers = {
         key_vault = {
           name                = "coyvault"
           resource_group_name = "ssh-key"
-          secret_name         = "kvs-project102-prod-global-002"
+          secret_name         = "MSSQLPASSWORD"
         }
       }
     }
