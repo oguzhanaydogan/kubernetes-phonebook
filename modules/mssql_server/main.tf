@@ -89,3 +89,23 @@ resource "azapi_resource" "sync_groups" {
     }
   })
 }
+
+resource "azapi_resource" "symbolicname" {
+  type = "Microsoft.Sql/servers/databases/syncGroups/syncMembers@2022-05-01-preview"
+  name = "string"
+  parent_id = "string"
+  body = jsonencode({
+    properties = {
+      databaseName = "string"
+      databaseType = "string"
+      password = "string"
+      serverName = "string"
+      sqlServerDatabaseId = "string"
+      syncAgentId = "string"
+      syncDirection = "string"
+      syncMemberAzureDatabaseResourceId = "string"
+      usePrivateLinkConnection = bool
+      userName = "string"
+    }
+  })
+}
