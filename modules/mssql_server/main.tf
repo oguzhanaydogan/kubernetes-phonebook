@@ -45,6 +45,39 @@ locals {
   sync_groups = {
     for sync_group in sync_groups_flattened : "${sync_group.database}_${sync_group.name}" => sync_group
   }
+
+  sync_group_memberships_servers = {
+    for k, v in var.mssql_databases: k => {
+      for key, value in v.sync_group_memberships : key => value.sync_group.server
+    }
+  }
+  sync_group_memberships_servers_flattened = flatten([
+    for k, v in var.mssql_databases : [
+      for x, y in v.sync_group_memberships : y.sync_group.server
+    ]
+  ])
+  sync_group_membership_servers = {
+    for v in toset(local.sync_group_memberships_servers_flattened) : v.name => v
+  }
+  sync_group_memberships_databases_flattened = flatten([
+    for k, v in var.mssql_databases : [
+      for x, y in v.sync_group_memberships : merge(y.sync_group.database, {server_name = y.sync_group.server.name})
+    ]
+  ])
+  sync_group_membership_databases = {
+    for v in toset(local.sync_group_memberships_databases_flattened) : v.name => v
+  }
+  sync_group_membership_sync_groups_flattened= {
+
+  }
+  sync_group_memberships_flattened = flatten([
+    for k, database in var.mssql_databases : [
+      for key, sync_group_membership in database.sync_group_memberships : merge({database = k}, sync_group_membership)
+    ]
+  ])
+  sync_group_memberships = {
+    for sync_group_membership in sync_group_memberships_flattened : "${sync_group_membership.database}_${sync_group_membership.name}" => sync_group_membership
+  }
 }
 
 resource "azurerm_mssql_server" "mssql_server" {
@@ -76,7 +109,7 @@ resource "azapi_resource" "sync_groups" {
   for_each = local.sync_groups
 
   name      = each.value.name
-  type      = each.value.type
+  type      = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
   parent_id = azurerm_mssql_database.mssql_database[each.value.database].id
   body      = jsonencode({
     properties = {
@@ -90,10 +123,35 @@ resource "azapi_resource" "sync_groups" {
   })
 }
 
-resource "azapi_resource" "symbolicname" {
-  type = "Microsoft.Sql/servers/databases/syncGroups/syncMembers@2022-05-01-preview"
+data "azurerm_mssql_server" "example" {
+  for_each = local.sync_group_memberships_servers
+  
+  name                = "existingMsSqlServer"
+  resource_group_name = "existingResGroup"
+}
+
+data "azurerm_sql_database" "example" {
+  for_each = local.sync_group_membership_databases
+
+  name                = "example_db"
+  server_name         = "example_db_server"
+  resource_group_name = "example-resources"
+}
+
+data "azapi_resource" "membership_sync_groups" {
+  for_each = local.membership_sync_groups
+  
+  type = "Microsoft.Network/loadBalancers/probes@2023-02-01"
   name = "string"
   parent_id = "string"
+}
+
+resource "azapi_resource" "sync_group_memberships" {
+  for_each = local.sync_group_memberships
+
+  type = "Microsoft.Sql/servers/databases/syncGroups/syncMembers@2022-05-01-preview"
+  name = each.value.name
+  parent_id = data.azapi_resources.sync_group.id
   body = jsonencode({
     properties = {
       databaseName = "string"
