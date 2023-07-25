@@ -273,17 +273,31 @@ module "load_balancers" {
   depends_on = [module.virtual_networks]
 }
 
-module "mssql_servers" {
+module "sql_project102_prod_eastus_001" {
   source   = "./modules/mssql_server"
-  for_each = var.mssql_servers
 
-  name                = each.value.name
-  resource_group_name = each.value.resource_group_name
-  location            = each.value.location
-  msqql_version       = each.value.version
-  administrator_login = each.value.administrator_login
-  tags                = each.value.tags
-  mssql_databases     = each.value.mssql_databases
+  name                = var.sql_project102_prod_eastus_001.name
+  resource_group_name = var.sql_project102_prod_eastus_001.resource_group_name
+  location            = var.sql_project102_prod_eastus_001.location
+  msqql_version       = var.sql_project102_prod_eastus_001.version
+  administrator_login = var.sql_project102_prod_eastus_001.administrator_login
+  tags                = var.sql_project102_prod_eastus_001.tags
+  mssql_databases     = var.sql_project102_prod_eastus_001.mssql_databases
+
+  depends_on = [module.key_vault_access_policies]
+}
+
+module "sql_project102_prod_westeurope_001" {
+  source   = "./modules/mssql_server"
+
+  name                = var.sql_project102_prod_westeurope_001.name
+  resource_group_name = var.sql_project102_prod_westeurope_001.resource_group_name
+  location            = var.sql_project102_prod_westeurope_001.location
+  msqql_version       = var.sql_project102_prod_westeurope_001.version
+  administrator_login = var.sql_project102_prod_westeurope_001.administrator_login
+  tags                = var.sql_project102_prod_westeurope_001.tags
+  mssql_databases     = var.sql_project102_prod_westeurope_001.mssql_databases
+  
 
   depends_on = [module.key_vault_access_policies]
 }
