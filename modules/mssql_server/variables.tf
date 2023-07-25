@@ -70,7 +70,6 @@ variable "mssql_databases" {
         })
         database = object({
           name                = string
-          resource_group_name = string
         })
       })
       own_database_type        = string

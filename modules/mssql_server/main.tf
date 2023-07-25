@@ -142,8 +142,7 @@ data "azurerm_mssql_database" "sync_group_memberships_databases" {
   for_each = local.sync_group_memberships_databases
 
   name                = each.value.name
-  server_name         = each.value.server_name
-  resource_group_name = each.value.resource_group_name
+  server_id           = data.azurerm_mssql_server.sync_group_memberships_servers[each.value.server_name].id
 }
 
 data "azapi_resource" "sync_group_memberships_sync_groups" {
@@ -169,9 +168,9 @@ resource "azapi_resource" "sync_group_memberships_memberships" {
       password                          = local.administrator_login_password
       syncMemberAzureDatabaseResourceId = azurerm_mssql_database.mssql_database[join("_", split("-", each.value.database))].id
       usePrivateLinkConnection          = each.value.usePrivateLinkConnection
-      # Hub info
-      serverName          = data.azurerm_mssql_server.sync_group_memberships_servers["${each.value.sync_group.server.name}"].fully_qualified_domain_name
+      serverName          = azurerm_mssql_server.mssql_server.fully_qualified_domain_name
       sqlServerDatabaseId = data.azurerm_mssql_database.sync_group_memberships_databases["${each.value.sync_group.server.name}_${each.value.sync_group.database.name}"].id
+      # Hub info
       syncAgentId         = data.azurerm_mssql_database.sync_group_memberships_databases["${each.value.sync_group.server.name}_${each.value.sync_group.database.name}"].id
       syncDirection       = "Bidirectional"
     }

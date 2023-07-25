@@ -692,7 +692,6 @@ sql_project102_prod_westeurope_001 = {
             }
             database = {
               name                = "phonebook"
-              resource_group_name = "rg-project102-prod-eastus-001"
             }
           }
           own_database_type        = "AzureSqlDatabase"
