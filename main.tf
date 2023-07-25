@@ -22,42 +22,6 @@ provider "azurerm" {
   }
 }
 
-# module "arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu" {
-#   source              = "./modules/arm_template_deployment"
-#   name                = "create-phonebook-sync-group-member-phonebook-eu"
-#   resource_group_name = module.resource_groups["rg_eastus"].name
-#   deployment_mode     = "Incremental"
-#   template_content    = <<TEMPLATE
-#   {
-#     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-#     "contentVersion": "1.0.0.0",
-#     "parameters": null,
-#     "variables": null,
-#     "resources": [
-#       {
-#         "type": "Microsoft.Sql/servers/databases/syncGroups/syncMembers",
-#         "apiVersion": "2022-05-01-preview",
-#         "name": "coyhub-db-us/phonebook/phonebook-sync-group/coyhub-db-eu",
-#         "properties": {
-#           "databaseName": "phonebook",
-#           "databaseType": "AzureSqlDatabase",
-#           "userName": "azureuser",
-#           "password": "Test1234.",
-#           "serverName": "coyhub-db-eu.database.windows.net",
-#           "syncDirection": "Bidirectional",
-#           "syncMemberAzureDatabaseResourceId": "${module.mssql_databases["phonebook_eu"].id}",
-#           "usePrivateLinkConnection": false
-#         }
-#       }
-#     ]
-#   }
-#   TEMPLATE
-#
-# depends_on = [
-#   module.azapi_create_phonebook_sync_group
-# ]
-# }
-
 # module "azapi_update_phonebook_sync_group" {
 #   source      = "./modules/azapi_update_resource"
 #   type        = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
@@ -138,7 +102,7 @@ module "firewall_policies" {
   name                   = each.value.name
   resource_group_name    = each.value.resource_group_name
   location               = each.value.location
-  sku = each.value.sku
+  sku                    = each.value.sku
   rule_collection_groups = each.value.rule_collection_groups
 
   depends_on = [module.resource_groups]
@@ -201,7 +165,7 @@ module "kubernetes_clusters" {
   ingress_application_gateway   = each.value.ingress_application_gateway
   network_profile               = each.value.network_profile
 
-  depends_on = [ module.virtual_networks ]
+  depends_on = [module.virtual_networks]
 }
 
 module "linux_virtual_machines" {
@@ -273,35 +237,6 @@ module "load_balancers" {
   depends_on = [module.virtual_networks]
 }
 
-module "sql_project102_prod_eastus_001" {
-  source   = "./modules/mssql_server"
-
-  name                = var.sql_project102_prod_eastus_001.name
-  resource_group_name = var.sql_project102_prod_eastus_001.resource_group_name
-  location            = var.sql_project102_prod_eastus_001.location
-  msqql_version       = var.sql_project102_prod_eastus_001.version
-  administrator_login = var.sql_project102_prod_eastus_001.administrator_login
-  tags                = var.sql_project102_prod_eastus_001.tags
-  mssql_databases     = var.sql_project102_prod_eastus_001.mssql_databases
-
-  depends_on = [module.key_vault_access_policies]
-}
-
-module "sql_project102_prod_westeurope_001" {
-  source   = "./modules/mssql_server"
-
-  name                = var.sql_project102_prod_westeurope_001.name
-  resource_group_name = var.sql_project102_prod_westeurope_001.resource_group_name
-  location            = var.sql_project102_prod_westeurope_001.location
-  msqql_version       = var.sql_project102_prod_westeurope_001.version
-  administrator_login = var.sql_project102_prod_westeurope_001.administrator_login
-  tags                = var.sql_project102_prod_westeurope_001.tags
-  mssql_databases     = var.sql_project102_prod_westeurope_001.mssql_databases
-  
-
-  depends_on = [module.key_vault_access_policies]
-}
-
 module "network_security_groups" {
   source   = "./modules/network_security_group"
   for_each = var.network_security_groups
@@ -339,7 +274,8 @@ module "private_endpoints" {
 
   depends_on = [
     module.private_dns_zones,
-    module.mssql_servers
+    module.sql_project102_prod_eastus_001,
+    module.sql_project102_prod_westeurope_001
   ]
 }
 
@@ -375,6 +311,37 @@ module "route_tables" {
   subnet_associations = each.value.subnet_associations
 
   depends_on = [module.virtual_networks]
+}
+
+module "sql_project102_prod_eastus_001" {
+  source = "./modules/mssql_server"
+
+  name                = var.sql_project102_prod_eastus_001.name
+  resource_group_name = var.sql_project102_prod_eastus_001.resource_group_name
+  location            = var.sql_project102_prod_eastus_001.location
+  msqql_version       = var.sql_project102_prod_eastus_001.version
+  administrator_login = var.sql_project102_prod_eastus_001.administrator_login
+  tags                = var.sql_project102_prod_eastus_001.tags
+  mssql_databases     = var.sql_project102_prod_eastus_001.mssql_databases
+
+  depends_on = [module.key_vault_secrets]
+}
+
+module "sql_project102_prod_westeurope_001" {
+  source = "./modules/mssql_server"
+
+  name                = var.sql_project102_prod_westeurope_001.name
+  resource_group_name = var.sql_project102_prod_westeurope_001.resource_group_name
+  location            = var.sql_project102_prod_westeurope_001.location
+  msqql_version       = var.sql_project102_prod_westeurope_001.version
+  administrator_login = var.sql_project102_prod_westeurope_001.administrator_login
+  tags                = var.sql_project102_prod_westeurope_001.tags
+  mssql_databases     = var.sql_project102_prod_westeurope_001.mssql_databases
+
+  depends_on = [
+    module.key_vault_secrets,
+    module.sql_project102_prod_eastus_001
+  ]
 }
 
 module "virtual_networks" {

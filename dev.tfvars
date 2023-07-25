@@ -41,7 +41,7 @@ firewall_policies = {
     name                = "fwp-project102-prod-eastus-001"
     resource_group_name = "rg-project102-prod-eastus-001"
     location            = "East US"
-    sku = "Basic"
+    sku                 = "Basic"
 
     rule_collection_groups = {
       fwp_project102_prod_eastus_001 = {
@@ -413,115 +413,6 @@ load_balancers = {
   }
 }
 
-
-sql_project102_prod_eastus_001 = {
-  name                = "sql-project102-prod-eastus-001"
-  resource_group_name = "rg-project102-prod-eastus-001"
-  location            = "East US"
-  version             = "12.0"
-  administrator_login = {
-    username = {
-      source = "key_vault"
-      key_vault = {
-        name                = "coyvault"
-        resource_group_name = "ssh-key"
-        secret_name         = "MSSQLADMIN"
-      }
-    }
-    password = {
-      source = "key_vault"
-      key_vault = {
-        name                = "coyvault"
-        resource_group_name = "ssh-key"
-        secret_name         = "MSSQLPASSWORD"
-      }
-    }
-  }
-  tags = {
-    name = "sql-project102-prod-eastus-001"
-  }
-  mssql_databases = {
-    sqldb-project102-prod-eastus-001 = {
-      name                        = "phonebook"
-      collation                   = "SQL_Latin1_General_CP1_CI_AS"
-      max_size_gb                 = 32
-      sku_name                    = "GP_S_Gen5_1"
-      min_capacity                = 0.5
-      auto_pause_delay_in_minutes = 60
-      read_replica_count          = 0
-      read_scale                  = false
-      zone_redundant              = false
-      sync_groups = {
-        sqldbsg_project102_prod_global_001 = { # create_sql_db_sync_group
-          name = "sqldbsg-project102-prod-eastus-001"
-          conflictResolutionPolicy = "HubWin"
-          interval                 = 60
-          usePrivateLinkConnection = false
-        }
-      }
-    }
-  }
-}
-
-sql_project102_prod_westeurope_001 = {
-  name                = "sql-project102-prod-westeurope-001"
-  resource_group_name = "rg-project102-prod-westeurope-001"
-  location            = "West Europe"
-  version             = "12.0"
-  administrator_login = {
-    username = {
-      source = "key_vault"
-      key_vault = {
-        name                = "coyvault"
-        resource_group_name = "ssh-key"
-        secret_name         = "MSSQLADMIN"
-      }
-    }
-    password = {
-      source = "key_vault"
-      key_vault = {
-        name                = "coyvault"
-        resource_group_name = "ssh-key"
-        secret_name         = "MSSQLPASSWORD"
-      }
-    }
-  }
-  tags = {
-    name = "sql-project102-prod-westeurope-001"
-  }
-  mssql_databases = {
-    sqldb_project102_prod_westeurope_001 = {
-      name                        = "phonebook"
-      collation                   = "SQL_Latin1_General_CP1_CI_AS"
-      max_size_gb                 = 32
-      sku_name                    = "GP_S_Gen5_1"
-      min_capacity                = 0.5
-      auto_pause_delay_in_minutes = 60
-      read_replica_count          = 0
-      read_scale                  = false
-      zone_redundant              = false
-      sync_group_memberships      = {
-        membership_01 ={
-          name = 
-          sync_group = { 
-            name = 
-            server = {
-              name =
-              resource_group_name = 
-            }
-            database = {
-              name = 
-              resource_group_name = 
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-
-
 network_security_groups = {
   nsg_project102_prod_eastus_001 = { # ssh
     name                = "nsg-project102-prod-eastus-001"
@@ -703,6 +594,114 @@ resource_groups = {
 }
 
 route_tables = {}
+
+sql_project102_prod_eastus_001 = {
+  name                = "sql-project102-prod-eastus-001"
+  resource_group_name = "rg-project102-prod-eastus-001"
+  location            = "East US"
+  version             = "12.0"
+  administrator_login = {
+    username = {
+      source = "key_vault"
+      key_vault = {
+        name                = "coyvault"
+        resource_group_name = "ssh-key"
+        secret_name         = "MSSQLADMIN"
+      }
+    }
+    password = {
+      source = "key_vault"
+      key_vault = {
+        name                = "coyvault"
+        resource_group_name = "ssh-key"
+        secret_name         = "MSSQLPASSWORD"
+      }
+    }
+  }
+  tags = {
+    name = "sql-project102-prod-eastus-001"
+  }
+  mssql_databases = {
+    sqldb_project102_prod_eastus_001 = {
+      name                        = "phonebook"
+      collation                   = "SQL_Latin1_General_CP1_CI_AS"
+      max_size_gb                 = 32
+      sku_name                    = "GP_S_Gen5_1"
+      min_capacity                = 0.5
+      auto_pause_delay_in_minutes = 60
+      read_replica_count          = 0
+      read_scale                  = false
+      zone_redundant              = false
+      sync_groups = {
+        sqldbsg_project102_prod_global_001 = { # create_sql_db_sync_group
+          name                     = "sqldbsg-project102-prod-eastus-001"
+          conflictResolutionPolicy = "HubWin"
+          interval                 = 60
+          usePrivateLinkConnection = false
+        }
+      }
+    }
+  }
+}
+
+sql_project102_prod_westeurope_001 = {
+  name                = "sql-project102-prod-westeurope-001"
+  resource_group_name = "rg-project102-prod-westeurope-001"
+  location            = "West Europe"
+  version             = "12.0"
+  administrator_login = {
+    username = {
+      source = "key_vault"
+      key_vault = {
+        name                = "coyvault"
+        resource_group_name = "ssh-key"
+        secret_name         = "MSSQLADMIN"
+      }
+    }
+    password = {
+      source = "key_vault"
+      key_vault = {
+        name                = "coyvault"
+        resource_group_name = "ssh-key"
+        secret_name         = "MSSQLPASSWORD"
+      }
+    }
+  }
+  tags = {
+    name = "sql-project102-prod-westeurope-001"
+  }
+  mssql_databases = {
+    sqldb_project102_prod_westeurope_001 = {
+      name                        = "phonebook"
+      collation                   = "SQL_Latin1_General_CP1_CI_AS"
+      max_size_gb                 = 32
+      sku_name                    = "GP_S_Gen5_1"
+      min_capacity                = 0.5
+      auto_pause_delay_in_minutes = 60
+      read_replica_count          = 0
+      read_scale                  = false
+      zone_redundant              = false
+      sync_group_memberships = {
+        membership_01 = {
+          name = "sqldbsg-project102-prod-eastus-001-membership"
+          sync_group = {
+            name = "sqldbsg-project102-prod-eastus-001"
+            server = {
+              name                = "sql-project102-prod-eastus-001"
+              resource_group_name = "rg-project102-prod-eastus-001"
+            }
+            database = {
+              name                = "phonebook"
+              resource_group_name = "rg-project102-prod-eastus-001"
+            }
+          }
+          own_database_type        = "AzureSqlDatabase"
+          usePrivateLinkConnection = false
+        }
+      }
+    }
+  }
+}
 
 virtual_networks = {
   vnet_project102_prod_eastus_001 = { # app

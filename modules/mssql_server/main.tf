@@ -27,7 +27,7 @@ data "azurerm_key_vault_secret" "key_vault_secret_admin_password" {
 }
 
 locals {
-  administrator_login = coalesce(
+  administrator_login_username = coalesce(
     data.azurerm_key_vault_secret.key_vault_secret_admin_user[0].value,
     var.administrator_login.username.literal,
     "Coalesce could not find any input for admin user"
@@ -37,57 +37,65 @@ locals {
     var.administrator_login.password.literal,
     "Coalesce could not find any input for admin password"
   )
-  sync_groups_flattened = flatten([
-    for k, database in var.mssql_databases : [
-      for key, sync_group in database.sync_groups : merge({database = k}, sync_group)
+  # Since we don't have the calling database (the one above) name anymore, we need to inject it into the object.
+  owned_sync_groups_flattened = flatten([
+    for key, database in var.mssql_databases : [
+      for k, group in database.sync_groups : merge({ "database" = key }, group)
     ]
   ])
-  sync_groups = {
-    for sync_group in sync_groups_flattened : "${sync_group.database}_${sync_group.name}" => sync_group
-  }
-
-  sync_group_memberships_servers = {
-    for k, v in var.mssql_databases: k => {
-      for key, value in v.sync_group_memberships : key => value.sync_group.server
-    }
+  # Two databases can have syhnc groups with the same names. To distinguish between these, we can use interpolation.
+  owned_sync_groups = {
+    for group in local.owned_sync_groups_flattened : "${group.database}_${group.name}" => group
   }
   sync_group_memberships_servers_flattened = flatten([
-    for k, v in var.mssql_databases : [
-      for x, y in v.sync_group_memberships : y.sync_group.server
+    for key, database in var.mssql_databases : [
+      for k, group in database.sync_group_memberships : group.sync_group.server
     ]
   ])
-  sync_group_membership_servers = {
-    for v in toset(local.sync_group_memberships_servers_flattened) : v.name => v
+  # For above list can contain duplicates, we need to use toset function.
+  sync_group_memberships_servers = {
+    for server in toset(local.sync_group_memberships_servers_flattened) : server.name => server
   }
+  # Since we don't have the calling server (the one above) name anymore, we need to inject it into the object.
   sync_group_memberships_databases_flattened = flatten([
-    for k, v in var.mssql_databases : [
-      for x, y in v.sync_group_memberships : merge(y.sync_group.database, {server_name = y.sync_group.server.name})
+    for key, database in var.mssql_databases : [
+      for k, membership in database.sync_group_memberships : merge(membership.sync_group.database, { server_name = membership.sync_group.server.name })
     ]
   ])
-  sync_group_membership_databases = {
-    for v in toset(local.sync_group_memberships_databases_flattened) : v.name => v
+  # For above list can contain duplicates, we need to use toset function.
+  sync_group_memberships_databases = {
+    for database in toset(local.sync_group_memberships_databases_flattened) : "${database.server_name}_${database.name}" => database
   }
-  sync_group_membership_sync_groups_flattened= {
-
-  }
-  sync_group_memberships_flattened = flatten([
-    for k, database in var.mssql_databases : [
-      for key, sync_group_membership in database.sync_group_memberships : merge({database = k}, sync_group_membership)
+  # Since we don't have the calling database and server (the ones above) names anymore, we need to inject them into the object.
+  sync_group_memberships_sync_groups_flattened = flatten([
+    for key, database in var.mssql_databases : [
+      for k, membership in database.sync_group_memberships : merge(membership.sync_group, { server_name = membership.sync_group.server.name, database_name = membership.sync_group.database.name })
     ]
   ])
-  sync_group_memberships = {
-    for sync_group_membership in sync_group_memberships_flattened : "${sync_group_membership.database}_${sync_group_membership.name}" => sync_group_membership
+  # For above list can contain duplicates, we need to use toset function.
+  sync_group_memberships_sync_groups = {
+    for group in toset(local.sync_group_memberships_sync_groups_flattened) : "${group.server_name}_${group.database_name}_${group.name}" => group
+  }
+  # Since we don't have the calling database (the one above) name anymore, we need to inject it into the object.
+  sync_group_memberships_memberships_flattened = flatten([
+    for key, database in var.mssql_databases : [
+      for k, membership in database.sync_group_memberships : merge({ "database" = key }, membership)
+    ]
+  ])
+  # Two databases can have memberships with the same names. To distinguish between these, we can use interpolation.
+  sync_group_memberships_memberships = {
+    for membership in local.sync_group_memberships_memberships_flattened : "${membership.database}_${membership.name}" => membership
   }
 }
 
 resource "azurerm_mssql_server" "mssql_server" {
-  name                = var.name
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  version             = var.msqql_version
-  administrator_login = local.administrator_login
+  name                         = var.name
+  resource_group_name          = var.resource_group_name
+  location                     = var.location
+  version                      = var.msqql_version
+  administrator_login          = local.administrator_login_username
   administrator_login_password = local.administrator_login_password
-  tags = var.tags
+  tags                         = var.tags
 }
 
 resource "azurerm_mssql_database" "mssql_database" {
@@ -105,17 +113,17 @@ resource "azurerm_mssql_database" "mssql_database" {
   zone_redundant              = each.value.zone_redundant
 }
 
-resource "azapi_resource" "sync_groups" {
-  for_each = local.sync_groups
+resource "azapi_resource" "owned_sync_groups" {
+  for_each = local.owned_sync_groups
 
   name      = each.value.name
   type      = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
   parent_id = azurerm_mssql_database.mssql_database[each.value.database].id
-  body      = jsonencode({
+  body = jsonencode({
     properties = {
       conflictResolutionPolicy = "${each.value.conflictResolutionPolicy}"
       hubDatabasePassword      = "${local.administrator_login_password}"
-      hubDatabaseUserName      = "${local.administrator_login}"
+      hubDatabaseUserName      = "${local.administrator_login_username}"
       interval                 = each.value.interval
       syncDatabaseId           = "${azurerm_mssql_database.mssql_database[each.value.database].id}"
       usePrivateLinkConnection = each.value.usePrivateLinkConnection
@@ -123,47 +131,49 @@ resource "azapi_resource" "sync_groups" {
   })
 }
 
-data "azurerm_mssql_server" "example" {
+data "azurerm_mssql_server" "sync_group_memberships_servers" {
   for_each = local.sync_group_memberships_servers
-  
-  name                = "existingMsSqlServer"
-  resource_group_name = "existingResGroup"
+
+  name                = each.value.name
+  resource_group_name = each.value.resource_group_name
 }
 
-data "azurerm_sql_database" "example" {
-  for_each = local.sync_group_membership_databases
+data "azurerm_mssql_database" "sync_group_memberships_databases" {
+  for_each = local.sync_group_memberships_databases
 
-  name                = "example_db"
-  server_name         = "example_db_server"
-  resource_group_name = "example-resources"
+  name                = each.value.name
+  server_name         = each.value.server_name
+  resource_group_name = each.value.resource_group_name
 }
 
-data "azapi_resource" "membership_sync_groups" {
-  for_each = local.membership_sync_groups
-  
-  type = "Microsoft.Network/loadBalancers/probes@2023-02-01"
-  name = "string"
-  parent_id = "string"
+data "azapi_resource" "sync_group_memberships_sync_groups" {
+  for_each = local.sync_group_memberships_sync_groups
+
+  type      = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
+  name      = each.value.name
+  parent_id = data.azurerm_mssql_database.sync_group_memberships_databases["${each.value.server.name}_${each.value.database.name}"].id
 }
 
-resource "azapi_resource" "sync_group_memberships" {
-  for_each = local.sync_group_memberships
+resource "azapi_resource" "sync_group_memberships_memberships" {
+  for_each = local.sync_group_memberships_memberships
 
-  type = "Microsoft.Sql/servers/databases/syncGroups/syncMembers@2022-05-01-preview"
-  name = each.value.name
-  parent_id = data.azapi_resources.sync_group.id
+  type      = "Microsoft.Sql/servers/databases/syncGroups/syncMembers@2022-05-01-preview"
+  name      = each.value.name
+  parent_id = data.azapi_resource.sync_group_memberships_sync_groups["${each.value.sync_group.server.name}_${each.value.sync_group.database.name}_${each.value.sync_group.name}"].id
   body = jsonencode({
     properties = {
-      databaseName = "string"
-      databaseType = "string"
-      password = "string"
-      serverName = "string"
-      sqlServerDatabaseId = "string"
-      syncAgentId = "string"
-      syncDirection = "string"
-      syncMemberAzureDatabaseResourceId = "string"
-      usePrivateLinkConnection = bool
-      userName = "string"
+      # Member info
+      databaseName                      = azurerm_mssql_database.mssql_database[join("_", split("-", each.value.database))].name
+      databaseType                      = each.value.own_database_type
+      userName                          = local.administrator_login_username
+      password                          = local.administrator_login_password
+      syncMemberAzureDatabaseResourceId = azurerm_mssql_database.mssql_database[join("_", split("-", each.value.database))].id
+      usePrivateLinkConnection          = each.value.usePrivateLinkConnection
+      # Hub info
+      serverName          = data.azurerm_mssql_server.sync_group_memberships_servers["${each.value.sync_group.server.name}"].fully_qualified_domain_name
+      sqlServerDatabaseId = data.azurerm_mssql_database.sync_group_memberships_databases["${each.value.sync_group.server.name}_${each.value.sync_group.database.name}"].id
+      syncAgentId         = data.azurerm_mssql_database.sync_group_memberships_databases["${each.value.sync_group.server.name}_${each.value.sync_group.database.name}"].id
+      syncDirection       = "Bidirectional"
     }
   })
 }

@@ -2,7 +2,7 @@ resource "azurerm_firewall_policy" "firewall_policy" {
   name                = var.name
   resource_group_name = var.resource_group_name
   location            = var.location
-  sku = var.sku
+  sku                 = var.sku
 }
 
 resource "azurerm_firewall_policy_rule_collection_group" "firewall_policy_rule_collection_group" {

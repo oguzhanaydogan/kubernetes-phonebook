@@ -43,7 +43,7 @@ variable "tags" {
 }
 
 variable "mssql_databases" {
-  default = {}
+  default = null
   type = map(object({
     name                        = string
     collation                   = string
@@ -54,12 +54,27 @@ variable "mssql_databases" {
     read_replica_count          = number
     read_scale                  = bool
     zone_redundant              = bool
-    sync_groups = optional({
-      name = string
-      type = string
+    sync_groups = optional(map(object({
+      name                     = string
       conflictResolutionPolicy = string
       interval                 = number
       usePrivateLinkConnection = bool
-    }, null)
+    })), {})
+    sync_group_memberships = optional(map(object({
+      name = string
+      sync_group = object({
+        name = string
+        server = object({
+          name                = string
+          resource_group_name = string
+        })
+        database = object({
+          name                = string
+          resource_group_name = string
+        })
+      })
+      own_database_type        = string
+      usePrivateLinkConnection = bool
+    })), {})
   }))
 }
