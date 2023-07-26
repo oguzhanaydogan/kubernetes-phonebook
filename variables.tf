@@ -60,4 +60,4 @@ variable "peer_project102_prod_global_003" {}
 
 variable "peer_project102_prod_global_004" {}
 
-variable "virtual_wans" {}
+variable "vwan_project102_prod_eastus_001" {}

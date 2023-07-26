@@ -31,8 +31,8 @@ module "bas_project102_prod_westeurope_001" {
   ip_configuration    = var.bas_project102_prod_westeurope_001.ip_configuration
 
   depends_on = [
-    module.virtual_networks,
-    module.public_ip_addresses
+    module.vmss_project102_prod_westeurope_001,
+    module.pip_project102_prod_westeurope_001
   ]
 }
 
@@ -48,9 +48,9 @@ module "fw_project102_prod_eastus_001" {
   virtual_hub                       = try(var.fw_project102_prod_eastus_001.virtual_hub, null)
 
   depends_on = [
-    module.virtual_networks,
+    module.vnet_project102_prod_eastus_001,
     module.fwp_project102_prod_eastus_001,
-    module.virtual_wans
+    module.vwan_project102_prod_eastus_001
   ]
 }
 
