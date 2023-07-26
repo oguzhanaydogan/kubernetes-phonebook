@@ -161,18 +161,17 @@ resource "azapi_resource" "sync_group_memberships_memberships" {
   parent_id = data.azapi_resource.sync_group_memberships_sync_groups["${each.value.sync_group.server.name}_${each.value.sync_group.database.name}_${each.value.sync_group.name}"].id
   body = jsonencode({
     properties = {
-      # Member info
-      databaseName                      = azurerm_mssql_database.mssql_database[join("_", split("-", each.value.database))].name
+      # Below info is all about member
+      databaseName                      = each.value.database
       databaseType                      = each.value.own_database_type
       userName                          = local.administrator_login_username
       password                          = local.administrator_login_password
       syncMemberAzureDatabaseResourceId = azurerm_mssql_database.mssql_database[join("_", split("-", each.value.database))].id
       usePrivateLinkConnection          = each.value.usePrivateLinkConnection
       serverName          = azurerm_mssql_server.mssql_server.fully_qualified_domain_name
-      sqlServerDatabaseId = data.azurerm_mssql_database.sync_group_memberships_databases["${each.value.sync_group.server.name}_${each.value.sync_group.database.name}"].id
-      # Hub info
-      syncAgentId         = data.azurerm_mssql_database.sync_group_memberships_databases["${each.value.sync_group.server.name}_${each.value.sync_group.database.name}"].id
       syncDirection       = "Bidirectional"
+      # Sync group hub
+      syncAgentId         = data.azurerm_mssql_database.sync_group_memberships_databases["${each.value.sync_group.server.name}_${each.value.sync_group.database.name}"].id // TODO: Try removing this line
     }
   })
 }

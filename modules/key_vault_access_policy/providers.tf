@@ -6,7 +6,3 @@ terraform {
     }
   }
 }
-
-provider "azuread" {
-  # Configuration options
-}

@@ -22,49 +22,13 @@ provider "azurerm" {
   }
 }
 
-# module "azapi_update_phonebook_sync_group" {
-#   source      = "./modules/azapi_update_resource"
-#   type        = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
-#   resource_id = "/subscriptions/14528ad0-4c9e-48a9-8ed0-111c1034b033/resourceGroups/rg-eastus/providers/Microsoft.Sql/servers/coyhub-db-us/databases/phonebook/syncGroups/phonebook-sync-group"
-#   body = {
-#     properties = {
-#       schema = {
-#         masterSyncMemberName = "phonebook"
-#         tables = [
-#           {
-#             quotedName = "dbo.phonebook"
-#             columns = [
-#               {
-#                 dataSize   = "100"
-#                 dataType   = "varchar"
-#                 quotedName = "name"
-#               },
-#               {
-#                 dataSize   = "100"
-#                 dataType   = "varchar"
-#                 quotedName = "number"
-#               }
-#             ]
-#           }
-#         ]
-#       }
-#     }
-#   }
-#
-#   depends_on = [
-#     module.azapi_create_phonebook_sync_group,
-#     module.arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu
-#   ]
-# }
-
-module "bastion_hosts" {
+module "bas_project102_prod_westeurope_001" {
   source   = "./modules/bastion_host"
-  for_each = var.bastion_hosts
 
-  name                = each.value.name
-  resource_group_name = each.value.resource_group_name
-  location            = each.value.location
-  ip_configuration    = each.value.ip_configuration
+  name                = var.bas_project102_prod_westeurope_001.name
+  resource_group_name = var.bas_project102_prod_westeurope_001.resource_group_name
+  location            = var.bas_project102_prod_westeurope_001.location
+  ip_configuration    = var.bas_project102_prod_westeurope_001.ip_configuration
 
   depends_on = [
     module.virtual_networks,
@@ -72,245 +36,281 @@ module "bastion_hosts" {
   ]
 }
 
-module "firewalls" {
+module "fw_project102_prod_eastus_001" {
   source   = "./modules/firewall"
-  for_each = var.firewalls
 
-  name                              = each.value.name
-  resource_group_name               = each.value.resource_group_name
-  location                          = each.value.location
-  sku_name                          = each.value.sku_name
-  sku_tier                          = each.value.sku_tier
-  firewall_policy                   = try(each.value.fireall_policy, null)
-  virtual_hub                       = try(each.value.virtual_hub, null)
-  ip_configuration                  = try(each.value.ip_configuration, null)
-  management_ip_configuration       = try(each.value.management_ip_configuration, null)
-  firewall_network_rule_collections = try(each.value.firewall_network_rule_collections, null)
+  name                              = var.fw_project102_prod_eastus_001.name
+  resource_group_name               = var.fw_project102_prod_eastus_001.resource_group_name
+  location                          = var.fw_project102_prod_eastus_001.location
+  sku_name                          = var.fw_project102_prod_eastus_001.sku_name
+  sku_tier                          = var.fw_project102_prod_eastus_001.sku_tier
+  firewall_policy                   = try(var.fw_project102_prod_eastus_001.fireall_policy, null)
+  virtual_hub                       = try(var.fw_project102_prod_eastus_001.virtual_hub, null)
 
   depends_on = [
     module.virtual_networks,
-    module.public_ip_addresses,
-    module.firewall_policies,
+    module.fwp_project102_prod_eastus_001,
     module.virtual_wans
   ]
 }
 
-module "firewall_policies" {
+module "fwp_project102_prod_eastus_001" {
   source   = "./modules/firewall_policy"
-  for_each = var.firewall_policies
 
-  name                   = each.value.name
-  resource_group_name    = each.value.resource_group_name
-  location               = each.value.location
-  sku                    = each.value.sku
-  rule_collection_groups = each.value.rule_collection_groups
+  name                   = var.fwp_project102_prod_eastus_001.name
+  resource_group_name    = var.fwp_project102_prod_eastus_001.resource_group_name
+  location               = var.fwp_project102_prod_eastus_001.location
+  sku                    = var.fwp_project102_prod_eastus_001.sku
+  rule_collection_groups = var.fwp_project102_prod_eastus_001.rule_collection_groups
 
-  depends_on = [module.resource_groups]
+  depends_on = [
+    module.rg_project102_prod_eastus_001
+  ]
 }
 
-module "front_doors" {
+module "afd_project102_prod_global_001" {
   source   = "./modules/front_door"
-  for_each = var.front_doors
 
-  name                = each.value.name
-  resource_group_name = each.value.resource_group_name
-  sku_name            = each.value.sku_name
-  endpoints           = each.value.endpoints
-  origin_groups       = each.value.origin_groups
-  origins             = each.value.origins
-  routes              = each.value.routes
-  rule_sets           = try(each.value.rule_sets, null)
-  rules               = try(each.value.rules, null)
+  name                = var.afd_project102_prod_global_001.name
+  resource_group_name = var.afd_project102_prod_global_001.resource_group_name
+  sku_name            = var.afd_project102_prod_global_001.sku_name
+  endpoints           = var.afd_project102_prod_global_001.endpoints
+  origin_groups       = var.afd_project102_prod_global_001.origin_groups
+  origins             = var.afd_project102_prod_global_001.origins
+  routes              = var.afd_project102_prod_global_001.routes
+  rule_sets           = var.afd_project102_prod_global_001.rule_sets
+  rules               = var.afd_project102_prod_global_001.rules
 
   depends_on = [
-    module.load_balancers,
-    module.kubernetes_clusters
+    module.lb_project102_prod_westeurope_001,
+    module.aks_project102_prod_eastus_001
   ]
 }
 
-module "key_vault_access_policies" {
+module "kvap_project102_prod_global_001" {
   source   = "./modules/key_vault_access_policy"
-  for_each = var.key_vault_access_policies
 
-  key_vault          = each.value.key_vault
-  object             = each.value.object
-  key_permissions    = each.value.key_permissions
-  secret_permissions = each.value.secret_permissions
+  key_vault          = var.kvap_project102_prod_global_001.key_vault
+  object             = var.kvap_project102_prod_global_001.object
+  key_permissions    = var.kvap_project102_prod_global_001.key_permissions
+  secret_permissions = var.kvap_project102_prod_global_001.secret_permissions
 }
 
-module "key_vault_secrets" {
+module "kvs_project102_prod_global_001" {
   source   = "./modules/key_vault_secret"
-  for_each = var.key_vault_secrets
 
-  name                          = each.value.name
-  key_vault_name                = each.value.key_vault_name
-  key_vault_resource_group_name = each.value.key_vault_resource_group_name
+  name                          = var.kvs_project102_prod_global_001.name
+  key_vault_name                = var.kvs_project102_prod_global_001.key_vault_name // TODO: Birlestir
+  key_vault_resource_group_name = var.kvs_project102_prod_global_001.key_vault_resource_group_name
 
-  depends_on = [module.key_vault_access_policies]
+  depends_on = [
+    module.kvap_project102_prod_global_001
+  ]
 }
 
-module "kubernetes_clusters" {
+module "aks_project102_prod_eastus_001" {
   source   = "./modules/kubernetes_cluster"
-  for_each = var.kubernetes_clusters
 
-  name                          = each.value.name
-  resource_group_name           = each.value.resource_group_name
-  location                      = each.value.location
-  public_network_access_enabled = each.value.public_network_access_enabled
-  private_cluster_enabled       = each.value.private_cluster_enabled
-  subnet_aks                    = each.value.subnet_aks
-  default_node_pool             = each.value.default_node_pool
-  identity                      = each.value.identity
-  subnet_agw                    = each.value.subnet_agw
-  ingress_application_gateway   = each.value.ingress_application_gateway
-  network_profile               = each.value.network_profile
+  name                          = var.aks_project102_prod_eastus_001.name
+  resource_group_name           = var.aks_project102_prod_eastus_001.resource_group_name
+  location                      = var.aks_project102_prod_eastus_001.location
+  public_network_access_enabled = var.aks_project102_prod_eastus_001.public_network_access_enabled
+  private_cluster_enabled       = var.aks_project102_prod_eastus_001.private_cluster_enabled
+  subnet_aks                    = var.aks_project102_prod_eastus_001.subnet_aks
+  default_node_pool             = var.aks_project102_prod_eastus_001.default_node_pool
+  identity                      = var.aks_project102_prod_eastus_001.identity
+  subnet_agw                    = var.aks_project102_prod_eastus_001.subnet_agw
+  ingress_application_gateway   = var.aks_project102_prod_eastus_001.ingress_application_gateway
+  network_profile               = var.aks_project102_prod_eastus_001.network_profile
 
-  depends_on = [module.virtual_networks]
+  depends_on = [
+    module.vnet_project102_prod_eastus_001
+  ]
 }
 
-module "linux_virtual_machines" {
+module "vm_project102_prod_eastus_001" {
   source   = "./modules/linux_virtual_machine"
-  for_each = var.linux_virtual_machines
 
-  name                               = each.value.name
-  resource_group_name                = each.value.resource_group_name
-  location                           = each.value.location
-  network_interface                  = each.value.network_interface
-  size                               = each.value.size
-  delete_os_disk_on_termination      = each.value.delete_os_disk_on_termination
-  delete_data_disks_on_termination   = each.value.delete_data_disks_on_termination
-  identity                           = each.value.identity
-  storage_image_reference            = each.value.storage_image_reference
-  storage_os_disk                    = each.value.storage_os_disk
-  os_profile                         = each.value.os_profile
-  os_profile_linux_config            = each.value.os_profile_linux_config
-  boot_diagnostics                   = each.value.boot_diagnostics
-  network_security_group_association = each.value.network_security_group_association
+  name                               = var.vm_project102_prod_eastus_001.name
+  resource_group_name                = var.vm_project102_prod_eastus_001.resource_group_name
+  location                           = var.vm_project102_prod_eastus_001.location
+  network_interface                  = var.vm_project102_prod_eastus_001.network_interface
+  size                               = var.vm_project102_prod_eastus_001.size
+  delete_os_disk_on_termination      = var.vm_project102_prod_eastus_001.delete_os_disk_on_termination
+  delete_data_disks_on_termination   = var.vm_project102_prod_eastus_001.delete_data_disks_on_termination
+  identity                           = var.vm_project102_prod_eastus_001.identity
+  storage_image_reference            = var.vm_project102_prod_eastus_001.storage_image_reference
+  storage_os_disk                    = var.vm_project102_prod_eastus_001.storage_os_disk
+  os_profile                         = var.vm_project102_prod_eastus_001.os_profile
+  os_profile_linux_config            = var.vm_project102_prod_eastus_001.os_profile_linux_config
+  boot_diagnostics                   = var.vm_project102_prod_eastus_001.boot_diagnostics
+  network_security_group_association = var.vm_project102_prod_eastus_001.network_security_group_association
 
   depends_on = [
-    module.virtual_networks,
-    module.public_ip_addresses,
-    module.network_security_groups
+    module.vnet_project102_prod_eastus_004,
+    module.pip_project102_prod_eastus_001,
+    module.nsg_project102_prod_eastus_001
   ]
 }
 
-module "linux_virtual_machine_scale_sets" {
+module "vmss_project102_prod_westeurope_001" {
   source   = "./modules/linux_virtual_machine_scale_set"
-  for_each = var.linux_virtual_machine_scale_sets
 
-  name                   = each.value.name
-  resource_group_name    = each.value.resource_group_name
-  location               = each.value.location
-  sku                    = each.value.sku
-  instances              = each.value.instances
-  admin_username         = each.value.admin_username
-  shared_image           = each.value.shared_image
-  upgrade_mode           = each.value.upgrade_mode
-  load_balancer          = try(each.value.load_balancer, null)
-  health_probe_name      = each.value.health_probe_name
-  admin_ssh_key          = each.value.admin_ssh_key
-  os_disk                = each.value.os_disk
-  network_interface      = each.value.network_interface
-  rolling_upgrade_policy = try(each.value.rolling_upgrade_policy, null)
+  name                   = var.vmss_project102_prod_westeurope_001.name
+  resource_group_name    = var.vmss_project102_prod_westeurope_001.resource_group_name
+  location               = var.vmss_project102_prod_westeurope_001.location
+  sku                    = var.vmss_project102_prod_westeurope_001.sku
+  instances              = var.vmss_project102_prod_westeurope_001.instances
+  admin_username         = var.vmss_project102_prod_westeurope_001.admin_username
+  shared_image           = var.vmss_project102_prod_westeurope_001.shared_image
+  upgrade_mode           = var.vmss_project102_prod_westeurope_001.upgrade_mode
+  load_balancer          = var.vmss_project102_prod_westeurope_001.load_balancer
+  health_probe_name      = var.vmss_project102_prod_westeurope_001.health_probe_name
+  admin_ssh_key          = var.vmss_project102_prod_westeurope_001.admin_ssh_key
+  os_disk                = var.vmss_project102_prod_westeurope_001.os_disk
+  network_interface      = var.vmss_project102_prod_westeurope_001.network_interface
+  rolling_upgrade_policy = var.vmss_project102_prod_westeurope_001.rolling_upgrade_policy
 
   depends_on = [
-    module.virtual_networks,
-    module.network_security_groups,
-    module.load_balancers
+    module.vnet_project102_prod_westeurope_001,
+    module.nsg_project102_prod_westeurope_001,
+    module.lb_project102_prod_westeurope_001
   ]
 }
 
-module "load_balancers" {
+module "lb_project102_prod_westeurope_001" {
   source   = "./modules/load_balancer"
-  for_each = var.load_balancers
 
-  name                       = each.value.name
-  resource_group_name        = each.value.resource_group_name
-  location                   = each.value.location
-  sku                        = each.value.sku
-  frontend_ip_configurations = each.value.frontend_ip_configurations
-  lb_backend_address_pools   = each.value.lb_backend_address_pools
-  lb_probes                  = each.value.lb_probes
-  lb_rules                   = each.value.lb_rules
-  private_link_service       = try(each.value.private_link_service)
-
-  depends_on = [module.virtual_networks]
-}
-
-module "network_security_groups" {
-  source   = "./modules/network_security_group"
-  for_each = var.network_security_groups
-
-  name                = each.value.name
-  resource_group_name = each.value.resource_group_name
-  location            = each.value.location
-  security_rules      = try(each.value.security_rules, null)
-
-  depends_on = [module.resource_groups]
-}
-
-module "private_dns_zones" {
-  source   = "./modules/private_dns_zone"
-  for_each = var.private_dns_zones
-
-  name                  = each.value.name
-  resource_group_name   = each.value.resource_group_name
-  virtual_network_links = each.value.virtual_network_links
-
-  depends_on = [module.virtual_networks]
-}
-
-module "private_endpoints" {
-  source   = "./modules/private_endpoint"
-  for_each = var.private_endpoints
-
-  name                       = each.value.name
-  resource_group_name        = each.value.resource_group_name
-  location                   = each.value.location
-  subnet                     = each.value.subnet
-  attached_resource          = each.value.attached_resource
-  private_service_connection = each.value.private_service_connection
-  private_dns_zone_group     = each.value.private_dns_zone_group
+  name                       = var.lb_project102_prod_westeurope_001.name
+  resource_group_name        = var.lb_project102_prod_westeurope_001.resource_group_name
+  location                   = var.lb_project102_prod_westeurope_001.location
+  sku                        = var.lb_project102_prod_westeurope_001.sku
+  frontend_ip_configurations = var.lb_project102_prod_westeurope_001.frontend_ip_configurations
+  lb_backend_address_pools   = var.lb_project102_prod_westeurope_001.lb_backend_address_pools
+  lb_probes                  = var.lb_project102_prod_westeurope_001.lb_probes
+  lb_rules                   = var.lb_project102_prod_westeurope_001.lb_rules
+  private_link_service       = var.lb_project102_prod_westeurope_001.private_link_service
 
   depends_on = [
-    module.private_dns_zones,
-    module.sql_project102_prod_eastus_001,
+    module.vnet_project102_prod_westeurope_001
+  ]
+}
+
+module "nsg_project102_prod_eastus_001" {
+  source   = "./modules/network_security_group"
+
+  name                = var.nsg_project102_prod_eastus_001.name
+  resource_group_name = var.nsg_project102_prod_eastus_001.resource_group_name
+  location            = var.nsg_project102_prod_eastus_001.location
+  security_rules      = var.nsg_project102_prod_eastus_001.security_rules
+
+  depends_on = [
+    module.rg_project102_prod_eastus_001
+  ]
+}
+
+module "nsg_project102_prod_westeurope_001" {
+  source   = "./modules/network_security_group"
+
+  name                = var.nsg_project102_prod_westeurope_001.name
+  resource_group_name = var.nsg_project102_prod_westeurope_001.resource_group_name
+  location            = var.nsg_project102_prod_westeurope_001.location
+  security_rules      = var.nsg_project102_prod_westeurope_001.security_rules
+
+  depends_on = [
+    module.rg_project102_prod_westeurope_001
+  ]
+}
+
+module "privatelink_database_windows_net_project102_prod_global_001" {
+  source   = "./modules/private_dns_zone"
+
+  name                  = var.privatelink_database_windows_net_project102_prod_global_001.name
+  resource_group_name   = var.privatelink_database_windows_net_project102_prod_global_001.resource_group_name
+  virtual_network_links = var.privatelink_database_windows_net_project102_prod_global_001.virtual_network_links
+
+  depends_on = [
+    module.vnet_project102_prod_eastus_001,
+    module.vnet_project102_prod_eastus_003,
+    module.vnet_project102_prod_westeurope_001,
+    module.vnet_project102_prod_westeurope_002
+  ]
+}
+
+module "pep_project102_prod_eastus_001" {
+  source   = "./modules/private_endpoint"
+
+  name                       = var.pep_project102_prod_eastus_001.name
+  resource_group_name        = var.pep_project102_prod_eastus_001.resource_group_name
+  location                   = var.pep_project102_prod_eastus_001.location
+  subnet                     = var.pep_project102_prod_eastus_001.subnet
+  attached_resource          = var.pep_project102_prod_eastus_001.attached_resource
+  private_service_connection = var.pep_project102_prod_eastus_001.private_service_connection
+  private_dns_zone_group     = var.pep_project102_prod_eastus_001.private_dns_zone_group
+
+  depends_on = [
+    module.privatelink_database_windows_net_project102_prod_global_001,
+    module.sql_project102_prod_eastus_001
+  ]
+}
+
+module "pep_project102_prod_westeurope_001" {
+  source   = "./modules/private_endpoint"
+
+  name                       = var.pep_project102_prod_westeurope_001.name
+  resource_group_name        = var.pep_project102_prod_westeurope_001.resource_group_name
+  location                   = var.pep_project102_prod_westeurope_001.location
+  subnet                     = var.pep_project102_prod_westeurope_001.subnet
+  attached_resource          = var.pep_project102_prod_westeurope_001.attached_resource
+  private_service_connection = var.pep_project102_prod_westeurope_001.private_service_connection
+  private_dns_zone_group     = var.pep_project102_prod_westeurope_001.private_dns_zone_group
+
+  depends_on = [
+    module.privatelink_database_windows_net_project102_prod_global_001,
     module.sql_project102_prod_westeurope_001
   ]
 }
 
-module "public_ip_addresses" {
+module "pip_project102_prod_eastus_001" {
   source   = "./modules/public_ip_address"
-  for_each = var.public_ip_addresses
 
-  name                = each.value.name
-  resource_group_name = each.value.resource_group_name
-  location            = each.value.location
-  allocation_method   = each.value.allocation_method
-  sku                 = each.value.sku
+  name                = var.pip_project102_prod_eastus_001.name
+  resource_group_name = var.pip_project102_prod_eastus_001.resource_group_name
+  location            = var.pip_project102_prod_eastus_001.location
+  allocation_method   = var.pip_project102_prod_eastus_001.allocation_method
+  sku                 = var.pip_project102_prod_eastus_001.sku
 
-  depends_on = [module.resource_groups]
+  depends_on = [
+    module.rg_project102_prod_eastus_001
+  ]
 }
 
-module "resource_groups" {
+module "pip_project102_prod_westeurope_001" {
+  source   = "./modules/public_ip_address"
+
+  name                = var.pip_project102_prod_westeurope_001.name
+  resource_group_name = var.pip_project102_prod_westeurope_001.resource_group_name
+  location            = var.pip_project102_prod_westeurope_001.location
+  allocation_method   = var.pip_project102_prod_westeurope_001.allocation_method
+  sku                 = var.pip_project102_prod_westeurope_001.sku
+
+  depends_on = [
+    module.rg_project102_prod_westeurope_001
+  ]
+}
+
+module "rg_project102_prod_eastus_001" {
   source   = "./modules/resource_group"
-  for_each = var.resource_groups
 
-  name     = each.value.name
-  location = each.value.location
+  name     = var.rg_project102_prod_eastus_001.name
+  location = var.rg_project102_prod_eastus_001.location
 }
 
-module "route_tables" {
-  source   = "./modules/route_table"
-  for_each = var.route_tables
+module "rg_project102_prod_westeurope_001" {
+  source   = "./modules/resource_group"
 
-  name                = each.value.name
-  resource_group_name = each.value.resource_group_name
-  location            = each.value.location
-  routes              = each.value.routes
-  subnet_associations = each.value.subnet_associations
-
-  depends_on = [module.virtual_networks]
+  name     = var.rg_project102_prod_westeurope_001.name
+  location = var.rg_project102_prod_westeurope_001.location
 }
 
 module "sql_project102_prod_eastus_001" {
@@ -324,7 +324,10 @@ module "sql_project102_prod_eastus_001" {
   tags                = var.sql_project102_prod_eastus_001.tags
   mssql_databases     = var.sql_project102_prod_eastus_001.mssql_databases
 
-  depends_on = [module.key_vault_secrets]
+  depends_on = [
+    module.rg_project102_prod_eastus_001,
+    module.kvs_project102_prod_global_001
+  ]
 }
 
 module "sql_project102_prod_westeurope_001" {
@@ -339,45 +342,167 @@ module "sql_project102_prod_westeurope_001" {
   mssql_databases     = var.sql_project102_prod_westeurope_001.mssql_databases
 
   depends_on = [
-    module.key_vault_secrets,
+    module.rg_project102_prod_westeurope_001,
+    module.kvs_project102_prod_global_001,
     module.sql_project102_prod_eastus_001
   ]
 }
 
-module "virtual_networks" {
+module "vnet_project102_prod_eastus_001" {
   source   = "./modules/virtual_network"
-  for_each = var.virtual_networks
 
-  name                = each.value.name
-  resource_group_name = each.value.resource_group_name
-  location            = each.value.location
-  address_space       = each.value.address_space
-  subnets             = try(each.value.subnets, null)
+  name                = var.vnet_project102_prod_eastus_001.name
+  resource_group_name = var.vnet_project102_prod_eastus_001.resource_group_name
+  location            = var.vnet_project102_prod_eastus_001.location
+  address_space       = var.vnet_project102_prod_eastus_001.address_space
+  subnets             = var.vnet_project102_prod_eastus_001.subnets
 
-  depends_on = [module.resource_groups]
+  depends_on = [
+    module.rg_project102_prod_eastus_001
+  ]
 }
 
-module "virtual_network_peerings" {
+module "vnet_project102_prod_eastus_002" {
+  source   = "./modules/virtual_network"
+
+  name                = var.vnet_project102_prod_eastus_002.name
+  resource_group_name = var.vnet_project102_prod_eastus_002.resource_group_name
+  location            = var.vnet_project102_prod_eastus_002.location
+  address_space       = var.vnet_project102_prod_eastus_002.address_space
+  subnets             = var.vnet_project102_prod_eastus_002.subnets
+
+  depends_on = [
+    module.rg_project102_prod_eastus_001
+  ]
+}
+
+module "vnet_project102_prod_eastus_003" {
+  source   = "./modules/virtual_network"
+
+  name                = var.vnet_project102_prod_eastus_003.name
+  resource_group_name = var.vnet_project102_prod_eastus_003.resource_group_name
+  location            = var.vnet_project102_prod_eastus_003.location
+  address_space       = var.vnet_project102_prod_eastus_003.address_space
+  subnets             = var.vnet_project102_prod_eastus_003.subnets
+
+  depends_on = [
+    module.rg_project102_prod_eastus_001
+  ]
+}
+
+module "vnet_project102_prod_eastus_004" {
+  source   = "./modules/virtual_network"
+
+  name                = var.vnet_project102_prod_eastus_004.name
+  resource_group_name = var.vnet_project102_prod_eastus_004.resource_group_name
+  location            = var.vnet_project102_prod_eastus_004.location
+  address_space       = var.vnet_project102_prod_eastus_004.address_space
+  subnets             = var.vnet_project102_prod_eastus_004.subnets
+
+  depends_on = [
+    module.rg_project102_prod_eastus_001
+  ]
+}
+
+module "vnet_project102_prod_westeurope_001" {
+  source   = "./modules/virtual_network"
+
+  name                = var.vnet_project102_prod_westeurope_001.name
+  resource_group_name = var.vnet_project102_prod_westeurope_001.resource_group_name
+  location            = var.vnet_project102_prod_westeurope_001.location
+  address_space       = var.vnet_project102_prod_westeurope_001.address_space
+  subnets             = var.vnet_project102_prod_westeurope_001.subnets
+
+  depends_on = [
+    module.rg_project102_prod_westeurope_001
+  ]
+}
+
+module "vnet_project102_prod_westeurope_002" {
+  source   = "./modules/virtual_network"
+
+  name                = var.vnet_project102_prod_westeurope_002.name
+  resource_group_name = var.vnet_project102_prod_westeurope_002.resource_group_name
+  location            = var.vnet_project102_prod_westeurope_002.location
+  address_space       = var.vnet_project102_prod_westeurope_002.address_space
+  subnets             = var.vnet_project102_prod_westeurope_002.subnets
+
+  depends_on = [
+    module.rg_project102_prod_westeurope_001
+  ]
+}
+
+module "peer_project102_prod_global_001" {
   source   = "./modules/virtual_network_peering"
-  for_each = var.vnet_peerings
 
-  name                    = each.value.name
-  resource_group_name     = each.value.resource_group_name
-  virtual_network_name    = each.value.virtual_network_name
-  remote_virtual_network  = each.value.remote_virtual_network
-  allow_forwarded_traffic = each.value.allow_forwarded_traffic
+  name                    = var.peer_project102_prod_global_001.name
+  resource_group_name     = var.peer_project102_prod_global_001.resource_group_name
+  virtual_network_name    = var.peer_project102_prod_global_001.virtual_network_name
+  remote_virtual_network  = var.peer_project102_prod_global_001.remote_virtual_network
+  allow_forwarded_traffic = var.peer_project102_prod_global_001.allow_forwarded_traffic
 
-  depends_on = [module.virtual_networks]
+  depends_on = [
+    module.vnet_project102_prod_eastus_003,
+    module.vnet_project102_prod_westeurope_001
+  ]
 }
 
-module "virtual_wans" {
+module "peer_project102_prod_global_002" {
+  source   = "./modules/virtual_network_peering"
+
+  name                    = var.peer_project102_prod_global_002.name
+  resource_group_name     = var.peer_project102_prod_global_002.resource_group_name
+  virtual_network_name    = var.peer_project102_prod_global_002.virtual_network_name
+  remote_virtual_network  = var.peer_project102_prod_global_002.remote_virtual_network
+  allow_forwarded_traffic = var.peer_project102_prod_global_002.allow_forwarded_traffic
+
+  depends_on = [
+    module.vnet_project102_prod_eastus_003,
+    module.vnet_project102_prod_westeurope_001
+  ]
+}
+
+module "peer_project102_prod_global_003" {
+  source   = "./modules/virtual_network_peering"
+
+  name                    = var.peer_project102_prod_global_003.name
+  resource_group_name     = var.peer_project102_prod_global_003.resource_group_name
+  virtual_network_name    = var.peer_project102_prod_global_003.virtual_network_name
+  remote_virtual_network  = var.peer_project102_prod_global_003.remote_virtual_network
+  allow_forwarded_traffic = var.peer_project102_prod_global_003.allow_forwarded_traffic
+
+  depends_on = [
+    module.vnet_project102_prod_westeurope_001,
+    module.vnet_project102_prod_westeurope_002
+  ]
+}
+
+module "peer_project102_prod_global_004" {
+  source   = "./modules/virtual_network_peering"
+
+  name                    = var.peer_project102_prod_global_004.name
+  resource_group_name     = var.peer_project102_prod_global_004.resource_group_name
+  virtual_network_name    = var.peer_project102_prod_global_004.virtual_network_name
+  remote_virtual_network  = var.peer_project102_prod_global_004.remote_virtual_network
+  allow_forwarded_traffic = var.peer_project102_prod_global_004.allow_forwarded_traffic
+
+  depends_on = [
+    module.vnet_project102_prod_westeurope_001,
+    module.vnet_project102_prod_westeurope_002
+  ]
+}
+
+module "vwan_project102_prod_eastus_001" {
   source   = "./modules/virtual_wan"
-  for_each = var.virtual_wans
 
-  name                = each.value.name
-  resource_group_name = each.value.resource_group_name
-  location            = each.value.location
-  virtual_hubs        = try(each.value.virtual_hubs, null)
+  name                = var.vwan_project102_prod_eastus_001.name
+  resource_group_name = var.vwan_project102_prod_eastus_001.resource_group_name
+  location            = var.vwan_project102_prod_eastus_001.location
+  virtual_hubs        = var.vwan_project102_prod_eastus_001.virtual_hubs
 
-  depends_on = [module.virtual_networks]
+  depends_on = [
+    module.vnet_project102_prod_eastus_002,
+    module.vnet_project102_prod_eastus_003,
+    module.vnet_project102_prod_eastus_004
+  ]
 }

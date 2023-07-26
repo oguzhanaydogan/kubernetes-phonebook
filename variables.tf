@@ -1,41 +1,63 @@
-variable "bastion_hosts" {}
+variable "bas_project102_prod_westeurope_001" {}
 
-variable "firewalls" {}
+variable "fw_project102_prod_eastus_001" {}
 
-variable "firewall_policies" {}
+variable "fwp_project102_prod_eastus_001" {}
 
-variable "front_doors" {}
+variable "afd_project102_prod_global_001" {}
 
-variable "key_vault_access_policies" {}
+variable "kvap_project102_prod_global_001" {}
 
-variable "key_vault_secrets" {}
+variable "kvs_project102_prod_global_001" {}
 
-variable "kubernetes_clusters" {}
+variable "aks_project102_prod_eastus_001" {}
 
-variable "linux_virtual_machines" {}
+variable "vm_project102_prod_eastus_001" {}
 
-variable "linux_virtual_machine_scale_sets" {}
+variable "vmss_project102_prod_westeurope_001" {}
 
-variable "load_balancers" {}
+variable "lb_project102_prod_westeurope_001" {}
 
-variable "network_security_groups" {}
+variable "nsg_project102_prod_eastus_001" {}
 
-variable "private_dns_zones" {}
+variable "nsg_project102_prod_westeurope_001" {}
 
-variable "private_endpoints" {}
+variable "privatelink_database_windows_net_project102_prod_global_001" {}
 
-variable "public_ip_addresses" {}
+variable "pep_project102_prod_eastus_001" {}
 
-variable "resource_groups" {}
+variable "pep_project102_prod_westeurope_001" {}
 
-variable "route_tables" {}
+variable "pip_project102_prod_eastus_001" {}
+
+variable "pip_project102_prod_westeurope_001" {}
+
+variable "rg_project102_prod_eastus_001" {}
+
+variable "rg_project102_prod_westeurope_001" {}
 
 variable "sql_project102_prod_eastus_001" {}
 
 variable "sql_project102_prod_westeurope_001" {}
 
-variable "virtual_networks" {}
+variable "vnet_project102_prod_eastus_001" {}
 
-variable "vnet_peerings" {}
+variable "vnet_project102_prod_eastus_002" {}
+
+variable "vnet_project102_prod_eastus_003" {}
+
+variable "vnet_project102_prod_eastus_004" {}
+
+variable "vnet_project102_prod_westeurope_001" {}
+
+variable "vnet_project102_prod_westeurope_002" {}
+
+variable "peer_project102_prod_global_001" {}
+
+variable "peer_project102_prod_global_002" {}
+
+variable "peer_project102_prod_global_003" {}
+
+variable "peer_project102_prod_global_004" {}
 
 variable "virtual_wans" {}

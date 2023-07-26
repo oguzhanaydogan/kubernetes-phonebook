@@ -1,0 +1,34 @@
+# module "azapi_update_phonebook_sync_group" {
+#   source      = "./modules/azapi_update_resource"
+#   type        = "Microsoft.Sql/servers/databases/syncGroups@2022-05-01-preview"
+#   resource_id = "/subscriptions/14528ad0-4c9e-48a9-8ed0-111c1034b033/resourceGroups/rg-eastus/providers/Microsoft.Sql/servers/coyhub-db-us/databases/phonebook/syncGroups/phonebook-sync-group"
+#   body = {
+#     properties = {
+#       schema = {
+#         masterSyncMemberName = "phonebook"
+#         tables = [
+#           {
+#             quotedName = "dbo.phonebook"
+#             columns = [
+#               {
+#                 dataSize   = "100"
+#                 dataType   = "varchar"
+#                 quotedName = "name"
+#               },
+#               {
+#                 dataSize   = "100"
+#                 dataType   = "varchar"
+#                 quotedName = "number"
+#               }
+#             ]
+#           }
+#         ]
+#       }
+#     }
+#   }
+#
+#   depends_on = [
+#     module.azapi_create_phonebook_sync_group,
+#     module.arm_template_deployment_create_phonebook_sync_group_member_phonebook_eu
+#   ]
+# }
