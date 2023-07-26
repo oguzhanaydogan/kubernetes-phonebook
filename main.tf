@@ -44,8 +44,8 @@ module "fw_project102_prod_eastus_001" {
   location                          = var.fw_project102_prod_eastus_001.location
   sku_name                          = var.fw_project102_prod_eastus_001.sku_name
   sku_tier                          = var.fw_project102_prod_eastus_001.sku_tier
-  firewall_policy                   = try(var.fw_project102_prod_eastus_001.fireall_policy, null)
-  virtual_hub                       = try(var.fw_project102_prod_eastus_001.virtual_hub, null)
+  firewall_policy                   = var.fw_project102_prod_eastus_001.fireall_policy
+  virtual_hub                       = var.fw_project102_prod_eastus_001.virtual_hub
 
   depends_on = [
     module.vnet_project102_prod_eastus_001,
