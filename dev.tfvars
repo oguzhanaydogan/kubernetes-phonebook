@@ -180,48 +180,50 @@ kvap_project102_prod_global_001 = {
 
 
 kvs_project102_prod_global_001 = {
-  name                          = "MSSQLPASSWORD"
-  key_vault_name                = "coyvault"
-  key_vault_resource_group_name = "ssh-key"
+  name = "MSSQLPASSWORD"
+  key_vault = {
+    name                = "coyvault"
+    resource_group_name = "ssh-key"
+  }
 }
 
-# aks_project102_prod_eastus_001 = {
-#   name                          = "aks-project102-prod-eastus-001"
-#   resource_group_name           = "rg-project102-prod-eastus-001"
-#   location                      = "East US"
-#   public_network_access_enabled = false
-#   private_cluster_enabled       = true
-#   subnet_aks = {
-#     name                 = "snet-project102-prod-eastus-001"
-#     virtual_network_name = "vnet-project102-prod-eastus-001"
-#     resource_group_name  = "rg-project102-prod-eastus-001"
-#   }
-#   default_node_pool = {
-#     name       = "default"
-#     node_count = 1
-#     vm_size    = "Standard_B2s"
-#   }
-#   identity = {
-#     type = "SystemAssigned"
-#   }
-#   subnet_agw = {
-#     name                 = "snet-project102-prod-eastus-002"
-#     virtual_network_name = "vnet-project102-prod-eastus-001"
-#     resource_group_name  = "rg-project102-prod-eastus-001"
-#   }
-#   ingress_application_gateway = {
-#     enabled = true
-#     name    = "agw-project102-prod-eastus-001"
-#   }
-#   network_profile = {
-#     network_plugin     = "azure"
-#     network_policy     = "azure"
-#     service_cidr       = "10.0.3.0/24"
-#     dns_service_ip     = "10.0.3.4"
-#     docker_bridge_cidr = "172.17.0.1/16"
-#     outbound_type      = "userDefinedRouting"
-#   }
-# }
+aks_project102_prod_eastus_001 = {
+  name                          = "aks-project102-prod-eastus-001"
+  resource_group_name           = "rg-project102-prod-eastus-001"
+  location                      = "East US"
+  public_network_access_enabled = false
+  private_cluster_enabled       = true
+  subnet_aks = {
+    name                 = "snet-project102-prod-eastus-001"
+    virtual_network_name = "vnet-project102-prod-eastus-001"
+    resource_group_name  = "rg-project102-prod-eastus-001"
+  }
+  default_node_pool = {
+    name       = "default"
+    node_count = 1
+    vm_size    = "Standard_B2s"
+  }
+  identity = {
+    type = "SystemAssigned"
+  }
+  subnet_agw = {
+    name                 = "snet-project102-prod-eastus-002"
+    virtual_network_name = "vnet-project102-prod-eastus-001"
+    resource_group_name  = "rg-project102-prod-eastus-001"
+  }
+  ingress_application_gateway = {
+    enabled = true
+    name    = "agw-project102-prod-eastus-001"
+  }
+  network_profile = {
+    network_plugin     = "azure"
+    network_policy     = "azure"
+    service_cidr       = "10.0.3.0/24"
+    dns_service_ip     = "10.0.3.4"
+    docker_bridge_cidr = "172.17.0.1/16"
+    outbound_type      = "userDefinedRouting"
+  }
+}
 
 vm_project102_prod_eastus_001 = { # ci/cd agent
   name                = "vm-project102-prod-eastus-001"
@@ -659,7 +661,7 @@ sql_project102_prod_westeurope_001 = {
               resource_group_name = "rg-project102-prod-eastus-001"
             }
             database = {
-              name                = "phonebook"
+              name = "phonebook"
             }
           }
           own_database_type        = "AzureSqlDatabase"
@@ -792,26 +794,6 @@ peer_project102_prod_global_002 = { # sql-eu_sql-us
   }
   allow_forwarded_traffic = true
 }
-peer_project102_prod_global_003 = { # app-eu_sql_eu
-  name                 = "peer-project102-prod-global-003"
-  resource_group_name  = "rg-project102-prod-westeurope-001"
-  virtual_network_name = "vnet-project102-prod-westeurope-001"
-  remote_virtual_network = {
-    name                = "vnet-project102-prod-westeurope-002"
-    resource_group_name = "rg-project102-prod-westeurope-001"
-  }
-  allow_forwarded_traffic = true
-}
-peer_project102_prod_global_004 = { # sql-eu_app-eu
-  name                 = "peer-project102-prod-global-004"
-  resource_group_name  = "rg-project102-prod-westeurope-001"
-  virtual_network_name = "vnet-project102-prod-westeurope-002"
-  remote_virtual_network = {
-    name                = "vnet-project102-prod-westeurope-001"
-    resource_group_name = "rg-project102-prod-westeurope-001"
-  }
-  allow_forwarded_traffic = true
-}
 
 vwan_project102_prod_eastus_001 = {
   name                = "vwan-project102-prod-eastus-001"
@@ -875,6 +857,49 @@ vwan_project102_prod_eastus_001 = {
       #     next_hop_connection =
       #   }
       # }
+    }
+  }
+}
+
+nm_project102_prod_westeurope_001 = {
+  name                = "nm-project102-prod-westeurope-001"
+  location            = "West Europe"
+  resource_group_name = "rg-project102-prod-westeurope-001"
+  scope_accesses      = ["Connectivity"]
+  scope = {
+    current_subscription_enabled = true
+  }
+  network_groups = {
+    nmng_project102_prod_westeurope_001 = {
+      name = "nmng-project102-prod-westeurope-001"
+      policies = {
+        nmngp_project102_prod_westeurope_001 = {
+          name = "nmngp-project102-prod-westeurope-001"
+          rule = {
+            effect = "addToNetworkGroup"
+            # Since conditions block is injected into a Json structure formatting is extremely important.
+            conditions = <<-EOT
+              {
+                "allOf": [
+                  {
+                  "field": "location",
+                  "equals": "westeurope"
+                  }
+                ]
+              }
+            EOT
+          }
+        }
+      }
+      connectivity_configurations = {
+        nmcc_project102_prod_westeurope_001 = {
+          name                  = "nmcc-project102-prod-westeurope-001"
+          connectivity_topology = "Mesh"
+          applies_to_group = {
+            group_connectivity = "None"
+          }
+        }
+      }
     }
   }
 }

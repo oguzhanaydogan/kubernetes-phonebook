@@ -23,7 +23,7 @@ provider "azurerm" {
 }
 
 module "bas_project102_prod_westeurope_001" {
-  source   = "./modules/bastion_host"
+  source = "./modules/bastion_host"
 
   name                = var.bas_project102_prod_westeurope_001.name
   resource_group_name = var.bas_project102_prod_westeurope_001.resource_group_name
@@ -37,15 +37,15 @@ module "bas_project102_prod_westeurope_001" {
 }
 
 module "fw_project102_prod_eastus_001" {
-  source   = "./modules/firewall"
+  source = "./modules/firewall"
 
-  name                              = var.fw_project102_prod_eastus_001.name
-  resource_group_name               = var.fw_project102_prod_eastus_001.resource_group_name
-  location                          = var.fw_project102_prod_eastus_001.location
-  sku_name                          = var.fw_project102_prod_eastus_001.sku_name
-  sku_tier                          = var.fw_project102_prod_eastus_001.sku_tier
-  firewall_policy                   = var.fw_project102_prod_eastus_001.fireall_policy
-  virtual_hub                       = var.fw_project102_prod_eastus_001.virtual_hub
+  name                = var.fw_project102_prod_eastus_001.name
+  resource_group_name = var.fw_project102_prod_eastus_001.resource_group_name
+  location            = var.fw_project102_prod_eastus_001.location
+  sku_name            = var.fw_project102_prod_eastus_001.sku_name
+  sku_tier            = var.fw_project102_prod_eastus_001.sku_tier
+  firewall_policy     = var.fw_project102_prod_eastus_001.firewall_policy
+  virtual_hub         = var.fw_project102_prod_eastus_001.virtual_hub
 
   depends_on = [
     module.vnet_project102_prod_eastus_001,
@@ -55,7 +55,7 @@ module "fw_project102_prod_eastus_001" {
 }
 
 module "fwp_project102_prod_eastus_001" {
-  source   = "./modules/firewall_policy"
+  source = "./modules/firewall_policy"
 
   name                   = var.fwp_project102_prod_eastus_001.name
   resource_group_name    = var.fwp_project102_prod_eastus_001.resource_group_name
@@ -69,7 +69,7 @@ module "fwp_project102_prod_eastus_001" {
 }
 
 module "afd_project102_prod_global_001" {
-  source   = "./modules/front_door"
+  source = "./modules/front_door"
 
   name                = var.afd_project102_prod_global_001.name
   resource_group_name = var.afd_project102_prod_global_001.resource_group_name
@@ -82,13 +82,13 @@ module "afd_project102_prod_global_001" {
   rules               = var.afd_project102_prod_global_001.rules
 
   depends_on = [
-    module.lb_project102_prod_westeurope_001,
-    module.aks_project102_prod_eastus_001
+    module.lb_project102_prod_westeurope_001
+    # module.aks_project102_prod_eastus_001
   ]
 }
 
 module "kvap_project102_prod_global_001" {
-  source   = "./modules/key_vault_access_policy"
+  source = "./modules/key_vault_access_policy"
 
   key_vault          = var.kvap_project102_prod_global_001.key_vault
   object             = var.kvap_project102_prod_global_001.object
@@ -97,39 +97,38 @@ module "kvap_project102_prod_global_001" {
 }
 
 module "kvs_project102_prod_global_001" {
-  source   = "./modules/key_vault_secret"
+  source = "./modules/key_vault_secret"
 
-  name                          = var.kvs_project102_prod_global_001.name
-  key_vault_name                = var.kvs_project102_prod_global_001.key_vault_name // TODO: Birlestir
-  key_vault_resource_group_name = var.kvs_project102_prod_global_001.key_vault_resource_group_name
+  name      = var.kvs_project102_prod_global_001.name
+  key_vault = var.kvs_project102_prod_global_001.key_vault
 
   depends_on = [
     module.kvap_project102_prod_global_001
   ]
 }
 
-module "aks_project102_prod_eastus_001" {
-  source   = "./modules/kubernetes_cluster"
+# module "aks_project102_prod_eastus_001" {
+#   source   = "./modules/kubernetes_cluster"
 
-  name                          = var.aks_project102_prod_eastus_001.name
-  resource_group_name           = var.aks_project102_prod_eastus_001.resource_group_name
-  location                      = var.aks_project102_prod_eastus_001.location
-  public_network_access_enabled = var.aks_project102_prod_eastus_001.public_network_access_enabled
-  private_cluster_enabled       = var.aks_project102_prod_eastus_001.private_cluster_enabled
-  subnet_aks                    = var.aks_project102_prod_eastus_001.subnet_aks
-  default_node_pool             = var.aks_project102_prod_eastus_001.default_node_pool
-  identity                      = var.aks_project102_prod_eastus_001.identity
-  subnet_agw                    = var.aks_project102_prod_eastus_001.subnet_agw
-  ingress_application_gateway   = var.aks_project102_prod_eastus_001.ingress_application_gateway
-  network_profile               = var.aks_project102_prod_eastus_001.network_profile
+#   name                          = var.aks_project102_prod_eastus_001.name
+#   resource_group_name           = var.aks_project102_prod_eastus_001.resource_group_name
+#   location                      = var.aks_project102_prod_eastus_001.location
+#   public_network_access_enabled = var.aks_project102_prod_eastus_001.public_network_access_enabled
+#   private_cluster_enabled       = var.aks_project102_prod_eastus_001.private_cluster_enabled
+#   subnet_aks                    = var.aks_project102_prod_eastus_001.subnet_aks
+#   default_node_pool             = var.aks_project102_prod_eastus_001.default_node_pool
+#   identity                      = var.aks_project102_prod_eastus_001.identity
+#   subnet_agw                    = var.aks_project102_prod_eastus_001.subnet_agw
+#   ingress_application_gateway   = var.aks_project102_prod_eastus_001.ingress_application_gateway
+#   network_profile               = var.aks_project102_prod_eastus_001.network_profile
 
-  depends_on = [
-    module.vnet_project102_prod_eastus_001
-  ]
-}
+#   depends_on = [
+#     module.vnet_project102_prod_eastus_001
+#   ]
+# }
 
 module "vm_project102_prod_eastus_001" {
-  source   = "./modules/linux_virtual_machine"
+  source = "./modules/linux_virtual_machine"
 
   name                               = var.vm_project102_prod_eastus_001.name
   resource_group_name                = var.vm_project102_prod_eastus_001.resource_group_name
@@ -154,7 +153,7 @@ module "vm_project102_prod_eastus_001" {
 }
 
 module "vmss_project102_prod_westeurope_001" {
-  source   = "./modules/linux_virtual_machine_scale_set"
+  source = "./modules/linux_virtual_machine_scale_set"
 
   name                   = var.vmss_project102_prod_westeurope_001.name
   resource_group_name    = var.vmss_project102_prod_westeurope_001.resource_group_name
@@ -179,7 +178,7 @@ module "vmss_project102_prod_westeurope_001" {
 }
 
 module "lb_project102_prod_westeurope_001" {
-  source   = "./modules/load_balancer"
+  source = "./modules/load_balancer"
 
   name                       = var.lb_project102_prod_westeurope_001.name
   resource_group_name        = var.lb_project102_prod_westeurope_001.resource_group_name
@@ -197,7 +196,7 @@ module "lb_project102_prod_westeurope_001" {
 }
 
 module "nsg_project102_prod_eastus_001" {
-  source   = "./modules/network_security_group"
+  source = "./modules/network_security_group"
 
   name                = var.nsg_project102_prod_eastus_001.name
   resource_group_name = var.nsg_project102_prod_eastus_001.resource_group_name
@@ -210,7 +209,7 @@ module "nsg_project102_prod_eastus_001" {
 }
 
 module "nsg_project102_prod_westeurope_001" {
-  source   = "./modules/network_security_group"
+  source = "./modules/network_security_group"
 
   name                = var.nsg_project102_prod_westeurope_001.name
   resource_group_name = var.nsg_project102_prod_westeurope_001.resource_group_name
@@ -223,7 +222,7 @@ module "nsg_project102_prod_westeurope_001" {
 }
 
 module "privatelink_database_windows_net_project102_prod_global_001" {
-  source   = "./modules/private_dns_zone"
+  source = "./modules/private_dns_zone"
 
   name                  = var.privatelink_database_windows_net_project102_prod_global_001.name
   resource_group_name   = var.privatelink_database_windows_net_project102_prod_global_001.resource_group_name
@@ -238,7 +237,7 @@ module "privatelink_database_windows_net_project102_prod_global_001" {
 }
 
 module "pep_project102_prod_eastus_001" {
-  source   = "./modules/private_endpoint"
+  source = "./modules/private_endpoint"
 
   name                       = var.pep_project102_prod_eastus_001.name
   resource_group_name        = var.pep_project102_prod_eastus_001.resource_group_name
@@ -255,7 +254,7 @@ module "pep_project102_prod_eastus_001" {
 }
 
 module "pep_project102_prod_westeurope_001" {
-  source   = "./modules/private_endpoint"
+  source = "./modules/private_endpoint"
 
   name                       = var.pep_project102_prod_westeurope_001.name
   resource_group_name        = var.pep_project102_prod_westeurope_001.resource_group_name
@@ -272,7 +271,7 @@ module "pep_project102_prod_westeurope_001" {
 }
 
 module "pip_project102_prod_eastus_001" {
-  source   = "./modules/public_ip_address"
+  source = "./modules/public_ip_address"
 
   name                = var.pip_project102_prod_eastus_001.name
   resource_group_name = var.pip_project102_prod_eastus_001.resource_group_name
@@ -286,7 +285,7 @@ module "pip_project102_prod_eastus_001" {
 }
 
 module "pip_project102_prod_westeurope_001" {
-  source   = "./modules/public_ip_address"
+  source = "./modules/public_ip_address"
 
   name                = var.pip_project102_prod_westeurope_001.name
   resource_group_name = var.pip_project102_prod_westeurope_001.resource_group_name
@@ -300,14 +299,14 @@ module "pip_project102_prod_westeurope_001" {
 }
 
 module "rg_project102_prod_eastus_001" {
-  source   = "./modules/resource_group"
+  source = "./modules/resource_group"
 
   name     = var.rg_project102_prod_eastus_001.name
   location = var.rg_project102_prod_eastus_001.location
 }
 
 module "rg_project102_prod_westeurope_001" {
-  source   = "./modules/resource_group"
+  source = "./modules/resource_group"
 
   name     = var.rg_project102_prod_westeurope_001.name
   location = var.rg_project102_prod_westeurope_001.location
@@ -349,7 +348,7 @@ module "sql_project102_prod_westeurope_001" {
 }
 
 module "vnet_project102_prod_eastus_001" {
-  source   = "./modules/virtual_network"
+  source = "./modules/virtual_network"
 
   name                = var.vnet_project102_prod_eastus_001.name
   resource_group_name = var.vnet_project102_prod_eastus_001.resource_group_name
@@ -363,7 +362,7 @@ module "vnet_project102_prod_eastus_001" {
 }
 
 module "vnet_project102_prod_eastus_002" {
-  source   = "./modules/virtual_network"
+  source = "./modules/virtual_network"
 
   name                = var.vnet_project102_prod_eastus_002.name
   resource_group_name = var.vnet_project102_prod_eastus_002.resource_group_name
@@ -377,7 +376,7 @@ module "vnet_project102_prod_eastus_002" {
 }
 
 module "vnet_project102_prod_eastus_003" {
-  source   = "./modules/virtual_network"
+  source = "./modules/virtual_network"
 
   name                = var.vnet_project102_prod_eastus_003.name
   resource_group_name = var.vnet_project102_prod_eastus_003.resource_group_name
@@ -391,7 +390,7 @@ module "vnet_project102_prod_eastus_003" {
 }
 
 module "vnet_project102_prod_eastus_004" {
-  source   = "./modules/virtual_network"
+  source = "./modules/virtual_network"
 
   name                = var.vnet_project102_prod_eastus_004.name
   resource_group_name = var.vnet_project102_prod_eastus_004.resource_group_name
@@ -405,7 +404,7 @@ module "vnet_project102_prod_eastus_004" {
 }
 
 module "vnet_project102_prod_westeurope_001" {
-  source   = "./modules/virtual_network"
+  source = "./modules/virtual_network"
 
   name                = var.vnet_project102_prod_westeurope_001.name
   resource_group_name = var.vnet_project102_prod_westeurope_001.resource_group_name
@@ -419,7 +418,7 @@ module "vnet_project102_prod_westeurope_001" {
 }
 
 module "vnet_project102_prod_westeurope_002" {
-  source   = "./modules/virtual_network"
+  source = "./modules/virtual_network"
 
   name                = var.vnet_project102_prod_westeurope_002.name
   resource_group_name = var.vnet_project102_prod_westeurope_002.resource_group_name
@@ -433,7 +432,7 @@ module "vnet_project102_prod_westeurope_002" {
 }
 
 module "peer_project102_prod_global_001" {
-  source   = "./modules/virtual_network_peering"
+  source = "./modules/virtual_network_peering"
 
   name                    = var.peer_project102_prod_global_001.name
   resource_group_name     = var.peer_project102_prod_global_001.resource_group_name
@@ -448,7 +447,7 @@ module "peer_project102_prod_global_001" {
 }
 
 module "peer_project102_prod_global_002" {
-  source   = "./modules/virtual_network_peering"
+  source = "./modules/virtual_network_peering"
 
   name                    = var.peer_project102_prod_global_002.name
   resource_group_name     = var.peer_project102_prod_global_002.resource_group_name
@@ -462,38 +461,8 @@ module "peer_project102_prod_global_002" {
   ]
 }
 
-module "peer_project102_prod_global_003" {
-  source   = "./modules/virtual_network_peering"
-
-  name                    = var.peer_project102_prod_global_003.name
-  resource_group_name     = var.peer_project102_prod_global_003.resource_group_name
-  virtual_network_name    = var.peer_project102_prod_global_003.virtual_network_name
-  remote_virtual_network  = var.peer_project102_prod_global_003.remote_virtual_network
-  allow_forwarded_traffic = var.peer_project102_prod_global_003.allow_forwarded_traffic
-
-  depends_on = [
-    module.vnet_project102_prod_westeurope_001,
-    module.vnet_project102_prod_westeurope_002
-  ]
-}
-
-module "peer_project102_prod_global_004" {
-  source   = "./modules/virtual_network_peering"
-
-  name                    = var.peer_project102_prod_global_004.name
-  resource_group_name     = var.peer_project102_prod_global_004.resource_group_name
-  virtual_network_name    = var.peer_project102_prod_global_004.virtual_network_name
-  remote_virtual_network  = var.peer_project102_prod_global_004.remote_virtual_network
-  allow_forwarded_traffic = var.peer_project102_prod_global_004.allow_forwarded_traffic
-
-  depends_on = [
-    module.vnet_project102_prod_westeurope_001,
-    module.vnet_project102_prod_westeurope_002
-  ]
-}
-
 module "vwan_project102_prod_eastus_001" {
-  source   = "./modules/virtual_wan"
+  source = "./modules/virtual_wan"
 
   name                = var.vwan_project102_prod_eastus_001.name
   resource_group_name = var.vwan_project102_prod_eastus_001.resource_group_name
@@ -504,5 +473,20 @@ module "vwan_project102_prod_eastus_001" {
     module.vnet_project102_prod_eastus_002,
     module.vnet_project102_prod_eastus_003,
     module.vnet_project102_prod_eastus_004
+  ]
+}
+
+module "nm_project102_prod_westeurope_001" {
+  source = "./modules/network_manager"
+
+  name                = var.nm_project102_prod_westeurope_001.name
+  location            = var.nm_project102_prod_westeurope_001.location
+  resource_group_name = var.nm_project102_prod_westeurope_001.resource_group_name
+  scope_accesses      = var.nm_project102_prod_westeurope_001.scope_accesses
+  scope               = var.nm_project102_prod_westeurope_001.scope
+  network_groups      = var.nm_project102_prod_westeurope_001.network_groups
+
+  depends_on = [
+    module.rg_project102_prod_westeurope_001
   ]
 }

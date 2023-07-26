@@ -56,8 +56,6 @@ variable "peer_project102_prod_global_001" {}
 
 variable "peer_project102_prod_global_002" {}
 
-variable "peer_project102_prod_global_003" {}
-
-variable "peer_project102_prod_global_004" {}
-
 variable "vwan_project102_prod_eastus_001" {}
+
+variable "nm_project102_prod_westeurope_001" {}
