@@ -85,7 +85,7 @@ resource "azurerm_policy_definition" "custom_policies" {
 
 data "azurerm_subscription" "current" {
 }
-
+// TODO: Bu asagidaki block scope'taki tum subscriptionlara olmayacak mi?
 resource "azurerm_subscription_policy_assignment" "azure_policy_assignments" {
   for_each = local.network_group_policies
 
