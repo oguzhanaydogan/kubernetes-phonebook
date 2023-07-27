@@ -30,7 +30,7 @@ locals {
   }
 }
 
-resource "azurerm_network_manager" "network_manager_instance" {
+resource "azurerm_network_manager" "network_manager" {
   name                = var.name
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -45,7 +45,7 @@ resource "azurerm_network_manager_network_group" "network_groups" {
   for_each = var.network_groups
 
   name               = each.value.name
-  network_manager_id = azurerm_network_manager.network_manager_instance.id
+  network_manager_id = azurerm_network_manager.network_manager.id
 }
 
 resource "azurerm_policy_definition" "custom_policies" {
@@ -86,7 +86,7 @@ resource "azurerm_policy_definition" "custom_policies" {
 data "azurerm_subscription" "current" {
 }
 
-resource "azurerm_subscription_policy_assignment" "azure_policy_assignment" {
+resource "azurerm_subscription_policy_assignment" "azure_policy_assignments" {
   for_each = local.network_group_policies
 
   name                 = "${each.value.name}-policy-assignment"
@@ -94,11 +94,11 @@ resource "azurerm_subscription_policy_assignment" "azure_policy_assignment" {
   subscription_id      = data.azurerm_subscription.current.id
 }
 
-resource "azurerm_network_manager_connectivity_configuration" "connectivity_config" {
+resource "azurerm_network_manager_connectivity_configuration" "connectivity_configurations" {
   for_each = local.connectivity_configurations
 
   name                  = each.value.name
-  network_manager_id    = azurerm_network_manager.network_manager_instance.id
+  network_manager_id    = azurerm_network_manager.network_manager.id
   connectivity_topology = each.value.connectivity_topology
 
   applies_to_group {
@@ -107,11 +107,11 @@ resource "azurerm_network_manager_connectivity_configuration" "connectivity_conf
   }
 }
 
-resource "azurerm_network_manager_deployment" "commit_deployment" {
+resource "azurerm_network_manager_deployment" "network_manager_deployments" {
   for_each = local.connectivity_configurations
 
-  network_manager_id = azurerm_network_manager.network_manager_instance.id
+  network_manager_id = azurerm_network_manager.network_manager.id
   location           = each.value.deployment.location
   scope_access       = each.value.deployment.scope_access
-  configuration_ids  = [azurerm_network_manager_connectivity_configuration.connectivity_config[each.key].id]
+  configuration_ids  = [azurerm_network_manager_connectivity_configuration.connectivity_configurations[each.key].id]
 }
