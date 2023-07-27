@@ -2,12 +2,6 @@ data "azurerm_subscription" "current_subscription" {
   count = var.scope.current_subscription_enabled ? 1 : 0
 }
 
-data "azurerm_subscription" "other_subscriptions" {
-  for_each = toset(var.scope.other_subscription_ids)
-
-  subscription_id = each.value
-}
-
 locals {
   network_group_policies_flattened = flatten([
     for key, group in var.network_groups : [
@@ -37,7 +31,7 @@ resource "azurerm_network_manager" "network_manager" {
   scope_accesses      = var.scope_accesses
 
   scope {
-    subscription_ids = concat(try([data.azurerm_subscription.current_subscription[0].id], []), try(values(data.azurerm_subscription.other_subscriptions)[*].id, []))
+    subscription_ids = concat(try([data.azurerm_subscription.current_subscription[0].id], []), var.scope.other_subscription_ids)
   }
 }
 
@@ -83,15 +77,15 @@ resource "azurerm_policy_definition" "custom_policies" {
   POLICY_RULE
 }
 
-data "azurerm_subscription" "current" {
-}
-// TODO: Bu asagidaki block scope'taki tum subscriptionlara olmayacak mi?
 resource "azurerm_subscription_policy_assignment" "azure_policy_assignments" {
   for_each = local.network_group_policies
 
   name                 = "${each.value.name}-policy-assignment"
   policy_definition_id = azurerm_policy_definition.custom_policies[each.key].id
-  subscription_id      = data.azurerm_subscription.current.id
+  subscription_id      = coalesce(
+    each.value.subscription.is_current ? data.azurerm_subscription.current_subscription.id : "",
+    each.value.subscription.id
+  )
 }
 
 resource "azurerm_network_manager_connectivity_configuration" "connectivity_configurations" {

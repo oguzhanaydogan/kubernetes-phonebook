@@ -875,6 +875,9 @@ nm_project102_prod_westeurope_001 = {
       policies = {
         nmngp_project102_prod_westeurope_001 = {
           name = "nmngp-project102-prod-westeurope-001"
+          subscription = {
+            is_current = true 
+          }
           rule = {
             effect = "addToNetworkGroup"
             conditions = <<EOT

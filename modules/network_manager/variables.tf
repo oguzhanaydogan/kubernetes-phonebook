@@ -27,6 +27,10 @@ variable "network_groups" {
     name = string
     policies = map(object({
       name = string
+      subscription = object({
+        is_current = bool
+        id = optional(string, "")
+      })
       rule = object({
         effect     = string
         conditions = string
