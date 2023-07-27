@@ -877,8 +877,7 @@ nm_project102_prod_westeurope_001 = {
           name = "nmngp-project102-prod-westeurope-001"
           rule = {
             effect = "addToNetworkGroup"
-            # Since conditions block is injected into a Json structure formatting is extremely important.
-            conditions = <<-EOT
+            conditions = <<EOT
               {
                 "allOf": [
                   {
@@ -897,6 +896,10 @@ nm_project102_prod_westeurope_001 = {
           connectivity_topology = "Mesh"
           applies_to_group = {
             group_connectivity = "None"
+          }
+          deployment = {
+            location = "West Europe"
+            scope_access = "Connectivity"
           }
         }
       }

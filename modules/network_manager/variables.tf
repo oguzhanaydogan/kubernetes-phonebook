@@ -38,6 +38,10 @@ variable "network_groups" {
       applies_to_group = object({
         group_connectivity = string
       })
+      deployment = object({
+        location = string
+        scope_access = string
+      })
     }))
   }))
 }

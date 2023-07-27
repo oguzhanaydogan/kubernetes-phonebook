@@ -11,7 +11,7 @@ data "azurerm_subscription" "other_subscriptions" {
 locals {
   network_group_policies_flattened = flatten([
     for key, group in var.network_groups : [
-        for k, policy in group.policies : merge(policy, {network_group = key})
+      for k, policy in group.policies : merge(policy, { network_group = key })
     ]
   ])
 
@@ -21,7 +21,7 @@ locals {
 
   connectivity_configurations_flattened = flatten([
     for key, group in var.network_groups : [
-        for k, config in group.connectivity_configurations : merge(config, {network_group = key})
+      for k, config in group.connectivity_configurations : merge(config, { network_group = key })
     ]
   ])
 
@@ -51,7 +51,7 @@ resource "azurerm_network_manager_network_group" "network_groups" {
 resource "azurerm_policy_definition" "custom_policies" {
   for_each = local.network_group_policies
 
-  name         =  each.value.name
+  name         = each.value.name
   policy_type  = "Custom"
   mode         = "Microsoft.Network.Data"
   display_name = "Policy Definition for Network Group ${each.value.name}"
@@ -67,10 +67,10 @@ resource "azurerm_policy_definition" "custom_policies" {
       "if": {
         "allOf": [
           {
-              "field": "type",
-              "equals": "Microsoft.Network/virtualNetworks"
+            "field": "type",
+            "equals": "Microsoft.Network/virtualNetworks"
           },
-          "${each.value.rule.conditions}"
+          ${each.value.rule.conditions}
         ]
       },
       "then": {
@@ -95,7 +95,7 @@ resource "azurerm_subscription_policy_assignment" "azure_policy_assignment" {
 }
 
 resource "azurerm_network_manager_connectivity_configuration" "connectivity_config" {
-  for_each =   local.connectivity_configurations
+  for_each = local.connectivity_configurations
 
   name                  = each.value.name
   network_manager_id    = azurerm_network_manager.network_manager_instance.id
@@ -105,4 +105,13 @@ resource "azurerm_network_manager_connectivity_configuration" "connectivity_conf
     group_connectivity = each.value.applies_to_group.group_connectivity
     network_group_id   = azurerm_network_manager_network_group.network_groups[each.value.network_group].id
   }
+}
+
+resource "azurerm_network_manager_deployment" "commit_deployment" {
+  for_each = local.connectivity_configurations
+
+  network_manager_id = azurerm_network_manager.network_manager_instance.id
+  location           = each.value.deployment.location
+  scope_access       = each.value.deployment.scope_access
+  configuration_ids  = [azurerm_network_manager_connectivity_configuration.connectivity_config[each.key].id]
 }
