@@ -22,19 +22,19 @@ provider "azurerm" {
   }
 }
 
-module "bas_project102_prod_westeurope_001" {
-  source = "./modules/bastion_host"
+# module "bas_project102_prod_westeurope_001" {
+#   source = "./modules/bastion_host"
 
-  name                = var.bas_project102_prod_westeurope_001.name
-  resource_group_name = var.bas_project102_prod_westeurope_001.resource_group_name
-  location            = var.bas_project102_prod_westeurope_001.location
-  ip_configuration    = var.bas_project102_prod_westeurope_001.ip_configuration
+#   name                = var.bas_project102_prod_westeurope_001.name
+#   resource_group_name = var.bas_project102_prod_westeurope_001.resource_group_name
+#   location            = var.bas_project102_prod_westeurope_001.location
+#   ip_configuration    = var.bas_project102_prod_westeurope_001.ip_configuration
 
-  depends_on = [
-    module.vmss_project102_prod_westeurope_001,
-    module.pip_project102_prod_westeurope_001
-  ]
-}
+#   depends_on = [
+#     module.vmss_project102_prod_westeurope_001,
+#     module.pip_project102_prod_westeurope_001
+#   ]
+# }
 
 module "fw_project102_prod_eastus_001" {
   source = "./modules/firewall"
@@ -68,24 +68,24 @@ module "fwp_project102_prod_eastus_001" {
   ]
 }
 
-module "afd_project102_prod_global_001" {
-  source = "./modules/front_door"
+# module "afd_project102_prod_global_001" {
+#   source = "./modules/front_door"
 
-  name                = var.afd_project102_prod_global_001.name
-  resource_group_name = var.afd_project102_prod_global_001.resource_group_name
-  sku_name            = var.afd_project102_prod_global_001.sku_name
-  endpoints           = var.afd_project102_prod_global_001.endpoints
-  origin_groups       = var.afd_project102_prod_global_001.origin_groups
-  origins             = var.afd_project102_prod_global_001.origins
-  routes              = var.afd_project102_prod_global_001.routes
-  rule_sets           = var.afd_project102_prod_global_001.rule_sets
-  rules               = var.afd_project102_prod_global_001.rules
+#   name                = var.afd_project102_prod_global_001.name
+#   resource_group_name = var.afd_project102_prod_global_001.resource_group_name
+#   sku_name            = var.afd_project102_prod_global_001.sku_name
+#   endpoints           = var.afd_project102_prod_global_001.endpoints
+#   origin_groups       = var.afd_project102_prod_global_001.origin_groups
+#   origins             = var.afd_project102_prod_global_001.origins
+#   routes              = var.afd_project102_prod_global_001.routes
+#   rule_sets           = var.afd_project102_prod_global_001.rule_sets
+#   rules               = var.afd_project102_prod_global_001.rules
 
-  depends_on = [
-    module.lb_project102_prod_westeurope_001
-    # module.aks_project102_prod_eastus_001
-  ]
-}
+#   depends_on = [
+#     module.lb_project102_prod_westeurope_001
+#     # module.aks_project102_prod_eastus_001
+#   ]
+# }
 
 module "kvap_project102_prod_global_001" {
   source = "./modules/key_vault_access_policy"
@@ -123,7 +123,9 @@ module "kvs_project102_prod_global_001" {
 #   network_profile               = var.aks_project102_prod_eastus_001.network_profile
 
 #   depends_on = [
-#     module.vnet_project102_prod_eastus_001
+#     module.vnet_project102_prod_eastus_001,
+#     module.fw_project102_prod_eastus_001,
+#     module.vwan_project102_prod_eastus_001
 #   ]
 # }
 
@@ -152,48 +154,48 @@ module "vm_project102_prod_eastus_001" {
   ]
 }
 
-module "vmss_project102_prod_westeurope_001" {
-  source = "./modules/linux_virtual_machine_scale_set"
+# module "vmss_project102_prod_westeurope_001" {
+#   source = "./modules/linux_virtual_machine_scale_set"
 
-  name                   = var.vmss_project102_prod_westeurope_001.name
-  resource_group_name    = var.vmss_project102_prod_westeurope_001.resource_group_name
-  location               = var.vmss_project102_prod_westeurope_001.location
-  sku                    = var.vmss_project102_prod_westeurope_001.sku
-  instances              = var.vmss_project102_prod_westeurope_001.instances
-  admin_username         = var.vmss_project102_prod_westeurope_001.admin_username
-  shared_image           = var.vmss_project102_prod_westeurope_001.shared_image
-  upgrade_mode           = var.vmss_project102_prod_westeurope_001.upgrade_mode
-  load_balancer          = var.vmss_project102_prod_westeurope_001.load_balancer
-  health_probe_name      = var.vmss_project102_prod_westeurope_001.health_probe_name
-  admin_ssh_key          = var.vmss_project102_prod_westeurope_001.admin_ssh_key
-  os_disk                = var.vmss_project102_prod_westeurope_001.os_disk
-  network_interface      = var.vmss_project102_prod_westeurope_001.network_interface
-  rolling_upgrade_policy = var.vmss_project102_prod_westeurope_001.rolling_upgrade_policy
+#   name                   = var.vmss_project102_prod_westeurope_001.name
+#   resource_group_name    = var.vmss_project102_prod_westeurope_001.resource_group_name
+#   location               = var.vmss_project102_prod_westeurope_001.location
+#   sku                    = var.vmss_project102_prod_westeurope_001.sku
+#   instances              = var.vmss_project102_prod_westeurope_001.instances
+#   admin_username         = var.vmss_project102_prod_westeurope_001.admin_username
+#   shared_image           = var.vmss_project102_prod_westeurope_001.shared_image
+#   upgrade_mode           = var.vmss_project102_prod_westeurope_001.upgrade_mode
+#   load_balancer          = var.vmss_project102_prod_westeurope_001.load_balancer
+#   health_probe_name      = var.vmss_project102_prod_westeurope_001.health_probe_name
+#   admin_ssh_key          = var.vmss_project102_prod_westeurope_001.admin_ssh_key
+#   os_disk                = var.vmss_project102_prod_westeurope_001.os_disk
+#   network_interface      = var.vmss_project102_prod_westeurope_001.network_interface
+#   rolling_upgrade_policy = var.vmss_project102_prod_westeurope_001.rolling_upgrade_policy
 
-  depends_on = [
-    module.vnet_project102_prod_westeurope_001,
-    module.nsg_project102_prod_westeurope_001,
-    module.lb_project102_prod_westeurope_001
-  ]
-}
+#   depends_on = [
+#     module.vnet_project102_prod_westeurope_001,
+#     module.nsg_project102_prod_westeurope_001,
+#     module.lb_project102_prod_westeurope_001
+#   ]
+# }
 
-module "lb_project102_prod_westeurope_001" {
-  source = "./modules/load_balancer"
+# module "lb_project102_prod_westeurope_001" {
+#   source = "./modules/load_balancer"
 
-  name                       = var.lb_project102_prod_westeurope_001.name
-  resource_group_name        = var.lb_project102_prod_westeurope_001.resource_group_name
-  location                   = var.lb_project102_prod_westeurope_001.location
-  sku                        = var.lb_project102_prod_westeurope_001.sku
-  frontend_ip_configurations = var.lb_project102_prod_westeurope_001.frontend_ip_configurations
-  lb_backend_address_pools   = var.lb_project102_prod_westeurope_001.lb_backend_address_pools
-  lb_probes                  = var.lb_project102_prod_westeurope_001.lb_probes
-  lb_rules                   = var.lb_project102_prod_westeurope_001.lb_rules
-  private_link_service       = var.lb_project102_prod_westeurope_001.private_link_service
+#   name                       = var.lb_project102_prod_westeurope_001.name
+#   resource_group_name        = var.lb_project102_prod_westeurope_001.resource_group_name
+#   location                   = var.lb_project102_prod_westeurope_001.location
+#   sku                        = var.lb_project102_prod_westeurope_001.sku
+#   frontend_ip_configurations = var.lb_project102_prod_westeurope_001.frontend_ip_configurations
+#   lb_backend_address_pools   = var.lb_project102_prod_westeurope_001.lb_backend_address_pools
+#   lb_probes                  = var.lb_project102_prod_westeurope_001.lb_probes
+#   lb_rules                   = var.lb_project102_prod_westeurope_001.lb_rules
+#   private_link_service       = var.lb_project102_prod_westeurope_001.private_link_service
 
-  depends_on = [
-    module.vnet_project102_prod_westeurope_001
-  ]
-}
+#   depends_on = [
+#     module.vnet_project102_prod_westeurope_001
+#   ]
+# }
 
 module "nsg_project102_prod_eastus_001" {
   source = "./modules/network_security_group"
@@ -208,18 +210,18 @@ module "nsg_project102_prod_eastus_001" {
   ]
 }
 
-module "nsg_project102_prod_westeurope_001" {
-  source = "./modules/network_security_group"
+# module "nsg_project102_prod_westeurope_001" {
+#   source = "./modules/network_security_group"
 
-  name                = var.nsg_project102_prod_westeurope_001.name
-  resource_group_name = var.nsg_project102_prod_westeurope_001.resource_group_name
-  location            = var.nsg_project102_prod_westeurope_001.location
-  security_rules      = var.nsg_project102_prod_westeurope_001.security_rules
+#   name                = var.nsg_project102_prod_westeurope_001.name
+#   resource_group_name = var.nsg_project102_prod_westeurope_001.resource_group_name
+#   location            = var.nsg_project102_prod_westeurope_001.location
+#   security_rules      = var.nsg_project102_prod_westeurope_001.security_rules
 
-  depends_on = [
-    module.rg_project102_prod_westeurope_001
-  ]
-}
+#   depends_on = [
+#     module.rg_project102_prod_westeurope_001
+#   ]
+# }
 
 module "privatelink_database_windows_net_project102_prod_global_001" {
   source = "./modules/private_dns_zone"
@@ -253,22 +255,22 @@ module "pep_project102_prod_eastus_001" {
   ]
 }
 
-module "pep_project102_prod_westeurope_001" {
-  source = "./modules/private_endpoint"
+# module "pep_project102_prod_westeurope_001" {
+#   source = "./modules/private_endpoint"
 
-  name                       = var.pep_project102_prod_westeurope_001.name
-  resource_group_name        = var.pep_project102_prod_westeurope_001.resource_group_name
-  location                   = var.pep_project102_prod_westeurope_001.location
-  subnet                     = var.pep_project102_prod_westeurope_001.subnet
-  attached_resource          = var.pep_project102_prod_westeurope_001.attached_resource
-  private_service_connection = var.pep_project102_prod_westeurope_001.private_service_connection
-  private_dns_zone_group     = var.pep_project102_prod_westeurope_001.private_dns_zone_group
+#   name                       = var.pep_project102_prod_westeurope_001.name
+#   resource_group_name        = var.pep_project102_prod_westeurope_001.resource_group_name
+#   location                   = var.pep_project102_prod_westeurope_001.location
+#   subnet                     = var.pep_project102_prod_westeurope_001.subnet
+#   attached_resource          = var.pep_project102_prod_westeurope_001.attached_resource
+#   private_service_connection = var.pep_project102_prod_westeurope_001.private_service_connection
+#   private_dns_zone_group     = var.pep_project102_prod_westeurope_001.private_dns_zone_group
 
-  depends_on = [
-    module.privatelink_database_windows_net_project102_prod_global_001,
-    module.sql_project102_prod_westeurope_001
-  ]
-}
+#   depends_on = [
+#     module.privatelink_database_windows_net_project102_prod_global_001,
+#     module.sql_project102_prod_westeurope_001
+#   ]
+# }
 
 module "pip_project102_prod_eastus_001" {
   source = "./modules/public_ip_address"
@@ -284,19 +286,19 @@ module "pip_project102_prod_eastus_001" {
   ]
 }
 
-module "pip_project102_prod_westeurope_001" {
-  source = "./modules/public_ip_address"
+# module "pip_project102_prod_westeurope_001" {
+#   source = "./modules/public_ip_address"
 
-  name                = var.pip_project102_prod_westeurope_001.name
-  resource_group_name = var.pip_project102_prod_westeurope_001.resource_group_name
-  location            = var.pip_project102_prod_westeurope_001.location
-  allocation_method   = var.pip_project102_prod_westeurope_001.allocation_method
-  sku                 = var.pip_project102_prod_westeurope_001.sku
+#   name                = var.pip_project102_prod_westeurope_001.name
+#   resource_group_name = var.pip_project102_prod_westeurope_001.resource_group_name
+#   location            = var.pip_project102_prod_westeurope_001.location
+#   allocation_method   = var.pip_project102_prod_westeurope_001.allocation_method
+#   sku                 = var.pip_project102_prod_westeurope_001.sku
 
-  depends_on = [
-    module.rg_project102_prod_westeurope_001
-  ]
-}
+#   depends_on = [
+#     module.rg_project102_prod_westeurope_001
+#   ]
+# }
 
 module "rg_project102_prod_eastus_001" {
   source = "./modules/resource_group"
@@ -329,23 +331,23 @@ module "sql_project102_prod_eastus_001" {
   ]
 }
 
-module "sql_project102_prod_westeurope_001" {
-  source = "./modules/mssql_server"
+# module "sql_project102_prod_westeurope_001" {
+#   source = "./modules/mssql_server"
 
-  name                = var.sql_project102_prod_westeurope_001.name
-  resource_group_name = var.sql_project102_prod_westeurope_001.resource_group_name
-  location            = var.sql_project102_prod_westeurope_001.location
-  msqql_version       = var.sql_project102_prod_westeurope_001.version
-  administrator_login = var.sql_project102_prod_westeurope_001.administrator_login
-  tags                = var.sql_project102_prod_westeurope_001.tags
-  mssql_databases     = var.sql_project102_prod_westeurope_001.mssql_databases
+#   name                = var.sql_project102_prod_westeurope_001.name
+#   resource_group_name = var.sql_project102_prod_westeurope_001.resource_group_name
+#   location            = var.sql_project102_prod_westeurope_001.location
+#   msqql_version       = var.sql_project102_prod_westeurope_001.version
+#   administrator_login = var.sql_project102_prod_westeurope_001.administrator_login
+#   tags                = var.sql_project102_prod_westeurope_001.tags
+#   mssql_databases     = var.sql_project102_prod_westeurope_001.mssql_databases
 
-  depends_on = [
-    module.rg_project102_prod_westeurope_001,
-    module.kvs_project102_prod_global_001,
-    module.sql_project102_prod_eastus_001
-  ]
-}
+#   depends_on = [
+#     module.rg_project102_prod_westeurope_001,
+#     module.kvs_project102_prod_global_001,
+#     module.sql_project102_prod_eastus_001
+#   ]
+# }
 
 module "vnet_project102_prod_eastus_001" {
   source = "./modules/virtual_network"
@@ -476,17 +478,17 @@ module "vwan_project102_prod_eastus_001" {
   ]
 }
 
-module "nm_project102_prod_westeurope_001" {
-  source = "./modules/network_manager"
+# module "nm_project102_prod_westeurope_001" {
+#   source = "./modules/network_manager"
 
-  name                = var.nm_project102_prod_westeurope_001.name
-  location            = var.nm_project102_prod_westeurope_001.location
-  resource_group_name = var.nm_project102_prod_westeurope_001.resource_group_name
-  scope_accesses      = var.nm_project102_prod_westeurope_001.scope_accesses
-  scope               = var.nm_project102_prod_westeurope_001.scope
-  network_groups      = var.nm_project102_prod_westeurope_001.network_groups
+#   name                = var.nm_project102_prod_westeurope_001.name
+#   location            = var.nm_project102_prod_westeurope_001.location
+#   resource_group_name = var.nm_project102_prod_westeurope_001.resource_group_name
+#   scope_accesses      = var.nm_project102_prod_westeurope_001.scope_accesses
+#   scope               = var.nm_project102_prod_westeurope_001.scope
+#   network_groups      = var.nm_project102_prod_westeurope_001.network_groups
 
-  depends_on = [
-    module.rg_project102_prod_westeurope_001
-  ]
-}
+#   depends_on = [
+#     module.rg_project102_prod_westeurope_001
+#   ]
+# }
