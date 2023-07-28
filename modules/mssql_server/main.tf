@@ -166,10 +166,10 @@ resource "azapi_resource" "sync_group_memberships_memberships" {
       databaseType                      = each.value.own_database_type
       userName                          = local.administrator_login_username
       password                          = local.administrator_login_password
-      syncMemberAzureDatabaseResourceId = azurerm_mssql_database.mssql_database[join("_", split("-", each.value.database))].id
+      syncMemberAzureDatabaseResourceId = azurerm_mssql_database.mssql_database[replace(each.value.database, "-", "_")].id
       usePrivateLinkConnection          = each.value.usePrivateLinkConnection
       serverName                        = azurerm_mssql_server.mssql_server.fully_qualified_domain_name
-      syncDirection                     = "Bidirectional"
+      syncDirection                     = each.value.syncDirection
       # Sync group hub
       # syncAgentId         = data.azurerm_mssql_database.sync_group_memberships_databases["${each.value.sync_group.server.name}_${each.value.sync_group.database.name}"].id // TODO: Try removing this line
     }

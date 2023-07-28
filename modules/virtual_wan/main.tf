@@ -1,7 +1,19 @@
-// TODO: Routelarin next hopunu halletmemiz lazim!
-
 locals {
-  # Inject 'reference_name' and 'virtual_hub' info into the 'connection' before flattening
+  # Gather 'firewall_policy's from all the 'virtual_hub's
+  virtual_hub_firewall_policies = {
+    for key, virtual_hub in var.virtual_hubs :
+    key => virtual_hub.firewall.policy
+  }
+
+  # Gather 'firewall's from all the 'virtual_hub's
+  virtual_hub_firewalls = {
+    for key, virtual_hub in var.virtual_hubs :
+    key => virtual_hub.firewall
+  }
+
+  # We will lose the hierarchical info after flattening,
+  # in this case 'virtual_hub' and 'reference_name' of the 'connection'.
+  # Inject these into the 'connection' before flattening
   virtual_hub_connections_flattened = flatten(
     [
       for key, virtual_hub in var.virtual_hubs :
@@ -24,7 +36,9 @@ locals {
     key => connection.remote_virtual_network
   }
 
-  # Inject 'reference_name' and 'virtual_hub' info into the 'route_table' before flattening
+  # We will lose the hierarchical info after flattening,
+  # in this case 'virtual_hub' and 'reference_name' of the 'route_table.
+  # Inject these into the 'connection' before flattening
   route_tables_flattened = flatten(
     [
       for key, virtual_hub in var.virtual_hubs :
@@ -41,7 +55,9 @@ locals {
     "${route_table.virtual_hub}_${route_table.reference_name}" => route_table
   }
 
-  # Inject 'reference_name' and 'virtual_hub' info into the 'route_table_route' before flattening
+  # We will lose the hierarchical info after flattening,
+  # in this case 'virtual_hub' and 'reference_name' of the 'route_table_route'.
+  # Inject these into the 'connection' before flattening
   route_table_routes_flattened = flatten(
     [
       for key, virtual_hub in var.virtual_hubs :
@@ -52,14 +68,15 @@ locals {
     ]
   )
 
-  # Add 'virtual_hub' to the key since different virtual hubs can have connections with the same name
+  # Add 'virtual_hub' to the key since different virtual hubs can have routes with the same name
   route_table_routes = {
     for route in local.route_table_routes_flattened :
     "${route.virtual_hub}_${route.reference_name}" => route
   }
 
   # Since same firewall can be referred by different routes, there may be duplicates
-  route_table_routes_firewalls = {
+  # Use 'for loop' grouping
+  route_table_route_firewalls = {
     for key, route in local.route_table_routes :
     key => route.next_hop.firewall...
   }
@@ -81,6 +98,29 @@ resource "azurerm_virtual_hub" "virtual_hubs" {
   address_prefix      = each.value.address_prefix
 }
 
+data "azurerm_firewall_policy" "virtual_hub_firewall_policies" {
+  for_each = local.virtual_hub_firewall_policies
+
+  name                = each.value.name
+  resource_group_name = each.value.resource_group_name
+}
+
+module "virtual_hub_firewalls" {
+  source   = "../firewall"
+  for_each = local.virtual_hub_firewalls
+
+  name                = each.value.name
+  resource_group_name = each.value.resource_group_name
+  location            = each.value.location
+  sku_name            = each.value.sku_name
+  sku_tier            = each.value.sku_tier
+  firewall_policy     = data.azurerm_firewall_policy.virtual_hub_firewall_policies[each.key]
+  virtual_hub = {
+    name                = azurerm_virtual_hub.virtual_hubs[each.key].name
+    resource_group_name = azurerm_virtual_hub.virtual_hubs[each.key].resource_group_name
+  }
+}
+
 data "azurerm_virtual_network" "virtual_networks" {
   for_each = local.virtual_networks
 
@@ -98,10 +138,10 @@ resource "azurerm_virtual_hub_connection" "virtual_hub_connections" {
   routing {
     associated_route_table_id = (
       each.value.routing.associated_route_table == "Default" ?
-      azurerm_virtual_hub.virtual_hubs[each.value.virtual_hub].route_table_id :
+      azurerm_virtual_hub.virtual_hubs[each.value.virtual_hub].default_route_table_id :
       (
         each.value.routing.associated_route_table == "None" ?
-        replace(azurerm_virtual_hub.virtual_hubs[each.value.virtual_hub].route_table_id, "defaultRouteTable", "noneRouteTable") :
+        replace(azurerm_virtual_hub.virtual_hubs[each.value.virtual_hub].default_route_table_id, "defaultRouteTable", "noneRouteTable") :
         azurerm_virtual_hub_route_table.virtual_hub_route_tables["${each.value.virtual_hub}_${each.value.reference_name}"].id
       )
     )
@@ -109,17 +149,17 @@ resource "azurerm_virtual_hub_connection" "virtual_hub_connections" {
       route_table_ids = concat(
         [
           for route_table in each.value.routing.propagated_route_tables :
-          azurerm_virtual_hub.virtual_hubs[route_table.virtual_hub].route_table_id
+          azurerm_virtual_hub.virtual_hubs[route_table.virtual_hub].default_route_table_id
           if route_table.name == "Default"
         ],
         [
           for route_table in each.value.routing.propagated_route_tables :
-          replace(azurerm_virtual_hub.virtual_hubs[route_table.virtual_hub].route_table_id, "defaultRouteTable", "noneRouteTable")
+          replace(azurerm_virtual_hub.virtual_hubs[route_table.virtual_hub].default_route_table_id, "defaultRouteTable", "noneRouteTable")
           if route_table.name == "None"
         ],
         [
           for route_table in each.value.routing.propagated_route_tables :
-          azurerm_virtual_hub_route_table.virtual_hub_route_tables["${route_table.virtual_hub}_${route_table.refrence_name}"].id
+          azurerm_virtual_hub_route_table.virtual_hub_route_tables["${route_table.virtual_hub}_${route_table.reference_name}"].id
           if route_table.name != "Default" && route_table.name != "None"
         ]
       )
@@ -127,11 +167,17 @@ resource "azurerm_virtual_hub_connection" "virtual_hub_connections" {
   }
 }
 
-data "azurerm_firewall" "route_table_routes_firewalls" {
-  for_each = local.route_table_routes_firewalls
+# Below firewall is not used to attach to the hub.
+# It is done in the firewall resource module via a 'virtual_hub_ block.
+data "azurerm_firewall" "route_table_route_firewalls" {
+  for_each = local.route_table_route_firewalls
 
+  # Since we used grouping, the value is a list of the same object multiple times
+  # Therefore, we can use the very first one
   name                = each.value[0].name
   resource_group_name = each.value[0].resource_group_name
+
+  depends_on = [ module.virtual_hub_firewalls ]
 }
 
 # CYCLE ALERT! Letting the route tables create their own routes causes a cycle because
@@ -144,18 +190,20 @@ resource "azurerm_virtual_hub_route_table" "virtual_hub_route_tables" {
   virtual_hub_id = azurerm_virtual_hub.virtual_hubs[each.value.virtual_hub].id
 }
 
+# Used for creating 'Default route table' routes as well
 resource "azurerm_virtual_hub_route_table_route" "route_table_routes" {
   for_each = local.route_table_routes
 
-  route_table_id = azurerm_virtual_hub.virtual_hubs[each.value.virtual_hub].route_table_id
+  route_table_id = azurerm_virtual_hub.virtual_hubs[each.value.virtual_hub].default_route_table_id
 
   name              = each.value.name
   destinations_type = each.value.destinations_type
   destinations      = each.value.destinations
   next_hop_type     = each.value.next_hop_type
+  # We need the connection's reference name rather than its name
   next_hop = (
     each.value.next_hop.firewall != {} ?
-    data.azurerm_firewall.route_table_routes_firewalls[each.key] :
-    azurerm_virtual_hub_connection.virtual_hub_connections["${each.value.virtual_hub}_${each.value.next_hop.connection_name}"].id
+    data.azurerm_firewall.route_table_route_firewalls[each.key].id :
+    azurerm_virtual_hub_connection.virtual_hub_connections["${each.value.virtual_hub}_${replace(each.value.next_hop.connection_name, "-", "_")}"].id
   )
 }

@@ -36,24 +36,6 @@ provider "azurerm" {
 #   ]
 # }
 
-module "fw_project102_prod_eastus_001" {
-  source = "./modules/firewall"
-
-  name                = var.fw_project102_prod_eastus_001.name
-  resource_group_name = var.fw_project102_prod_eastus_001.resource_group_name
-  location            = var.fw_project102_prod_eastus_001.location
-  sku_name            = var.fw_project102_prod_eastus_001.sku_name
-  sku_tier            = var.fw_project102_prod_eastus_001.sku_tier
-  firewall_policy     = var.fw_project102_prod_eastus_001.firewall_policy
-  virtual_hub         = var.fw_project102_prod_eastus_001.virtual_hub
-
-  depends_on = [
-    module.vnet_project102_prod_eastus_001,
-    module.fwp_project102_prod_eastus_001,
-    module.vwan_project102_prod_eastus_001
-  ]
-}
-
 module "fwp_project102_prod_eastus_001" {
   source = "./modules/firewall_policy"
 
@@ -474,7 +456,8 @@ module "vwan_project102_prod_eastus_001" {
   depends_on = [
     module.vnet_project102_prod_eastus_002,
     module.vnet_project102_prod_eastus_003,
-    module.vnet_project102_prod_eastus_004
+    module.vnet_project102_prod_eastus_004,
+    module.fwp_project102_prod_eastus_001
   ]
 }
 

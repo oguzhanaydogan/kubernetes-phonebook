@@ -15,6 +15,17 @@ variable "virtual_hubs" {
   type = map(object({
     name           = string
     address_prefix = string
+    firewall = optional(object({
+      name                = string
+      resource_group_name = string
+      location            = string
+      sku_name            = string
+      sku_tier            = string
+      policy = optional(object({
+        name                = string
+        resource_group_name = string
+      }))
+    }))
     virtual_hub_connections = optional(map(object({
       name = string
       remote_virtual_network = object({
@@ -32,9 +43,9 @@ variable "virtual_hubs" {
     route_tables = optional(map(object({
       name = string
     })), {})
-    default_route_table_routes = optional(map(object({
+    route_table_routes = optional(map(object({
       name              = string
-      route_table = string
+      route_table       = string
       destinations_type = string
       destinations      = list(string)
       next_hop_type     = string
@@ -42,8 +53,8 @@ variable "virtual_hubs" {
         firewall = optional(object({
           name                = string
           resource_group_name = string
-        }), null)
-        connection_name = optional(string)
+        }))
+        connection_name = optional(string, "")
       })
     })), {})
   }))

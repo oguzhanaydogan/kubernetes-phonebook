@@ -1,7 +1,5 @@
 variable "bas_project102_prod_westeurope_001" {}
 
-variable "fw_project102_prod_eastus_001" {}
-
 variable "fwp_project102_prod_eastus_001" {}
 
 variable "afd_project102_prod_global_001" {}

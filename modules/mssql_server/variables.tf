@@ -74,6 +74,7 @@ variable "mssql_databases" {
       })
       own_database_type        = string
       usePrivateLinkConnection = bool
+      syncDirection            = string
     })), {})
   }))
 }

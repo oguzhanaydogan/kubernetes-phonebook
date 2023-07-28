@@ -16,52 +16,6 @@ bas_project102_prod_westeurope_001 = {
   }
 }
 
-fw_project102_prod_eastus_001 = { # hub-us
-  name                = "fw-project102-prod-eastus-001"
-  resource_group_name = "rg-project102-prod-eastus-001"
-  location            = "East US"
-  sku_name            = "AZFW_Hub"
-  sku_tier            = "Basic"
-  firewall_policy = {
-    name                = "fwp-project102-prod-eastus-001"
-    resource_group_name = "rg-project102-prod-eastus-001"
-  }
-  virtual_hub = {
-    name                = "vwanvh-project102-prod-eastus-001"
-    resource_group_name = "rg-project102-prod-eastus-001"
-  }
-}
-
-fwp_project102_prod_eastus_001 = {
-  name                = "fwp-project102-prod-eastus-001"
-  resource_group_name = "rg-project102-prod-eastus-001"
-  location            = "East US"
-  sku                 = "Basic"
-
-  rule_collection_groups = {
-    fwp_project102_prod_eastus_001 = {
-      name     = "fwp-project102-prod-eastus-001"
-      priority = 100
-      network_rule_collections = {
-        network_rule_collection_1 = {
-          name     = "network-rule-collection-1"
-          priority = 100
-          action   = "Allow"
-          rules = {
-            subnet_aks_us_to_subnet_sql_us_pep = { // TODO: Bunun karsisi da gerekebilir.
-              name                  = "subnet-aks-us-to-subnet-sql-us-pep"
-              protocols             = ["TCP"]
-              source_addresses      = ["10.1.1.0/24"]
-              destination_addresses = ["10.3.2.0/24"]
-              destination_ports     = ["1433"]
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
 afd_project102_prod_global_001 = { # phonebook
   name                = "afd-project102-prod-global-001"
   resource_group_name = "rg-project102-prod-eastus-001"
@@ -608,6 +562,7 @@ sql_project102_prod_eastus_001 = {
           conflictResolutionPolicy = "HubWin"
           interval                 = 60
           usePrivateLinkConnection = false
+          syncDirection            = "Bidirectional"
         }
       }
     }
@@ -795,6 +750,36 @@ peer_project102_prod_global_002 = { # sql-eu_sql-us
   allow_forwarded_traffic = true
 }
 
+fwp_project102_prod_eastus_001 = {
+  name                = "fwp-project102-prod-eastus-001"
+  resource_group_name = "rg-project102-prod-eastus-001"
+  location            = "East US"
+  sku                 = "Basic"
+
+  rule_collection_groups = {
+    fwp_project102_prod_eastus_001 = {
+      name     = "fwp-project102-prod-eastus-001"
+      priority = 100
+      network_rule_collections = {
+        network_rule_collection_1 = {
+          name     = "network-rule-collection-1"
+          priority = 100
+          action   = "Allow"
+          rules = {
+            subnet_aks_us_to_subnet_sql_us_pep = { // TODO: Bunun karsisi da gerekebilir.
+              name                  = "subnet-aks-us-to-subnet-sql-us-pep"
+              protocols             = ["TCP"]
+              source_addresses      = ["10.1.1.0/24"]
+              destination_addresses = ["10.3.2.0/24"]
+              destination_ports     = ["1433"]
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 vwan_project102_prod_eastus_001 = {
   name                = "vwan-project102-prod-eastus-001"
   resource_group_name = "rg-project102-prod-eastus-001"
@@ -803,6 +788,17 @@ vwan_project102_prod_eastus_001 = {
     vwanvh_project102_prod_eastus_001 = {
       name           = "vwanvh-project102-prod-eastus-001"
       address_prefix = "10.31.0.0/16"
+      firewall = {
+        name                = "fw-project102-prod-eastus-001"
+        resource_group_name = "rg-project102-prod-eastus-001"
+        location            = "East US"
+        sku_name            = "AZFW_Hub"
+        sku_tier            = "Basic"
+        policy = {
+          name                = "fwp-project102-prod-eastus-001"
+          resource_group_name = "rg-project102-prod-eastus-001"
+        }
+      }
       virtual_hub_connections = {
         vwanvhc_project102_prod_eastus_001 = { # acr
           name = "vwanvhc-project102-prod-eastus-001"
@@ -855,9 +851,9 @@ vwan_project102_prod_eastus_001 = {
       route_table_routes = {
         internal_traffic_to_firewall = {
           name              = "internal-traffic-to-firewall"
-          route_table  = "Default"
+          route_table       = "Default"
           destinations_type = "CIDR"
-          destinations      = "10.0.0.0/8"
+          destinations      = ["10.0.0.0/8"]
           next_hop_type     = "ResourceId"
           next_hop = {
             firewall = {
