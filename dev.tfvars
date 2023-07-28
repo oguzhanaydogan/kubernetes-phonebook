@@ -773,6 +773,13 @@ fwp_project102_prod_eastus_001 = {
               destination_addresses = ["10.3.2.0/24"]
               destination_ports     = ["1433"]
             }
+            subnet_aks_us_to_internet = { // TODO: Bunun karsisi da gerekebilir.
+              name                  = "subnet-aks-us-to-internet"
+              protocols             = ["TCP"]
+              source_addresses      = ["10.1.1.0/24"]
+              destination_addresses = ["0.0.0.0/0"]
+              destination_ports     = ["80", "443"]
+            }
           }
         }
       }
@@ -849,11 +856,11 @@ vwan_project102_prod_eastus_001 = {
         }
       }
       route_table_routes = {
-        internal_traffic_to_firewall = {
-          name              = "internal-traffic-to-firewall"
+        all_traffic_to_firewall = {
+          name              = "all-traffic-to-firewall"
           route_table       = "Default"
           destinations_type = "CIDR"
-          destinations      = ["10.0.0.0/8"]
+          destinations      = ["0.0.0.0/0"]
           next_hop_type     = "ResourceId"
           next_hop = {
             firewall = {
