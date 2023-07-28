@@ -51,8 +51,8 @@ fwp_project102_prod_eastus_001 = {
             subnet_aks_us_to_subnet_sql_us_pep = { // TODO: Bunun karsisi da gerekebilir.
               name                  = "subnet-aks-us-to-subnet-sql-us-pep"
               protocols             = ["TCP"]
-              source_addresses      = ["10.0.1.0/24"]
-              destination_addresses = ["10.2.2.0/24"]
+              source_addresses      = ["10.1.1.0/24"]
+              destination_addresses = ["10.3.2.0/24"]
               destination_ports     = ["1433"]
             }
           }
@@ -218,8 +218,8 @@ aks_project102_prod_eastus_001 = {
   network_profile = {
     network_plugin     = "azure"
     network_policy     = "azure"
-    service_cidr       = "10.0.3.0/24"
-    dns_service_ip     = "10.0.3.4"
+    service_cidr       = "10.1.3.0/24"
+    dns_service_ip     = "10.1.3.4"
     docker_bridge_cidr = "172.17.0.1/16"
     outbound_type      = "userDefinedRouting"
   }
@@ -676,15 +676,15 @@ vnet_project102_prod_eastus_001 = { # app
   name                = "vnet-project102-prod-eastus-001"
   resource_group_name = "rg-project102-prod-eastus-001"
   location            = "East US"
-  address_space       = ["10.0.0.0/16"]
+  address_space       = ["10.1.0.0/16"]
   subnets = {
     snet_project102_prod_eastus_001 = { # aks
       name             = "snet-project102-prod-eastus-001"
-      address_prefixes = ["10.0.1.0/24"]
+      address_prefixes = ["10.1.1.0/24"]
     }
     snet_project102_prod_eastus_002 = { # agw
       name             = "snet-project102-prod-eastus-002"
-      address_prefixes = ["10.0.2.0/24"]
+      address_prefixes = ["10.1.2.0/24"]
     }
   }
 }
@@ -692,11 +692,11 @@ vnet_project102_prod_eastus_002 = { # acr
   name                = "vnet-project102-prod-eastus-002"
   resource_group_name = "rg-project102-prod-eastus-001"
   location            = "East US"
-  address_space       = ["10.1.0.0/16"]
+  address_space       = ["10.2.0.0/16"]
   subnets = {
     snet_project102_prod_eastus_003 = { # acr
       name             = "snet-project102-prod-eastus-004"
-      address_prefixes = ["10.1.1.0/24"]
+      address_prefixes = ["10.2.1.0/24"]
     }
   }
 }
@@ -704,15 +704,15 @@ vnet_project102_prod_eastus_003 = { # sql
   name                = "vnet-project102-prod-eastus-003"
   resource_group_name = "rg-project102-prod-eastus-001"
   location            = "East US"
-  address_space       = ["10.2.0.0/16"]
+  address_space       = ["10.3.0.0/16"]
   subnets = {
     snet_project102_prod_eastus_004 = { # sql-us
       name             = "snet-project102-prod-eastus-005"
-      address_prefixes = ["10.2.1.0/24"]
+      address_prefixes = ["10.3.1.0/24"]
     }
     snet_project102_prod_eastus_005 = { # sql-us-pep
       name             = "snet-project102-prod-eastus-006"
-      address_prefixes = ["10.2.2.0/24"]
+      address_prefixes = ["10.3.2.0/24"]
     }
   }
 }
@@ -720,11 +720,11 @@ vnet_project102_prod_eastus_004 = { # agent
   name                = "vnet-project102-prod-eastus-004"
   resource_group_name = "rg-project102-prod-eastus-001"
   location            = "East US"
-  address_space       = ["10.3.0.0/16"]
+  address_space       = ["10.4.0.0/16"]
   subnets = {
     snet_project102_prod_eastus_006 = { # agent
       name             = "snet-project102-prod-eastus-007"
-      address_prefixes = ["10.3.1.0/24"]
+      address_prefixes = ["10.4.1.0/24"]
     }
   }
 }
@@ -732,28 +732,28 @@ vnet_project102_prod_westeurope_001 = { # app
   name                = "vnet-project102-prod-westeurope-001"
   resource_group_name = "rg-project102-prod-westeurope-001"
   location            = "West Europe"
-  address_space       = ["10.10.0.0/16"]
+  address_space       = ["10.11.0.0/16"]
   subnets = {
     snet_project102_prod_westeurope_001 = { # app
       name             = "snet-project102-prod-westeurope-001"
-      address_prefixes = ["10.10.1.0/24"]
+      address_prefixes = ["10.11.1.0/24"]
     }
     snet_project102_prod_westeurope_002 = { # lb
       name             = "snet-project102-prod-westeurope-002"
-      address_prefixes = ["10.10.2.0/24"]
+      address_prefixes = ["10.11.2.0/24"]
     }
     snet_project102_prod_westeurope_003 = { # lb-pls
       name                                          = "snet-project102-prod-westeurope-003"
-      address_prefixes                              = ["10.10.3.0/24"]
+      address_prefixes                              = ["10.11.3.0/24"]
       private_link_service_network_policies_enabled = false
     }
     snet_project102_prod_westeurope_004 = { # lb-pls-pep
       name             = "snet-project102-prod-westeurope-004"
-      address_prefixes = ["10.10.4.0/24"]
+      address_prefixes = ["10.11.4.0/24"]
     }
     snet_project102_prod_westeurope_005 = { # bastion
       name             = "AzureBastionSubnet"
-      address_prefixes = ["10.10.5.0/24"]
+      address_prefixes = ["10.11.5.0/24"]
     }
   }
 }
@@ -761,15 +761,15 @@ vnet_project102_prod_westeurope_002 = { # sql
   name                = "vnet-project102-prod-westeurope-002"
   resource_group_name = "rg-project102-prod-westeurope-001"
   location            = "West Europe"
-  address_space       = ["10.11.0.0/16"]
+  address_space       = ["10.12.0.0/16"]
   subnets = {
     snet_project102_prod_westeurope_006 = { # sql-eu
       name             = "snet-project102-prod-westeurope-006"
-      address_prefixes = ["10.11.1.0/24"]
+      address_prefixes = ["10.12.1.0/24"]
     }
     snet_project102_prod_westeurope_007 = { # sql-eu-pep
       name             = "snet-project102-prod-westeurope-007"
-      address_prefixes = ["10.11.2.0/24"]
+      address_prefixes = ["10.12.2.0/24"]
     }
   }
 }
@@ -802,7 +802,7 @@ vwan_project102_prod_eastus_001 = {
   virtual_hubs = {
     vwanvh_project102_prod_eastus_001 = {
       name           = "vwanvh-project102-prod-eastus-001"
-      address_prefix = "10.30.0.0/16"
+      address_prefix = "10.31.0.0/16"
       virtual_hub_connections = {
         vwanvhc_project102_prod_eastus_001 = { # acr
           name = "vwanvhc-project102-prod-eastus-001"
@@ -827,8 +827,12 @@ vwan_project102_prod_eastus_001 = {
             resource_group_name = "rg-project102-prod-eastus-001"
           }
           routing = {
-            associated_route_table  = "Default"
-            propagated_route_tables = []
+            associated_route_table = "Default"
+            propagated_route_tables = [{
+              name        = "Default"
+              virtual_hub = "vwanvh_project102_prod_eastus_001"
+              }
+            ]
           }
         }
         vwanvhc_project102_prod_eastus_003 = { # SQL
@@ -841,22 +845,28 @@ vwan_project102_prod_eastus_001 = {
             associated_route_table = "Default"
             propagated_route_tables = [
               {
-                name        = "Default"
+                name        = "None"
                 virtual_hub = "vwanvh_project102_prod_eastus_001"
               }
             ]
           }
         }
       }
-      # route_table_routes = {
-      #   route_01 = {
-      #     name =
-      #     destinations_type =
-      #     destinations =
-      #     next_hop_type =
-      #     next_hop_connection =
-      #   }
-      # }
+      route_table_routes = {
+        internal_traffic_to_firewall = {
+          name              = "internal-traffic-to-firewall"
+          route_table  = "Default"
+          destinations_type = "CIDR"
+          destinations      = "10.0.0.0/8"
+          next_hop_type     = "ResourceId"
+          next_hop = {
+            firewall = {
+              name                = "fw-project102-prod-eastus-001"
+              resource_group_name = "rg-project102-prod-eastus-001"
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -876,10 +886,10 @@ nm_project102_prod_westeurope_001 = {
         nmngp_project102_prod_westeurope_001 = {
           name = "nmngp-project102-prod-westeurope-001"
           subscription = {
-            is_current = true 
+            is_current = true
           }
           rule = {
-            effect = "addToNetworkGroup"
+            effect     = "addToNetworkGroup"
             conditions = <<EOT
               {
                 "allOf": [
@@ -901,7 +911,7 @@ nm_project102_prod_westeurope_001 = {
             group_connectivity = "None"
           }
           deployment = {
-            location = "West Europe"
+            location     = "West Europe"
             scope_access = "Connectivity"
           }
         }

@@ -82,7 +82,7 @@ resource "azurerm_subscription_policy_assignment" "azure_policy_assignments" {
 
   name                 = "${each.value.name}-policy-assignment"
   policy_definition_id = azurerm_policy_definition.custom_policies[each.key].id
-  subscription_id      = coalesce(
+  subscription_id = coalesce(
     each.value.subscription.is_current ? data.azurerm_subscription.current_subscription.id : "",
     each.value.subscription.id
   )

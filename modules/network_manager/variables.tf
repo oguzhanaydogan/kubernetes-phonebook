@@ -29,7 +29,7 @@ variable "network_groups" {
       name = string
       subscription = object({
         is_current = bool
-        id = optional(string, "")
+        id         = optional(string, "")
       })
       rule = object({
         effect     = string
@@ -43,7 +43,7 @@ variable "network_groups" {
         group_connectivity = string
       })
       deployment = object({
-        location = string
+        location     = string
         scope_access = string
       })
     }))
