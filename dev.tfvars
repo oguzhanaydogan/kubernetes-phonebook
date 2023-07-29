@@ -214,7 +214,6 @@ kvap_project102_prod_global_001 = { // For Terraform
   ]
 }
 
-
 kvs_project102_prod_global_001 = { // MSSQLPASSWORD
   name = "MSSQLPASSWORD"
   key_vault = {
