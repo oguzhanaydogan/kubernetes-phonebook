@@ -1,8 +1,7 @@
 terraform {
   required_providers {
     azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "3.66.0"
+      source = "hashicorp/azurerm"
     }
   }
 
@@ -326,7 +325,7 @@ module "sql_project102_prod_eastus_001" {
 #   ]
 # }
 
-module "vm_project102_prod_eastus_001" {  // CI/CD Agent
+module "vm_project102_prod_eastus_001" { // CI/CD Agent
   source = "./modules/linux_virtual_machine"
 
   name                               = var.vm_project102_prod_eastus_001.name

@@ -10,3 +10,5 @@ resource "azurerm_virtual_network_peering" "vnet_peering" {
   remote_virtual_network_id = data.azurerm_virtual_network.remote_virtual_network.id
   allow_forwarded_traffic   = var.allow_forwarded_traffic
 }
+
+// TODO: Reverse enabled ekle

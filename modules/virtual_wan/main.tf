@@ -1,14 +1,30 @@
 locals {
-  # Gather 'firewall_policy's from all the 'virtual_hub's
-  virtual_hub_firewall_policies = {
-    for key, virtual_hub in var.virtual_hubs :
-    key => virtual_hub.firewall.policy
+  # Gather existing 'firewall_policy's from all the 'virtual_hub's
+  existing_virtual_hub_firewall_policies = {
+    for key, hub in var.virtual_hubs :
+    key => hub.firewall.firewall_policy.existing
+    if hub.firewall != null && hub.firewall.firewall_policy.existing != null
   }
 
-  # Gather 'firewall's from all the 'virtual_hub's
-  virtual_hub_firewalls = {
-    for key, virtual_hub in var.virtual_hubs :
-    key => virtual_hub.firewall
+  # Gather new 'firewall_policy's from all the 'virtual_hub's
+  new_virtual_hub_firewall_policies = {
+    for key, hub in var.virtual_hubs :
+    key => hub.firewall.firewall_policy.new
+    if hub.firewall != null && hub.firewall.firewall_policy.new != null
+  }
+
+  # Gather existing 'firewall's from all the 'virtual_hub's
+  existing_virtual_hub_firewalls = {
+    for key, hub in var.virtual_hubs :
+    key => hub.firewall.existing
+    if hub.firewall != null && hub.firewall.existing != null
+  }
+
+  # Gather new 'firewall's from all the 'virtual_hub's
+  new_virtual_hub_firewalls = {
+    for key, hub in var.virtual_hubs :
+    key => hub.firewall.new
+    if hub.firewall != null && hub.firewall.new != null
   }
 
   # We will lose the hierarchical info after flattening,
@@ -57,7 +73,7 @@ locals {
 
   # We will lose the hierarchical info after flattening,
   # in this case 'virtual_hub' and 'reference_name' of the 'route_table_route'.
-  # Inject these into the 'connection' before flattening
+  # Inject these into the 'route' before flattening
   route_table_routes_flattened = flatten(
     [
       for key, virtual_hub in var.virtual_hubs :
@@ -92,29 +108,61 @@ resource "azurerm_virtual_hub" "virtual_hubs" {
   for_each = var.virtual_hubs
 
   name                = each.value.name
-  resource_group_name = var.resource_group_name
   location            = var.location
+  resource_group_name = var.resource_group_name
   virtual_wan_id      = azurerm_virtual_wan.virtual_wan.id
   address_prefix      = each.value.address_prefix
 }
 
-data "azurerm_firewall_policy" "virtual_hub_firewall_policies" {
-  for_each = local.virtual_hub_firewall_policies
+# If 'firewall_policies' are existing, retrieve their data
+data "azurerm_firewall_policy" "existing_virtual_hub_firewall_policies" {
+  for_each = local.existing_virtual_hub_firewall_policies
 
   name                = each.value.name
   resource_group_name = each.value.resource_group_name
 }
 
-module "virtual_hub_firewalls" {
+# If 'firewall_policies' are new, create them
+module "new_virtual_hub_firewall_policies" {
+  for_each = local.new_virtual_hub_firewall_policies
+  source   = "../firewall_policy"
+
+  name                   = each.value.name
+  location               = each.value.location
+  resource_group_name    = each.value.resource_group_name
+  sku                    = each.value.sku
+  rule_collection_groups = try(each.value.rule_collection_groups)
+}
+
+# If 'firewalls' are existing, update them
+resource "azapi_update_resource" "existing_virtual_hub_firewalls" {
+  for_each = local.existing_virtual_hub_firewalls
+
+  type      = "Microsoft.Network/azureFirewalls@2023-02-01"
+  name      = each.value.name
+  parent_id = each.value.resource_group_name
+
+  body = jsonencode({
+    properties = {
+      virtualHub = azurerm_virtual_hub.virtual_hubs[each.key].id
+    }
+  })
+}
+
+# If 'firewalls' are new, create them
+module "new_virtual_hub_firewalls" {
   source   = "../firewall"
-  for_each = local.virtual_hub_firewalls
+  for_each = local.existing_virtual_hub_firewalls
 
   name                = each.value.name
   resource_group_name = each.value.resource_group_name
   location            = each.value.location
   sku_name            = each.value.sku_name
   sku_tier            = each.value.sku_tier
-  firewall_policy     = data.azurerm_firewall_policy.virtual_hub_firewall_policies[each.key]
+  firewall_policy = try(coalesce(
+    data.azurerm_firewall_policy.existing_virtual_hub_firewall_policies[each.key],
+    module.new_virtual_hub_firewall_policies[each.key]
+  ), null)
   virtual_hub = {
     name                = azurerm_virtual_hub.virtual_hubs[each.key].name
     resource_group_name = azurerm_virtual_hub.virtual_hubs[each.key].resource_group_name
@@ -167,19 +215,6 @@ resource "azurerm_virtual_hub_connection" "virtual_hub_connections" {
   }
 }
 
-# Below firewall is not used to attach to the hub.
-# It is done in the firewall resource module via a 'virtual_hub_ block.
-data "azurerm_firewall" "route_table_route_firewalls" {
-  for_each = local.route_table_route_firewalls
-
-  # Since we used grouping, the value is a list of the same object multiple times
-  # Therefore, we can use the very first one
-  name                = each.value[0].name
-  resource_group_name = each.value[0].resource_group_name
-
-  depends_on = [ module.virtual_hub_firewalls ]
-}
-
 # CYCLE ALERT! Letting the route tables create their own routes causes a cycle because
 # the routes can refer to the connections and connections already refer to the route tables.
 # Hence the 'rooute_table_routes' are created in the next block along with the 'Default table' routes.
@@ -190,7 +225,21 @@ resource "azurerm_virtual_hub_route_table" "virtual_hub_route_tables" {
   virtual_hub_id = azurerm_virtual_hub.virtual_hubs[each.value.virtual_hub].id
 }
 
-# Used for creating 'Default route table' routes as well
+# Below firewalls are not used to attach to the hub.
+# They are the 'next_hop's of the 'route_table_routes'.
+# Attaching firewalls to the hubs is done above.
+data "azurerm_firewall" "route_table_route_firewalls" {
+  for_each = local.route_table_route_firewalls
+
+  # Since we used grouping, the value is a list of the same object multiple times
+  # Therefore, we can use the very first one
+  name                = each.value[0].name
+  resource_group_name = each.value[0].resource_group_name
+
+  depends_on = [module.new_virtual_hub_firewalls]
+}
+
+# Used for creating Default 'route_table' routes as well as custom 'route_table' routes
 resource "azurerm_virtual_hub_route_table_route" "route_table_routes" {
   for_each = local.route_table_routes
 
@@ -200,7 +249,7 @@ resource "azurerm_virtual_hub_route_table_route" "route_table_routes" {
   destinations_type = each.value.destinations_type
   destinations      = each.value.destinations
   next_hop_type     = each.value.next_hop_type
-  # We need the connection's reference name rather than its name
+  # We need the connection's reference name rather than its name, hence we use 'replace' function
   next_hop = (
     each.value.next_hop.firewall != {} ?
     data.azurerm_firewall.route_table_route_firewalls[each.key].id :

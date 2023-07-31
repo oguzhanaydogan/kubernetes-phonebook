@@ -5,25 +5,16 @@ resource "azurerm_virtual_network" "virtual_network" {
   address_space       = var.address_space
 }
 
-resource "azurerm_subnet" "subnets" {
+module "subnets" {
+  source   = "../subnet"
   for_each = var.subnets
 
-  name                                          = each.value.name
-  resource_group_name                           = azurerm_virtual_network.virtual_network.resource_group_name
-  virtual_network_name                          = azurerm_virtual_network.virtual_network.name
-  address_prefixes                              = each.value.address_prefixes
-  private_link_service_network_policies_enabled = each.value.private_link_service_network_policies_enabled
-
-  dynamic "delegation" {
-    for_each = each.value.delegation != null ? [1] : []
-
-    content {
-      name = delegation.value.name
-
-      service_delegation {
-        name    = delegation.value.service_delegation.name
-        actions = delegation.value.service_delegation.actions
-      }
-    }
+  name = each.value.name
+  virtual_network = {
+    name                = azurerm_virtual_network.virtual_network.name
+    resource_group_name = azurerm_virtual_network.virtual_network.resource_group_name
   }
+  address_prefixes                              = each.value.address_prefixes
+  private_link_service_network_policies_enabled = try(each.value.private_link_service_network_policies_enabled, null)
+  delegation                                    = try(each.value.delegation, null)
 }

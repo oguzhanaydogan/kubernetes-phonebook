@@ -16,15 +16,5 @@ variable "address_space" {
 
 variable "subnets" {
   default = {}
-  type = map(object({
-    name                                          = string
-    address_prefixes                              = list(string)
-    private_link_service_network_policies_enabled = optional(bool, true)
-    delegation = optional(object({
-      name = string
-      service_delegation = object({
-        name    = string
-        actions = optional(list(string), [])
-    }) }), null)
-  }))
+  type    = any
 }

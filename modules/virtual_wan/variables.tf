@@ -16,16 +16,19 @@ variable "virtual_hubs" {
     name           = string
     address_prefix = string
     firewall = optional(object({
-      name                = string
-      resource_group_name = string
-      location            = string
-      sku_name            = string
-      sku_tier            = string
-      policy = optional(object({
+      existing = optional(object({
         name                = string
         resource_group_name = string
-      }))
-    }))
+      }), null)
+      new = optional(any, null) // Pass directly to 'firewall' module
+      firewall_policy = optional(object({
+        existing = optional(object({
+          name                = string
+          resource_group_name = string
+        }), null)
+        new = optional(any, null) // Pass directly to 'firewall_policy' module
+      }), null)
+    }), null)
     virtual_hub_connections = optional(map(object({
       name = string
       remote_virtual_network = object({

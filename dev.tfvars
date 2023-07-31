@@ -137,16 +137,16 @@ aks_project102_prod_eastus_001 = { // Phonebook US
 
 bas_project102_prod_westeurope_001 = {
   name                = "bas-project102-prod-westeurope-001"
-  resource_group_name = "rg-project102-prod-westeurope-001"
   location            = "West Europe"
+  resource_group_name = "rg-project102-prod-westeurope-001"
   ip_configuration = {
     name = "IPConfiguration"
-    subnet = {
+    existing_subnet = {
       name                 = "AzureBastionSubnet"
       virtual_network_name = "vnet-project102-prod-westeurope-001"
       resource_group_name  = "rg-project102-prod-westeurope-001"
     }
-    public_ip_address = {
+    existing_public_ip_address = {
       name                = "pip-project102-prod-westeurope-001"
       resource_group_name = "rg-project102-prod-westeurope-001"
     }
@@ -160,7 +160,7 @@ fwp_project102_prod_eastus_001 = {
   sku                 = "Basic"
 
   rule_collection_groups = {
-    fwprcg_project102_prod_eastus_001 = { // AKS rules collection group
+    fwprcg_project102_prod_eastus_001 = { // AKS
       name     = "fwprcg-project102-prod-eastus-001"
       priority = 100
       network_rule_collections = {
@@ -183,7 +183,7 @@ fwp_project102_prod_eastus_001 = {
               destination_addresses = ["0.0.0.0/0"]
               destination_ports     = ["80", "443"]
             }
-            subnet_aks_us_to_test_vm_sql = { // TODO: Test icin, silinecek
+            subnet_aks_us_to_test_vm_sql = { // TODO: Test vm icin, silinecek
               name                  = "subnet-aks-us-to-test-vm-sql"
               protocols             = ["ICMP"]
               source_addresses      = ["10.1.1.0/24"]
@@ -861,14 +861,18 @@ vwan_project102_prod_eastus_001 = {
       name           = "vwanvh-project102-prod-eastus-001"
       address_prefix = "10.31.0.0/16"
       firewall = {
-        name                = "fw-project102-prod-eastus-001"
-        resource_group_name = "rg-project102-prod-eastus-001"
-        location            = "East US"
-        sku_name            = "AZFW_Hub"
-        sku_tier            = "Basic"
-        policy = {
-          name                = "fwp-project102-prod-eastus-001"
+        new = {
+          name                = "fw-project102-prod-eastus-001"
+          location            = "East US"
           resource_group_name = "rg-project102-prod-eastus-001"
+          sku_name            = "AZFW_Hub"
+          sku_tier            = "Basic"
+        }
+        firewall_policy = {
+          existing = {
+            name                = "fwp-project102-prod-eastus-001"
+            resource_group_name = "rg-project102-prod-eastus-001"
+          }
         }
       }
       virtual_hub_connections = {
