@@ -249,7 +249,7 @@ resource "azurerm_virtual_hub_route_table_route" "route_table_routes" {
   destinations_type = each.value.destinations_type
   destinations      = each.value.destinations
   next_hop_type     = each.value.next_hop_type
-  # We need the connection's reference name rather than its name, hence we use 'replace' function
+  # We need the connection's reference name rather than its name, hence the 'replace' function
   next_hop = (
     each.value.next_hop.firewall != {} ?
     data.azurerm_firewall.route_table_route_firewalls[each.key].id :

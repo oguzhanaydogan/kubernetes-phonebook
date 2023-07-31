@@ -1,3 +1,42 @@
+locals {
+  # Gather all 'lb's from all origins
+  lbs = {
+    for key, origin in var.origins : key => {
+      name                = origin.host.name
+      resource_group_name = origin.host.resource_group_name
+    }
+    if origin.host.pls_enabled && origin.host.type == "Microsoft.Network/loadBalancers"
+  }
+
+  # Gather all 'private_link_service' from all origins
+  private_link_services = {
+    for key, origin in var.origins : key => {
+      name                = origin.private_link.target.name
+      resource_group_name = origin.private_link.target.resource_group_name
+    }
+    if origin.host.pls_enabled && origin.host.type == "Microsoft.Network/loadBalancers"
+  }
+
+  # Gather all 'storage_blob's from all origins
+  storage_blobs = {
+    for key, origin in var.origins : key => {
+      name                   = origin.host.name
+      storage_account_name   = origin.host.storage_account_name
+      storage_container_name = origin.host.storage_container_name
+    }
+    if origin.host.type == "Microsoft.Storage/blobs"
+  }
+
+  # Gather all 'app_service's from all origins
+  app_services = {
+    for key, origin in var.origins : key => {
+      name                = origin.host.name
+      resource_group_name = origin.host.resource_group_name
+    }
+    if origin.host.type == "Microsoft.Web/sites"
+  }
+}
+
 resource "azurerm_cdn_frontdoor_profile" "cdn_frontdoor_profile" {
   name                = var.name
   resource_group_name = var.resource_group_name
@@ -38,34 +77,6 @@ resource "azurerm_cdn_frontdoor_origin_group" "cdn_frontdoor_origin_groups" {
   }
 }
 
-locals {
-  lbs = {
-    for k, v in var.origins : v.host.name => {
-      name                = v.host.name
-      resource_group_name = v.host.resource_group_name
-    } if v.host.pls_enabled && v.host.type == "Microsoft.Network/loadBalancers"
-  }
-  private_link_services = {
-    for k, v in var.origins : v.private_link.target.name => {
-      name                = v.private_link.target.name
-      resource_group_name = v.private_link.target.resource_group_name
-    } if v.host.pls_enabled && v.host.type == "Microsoft.Network/loadBalancers"
-  }
-  storage_blobs = {
-    for k, v in var.origins : v.host.name => {
-      name                   = v.host.name
-      storage_account_name   = v.host.storage_account_name
-      storage_container_name = v.host.storage_container_name
-    } if v.host.type == "Microsoft.Storage/blobs"
-  }
-  app_services = {
-    for k, v in var.origins : v.host.name => {
-      name                = v.host.name
-      resource_group_name = v.host.resource_group_name
-    } if v.host.type == "Microsoft.Web/sites"
-  }
-}
-
 data "azurerm_lb" "lbs" {
   for_each = local.lbs
 
@@ -101,13 +112,14 @@ resource "azurerm_cdn_frontdoor_origin" "cdn_frontdoor_origins" {
   name                          = each.value.name
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.cdn_frontdoor_origin_groups[each.value.cdn_frontdoor_origin_group].id
   enabled                       = each.value.enabled
-
   certificate_name_check_enabled = each.value.certificate_name_check_enabled
-
   host_name = coalesce(
-    try(data.azurerm_lb.lbs[each.value.host.name].private_ip_address, ""),
-    try(data.azurerm_storage_blob.storage_blobs[each.value.host.name].url, ""),
-    try(data.azurerm_linux_web_app.app_services[each.value.host.name].default_hostname, ""),
+    try(
+      data.azurerm_lb.lbs[each.key].private_ip_address,
+      data.azurerm_storage_blob.storage_blobs[each.key].url,
+      data.azurerm_linux_web_app.app_services[each.key].default_hostname,
+      ""
+    ),
     "Coalesce could not find any non empty result!"
   )
   http_port  = each.value.http_port
@@ -116,16 +128,19 @@ resource "azurerm_cdn_frontdoor_origin" "cdn_frontdoor_origins" {
   weight     = each.value.weight
 
   dynamic "private_link" {
-    for_each = each.value.private_link == null ? [] : [1]
-
+    for_each = each.value.private_link != null ? [1] : []
+    
     content {
       request_message = each.value.private_link.request_message
       location        = each.value.private_link.location
       private_link_target_id = coalesce(
-        try(data.azurerm_private_link_service.private_link_services[each.value.private_link.target.name].id, ""),
-        try(data.azurerm_lb.lbs[each.value.private_link.target.name].id, ""),
-        try(data.azurerm_storage_blob.storage_blobs[each.value.private_link.target.name].id, ""),
-        try(data.azurerm_linux_web_app.app_services[each.value.private_link.target.name].id, ""),
+        try(
+          data.azurerm_private_link_service.private_link_services[each.value.key].id,
+          data.azurerm_lb.lbs[each.key].id,
+          data.azurerm_storage_blob.storage_blobs[each.key].id,
+          data.azurerm_linux_web_app.app_services[each.key].id,
+          ""
+        ),
         "Coalesce could not find any non empty result!"
       )
     }
@@ -139,13 +154,14 @@ resource "azurerm_cdn_frontdoor_route" "cdn_frontdoor_routes" {
   cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.cdn_frontdoor_endpoints[each.value.cdn_frontdoor_endpoint].id
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.cdn_frontdoor_origin_groups[each.value.cdn_frontdoor_origin_group].id
   cdn_frontdoor_origin_ids = [
-    for origin in each.value.cdn_frontdoor_origins : azurerm_cdn_frontdoor_origin.cdn_frontdoor_origins[origin].id
+    for origin in each.value.cdn_frontdoor_origins :
+    azurerm_cdn_frontdoor_origin.cdn_frontdoor_origins[origin].id
   ]
   cdn_frontdoor_rule_set_ids = [
-    for rule_set in each.value.cdn_frontdoor_rule_sets : azurerm_cdn_frontdoor_rule_set.cdn_frontdoor_rule_sets[rule_set].id
+    for rule_set in each.value.cdn_frontdoor_rule_sets :
+    azurerm_cdn_frontdoor_rule_set.cdn_frontdoor_rule_sets[rule_set].id
   ]
   enabled = each.value.enabled
-
   forwarding_protocol    = each.value.forwarding_protocol
   https_redirect_enabled = each.value.https_redirect_enabled
   patterns_to_match      = each.value.patterns_to_match
@@ -162,15 +178,15 @@ resource "azurerm_cdn_frontdoor_rule_set" "cdn_frontdoor_rule_sets" {
 resource "azurerm_cdn_frontdoor_rule" "cdn_frontdoor_rules" {
   for_each = var.rules
 
-  depends_on = [azurerm_cdn_frontdoor_origin_group.cdn_frontdoor_origin_groups, azurerm_cdn_frontdoor_origin.cdn_frontdoor_origins]
-
   name                      = each.value.name
   cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.cdn_frontdoor_rule_sets[each.value.rule_set].id
   order                     = index(keys(var.rules), each.key) + 1
 
-  conditions {
+  dynamic "conditions" {
+    for_each = each.value.conditions != null ? [1] : []
+
     dynamic "request_scheme_condition" {
-      for_each = each.value.conditions.request_scheme_conditions
+      for_each = conditions.request_scheme_condition != null ? [1] : []
 
       content {
         operator     = request_scheme_condition.value.operator
@@ -181,7 +197,7 @@ resource "azurerm_cdn_frontdoor_rule" "cdn_frontdoor_rules" {
 
   actions {
     dynamic "url_redirect_action" {
-      for_each = each.value.actions.url_redirect_actions
+      for_each = each.value.actions.url_redirect_action != null ? [1] : []
 
       content {
         redirect_type        = url_redirect_action.value.redirect_type
@@ -190,4 +206,9 @@ resource "azurerm_cdn_frontdoor_rule" "cdn_frontdoor_rules" {
       }
     }
   }
+
+  depends_on = [
+    azurerm_cdn_frontdoor_origin_group.cdn_frontdoor_origin_groups,
+    azurerm_cdn_frontdoor_origin.cdn_frontdoor_origins
+  ]
 }

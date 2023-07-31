@@ -1,4 +1,4 @@
-afd_project102_prod_global_001 = { // phonebook
+afd_project102_prod_global_001 = { // Phonebook
   name                = "afd-project102-prod-global-001"
   resource_group_name = "rg-project102-prod-eastus-001"
   sku_name            = "Premium_AzureFrontDoor"
@@ -77,20 +77,16 @@ afd_project102_prod_global_001 = { // phonebook
       name     = "AFDRuleProject102ProdGlobal001"
       rule_set = "afdrs_project102_prod_global_001"
       conditions = {
-        request_scheme_conditions = {
-          equal_https = {
-            operator     = "Equal"
-            match_values = ["HTTPS"]
-          }
+        request_scheme_condition = {
+          operator     = "Equal"
+          match_values = ["HTTPS"]
         }
       }
       actions = {
-        url_redirect_actions = {
-          moved_http = {
-            redirect_type        = "Moved"
-            redirect_protocol    = "Http"
-            destination_hostname = ""
-          }
+        url_redirect_action = {
+          redirect_type        = "Moved"
+          redirect_protocol    = "Http"
+          destination_hostname = ""
         }
       }
     }
