@@ -137,14 +137,18 @@ bas_project102_prod_westeurope_001 = {
   resource_group_name = "rg-project102-prod-westeurope-001"
   ip_configuration = {
     name = "IPConfiguration"
-    existing_subnet = {
-      name                 = "AzureBastionSubnet"
-      virtual_network_name = "vnet-project102-prod-westeurope-001"
-      resource_group_name  = "rg-project102-prod-westeurope-001"
+    subnet = {
+      existing = {
+        name                 = "AzureBastionSubnet"
+        virtual_network_name = "vnet-project102-prod-westeurope-001"
+        resource_group_name  = "rg-project102-prod-westeurope-001"
+      }
     }
-    existing_public_ip_address = {
-      name                = "pip-project102-prod-westeurope-001"
-      resource_group_name = "rg-project102-prod-westeurope-001"
+    public_ip_address = {
+      existing = {
+        name                = "pip-project102-prod-westeurope-001"
+        resource_group_name = "rg-project102-prod-westeurope-001"
+      }
     }
   }
 }

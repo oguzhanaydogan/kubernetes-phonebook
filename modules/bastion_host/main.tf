@@ -1,38 +1,40 @@
-// If existing subnet, retrieve its data
+# If existing 'subnet', retrieve its data
 data "azurerm_subnet" "existing_subnet" {
-  count = var.ip_configuration.existing_subnet != null ? 1 : 0
+  count = var.ip_configuration.subnet.existing != null ? 1 : 0
 
   name                 = var.ip_configuration.existing_subnet.name
   virtual_network_name = var.ip_configuration.existing_subnet.virtual_network_name
   resource_group_name  = var.ip_configuration.existing_subnet.resource_group_name
 }
 
+# If new 'subnet', create it
 module "new_subnet" {
   source = "../subnet"
-  count  = var.ip_configuration.new_subnet != null ? 1 : 0
+  count  = var.ip_configuration.subnet.new != null ? 1 : 0
 
   name             = "AzureBastionSubnet"
-  virtual_network  = var.ip_configuration.new_subnet.virtual_network
-  address_prefixes = var.ip_configuration.new_subnet.address_prefixes
+  virtual_network  = var.ip_configuration.subnet.new.virtual_network
+  address_prefixes = var.ip_configuration.subnet.new.address_prefixes
 }
 
-// If existing public IP address, retrieve its data
+# If existing 'public IP address', retrieve its data
 data "azurerm_public_ip" "existing_public_ip" {
-  count = var.ip_configuration.existing_public_ip_address != null ? 1 : 0
+  count = var.ip_configuration.public_ip_address.existing != null ? 1 : 0
 
   name                = var.ip_configuration.existing_public_ip_address.name
   resource_group_name = var.ip_configuration.existing_public_ip_address.resource_group_name
 }
 
+# If new 'public IP address', create it
 module "new_public_ip_address" {
   source = "../public_ip_address"
-  count  = var.ip_configuration.new_public_ip_address != null ? 1 : 0
+  count  = var.ip_configuration.public_ip_address.new != null ? 1 : 0
 
-  name                = var.ip_configuration.new_public_ip_address.name
-  location            = var.ip_configuration.new_public_ip_address.location
-  resource_group_name = var.ip_configuration.new_public_ip_address.resource_group_name
-  allocation_method   = var.ip_configuration.new_public_ip_address.allocation_method
-  sku                 = var.ip_configuration.new_public_ip_address.sku
+  name                = var.ip_configuration.public_ip_address.new.name
+  location            = var.ip_configuration.public_ip_address.new.location
+  resource_group_name = var.ip_configuration.public_ip_address.new.resource_group_name
+  allocation_method   = var.ip_configuration.public_ip_address.new.allocation_method
+  sku                 = var.ip_configuration.public_ip_address.new.sku
 }
 
 resource "azurerm_bastion_host" "bastion_host" {

@@ -13,24 +13,34 @@ variable "resource_group_name" {
 variable "ip_configuration" {
   type = object({
     name = string
-    existing_subnet = optional(object({
-      name                 = string
-      virtual_network_name = string
-      resource_group_name  = string
-    }), null)
-    new_subnet = optional(any, null) // Just pass it to the 'subnet' module
-    existing_public_ip_address = optional(object({
-      name                = string
-      resource_group_name = string
-    }), null)
-    new_public_ip_address = optional(any, null) // Just pass it to the 'publi_ip_address' module
+    subnet = object({
+      existing = optional(object({
+        name                 = string
+        virtual_network_name = string
+        resource_group_name  = string
+      }), null)
+      new = optional(any, null) // Pass directly to the 'subnet' module
+    })
+    public_ip_address = object({
+      existing = optional(object({
+        name                = string
+        resource_group_name = string
+      }), null)
+      new = optional(any, null) // Pass directly to the 'public_ip_address' module
+    })
   })
   validation {
-    condition     = (var.ip_configuration.existing_subnet == null && var.ip_configuration.new_subnet == null) || (var.ip_configuration.existing_subnet != null && var.ip_configuration.new_subnet != null)
-    error_message = "Exactly one of 'existing_subnet' and 'new_subnet' variables should have a value."
+    condition     = (
+      (var.ip_configuration.subnet.existing != null && var.ip_configuration.subnet.new == null) ||
+      (var.ip_configuration.subnet.existing == null && var.ip_configuration.subnet.new != null)
+    )
+    error_message = "Exactly one of the 'existing' and 'new' variables of the 'subnet' variable should have a value."
   }
   validation {
-    condition     = (var.ip_configuration.existing_public_ip_address == null && var.ip_configuration.new_public_ip_address == null) || (var.ip_configuration.existing_public_ip_address != null && var.ip_configuration.new_public_ip_address != null)
-    error_message = "Exactly one of 'existing_public_ip_address' and 'new_public_ip_address' variables should have a value."
+    condition     = (
+      (var.ip_configuration.public_ip_address.existing != null && var.ip_configuration.public_ip_address.new == null) ||
+      (var.ip_configuration.public_ip_address.existing == null && var.ip_configuration.public_ip_address.new != null)
+    )
+    error_message = "Exactly one of the 'existing' and 'new' variables of the 'public_ip_address' variable should have a value."
   }
 }

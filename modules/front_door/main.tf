@@ -113,6 +113,7 @@ resource "azurerm_cdn_frontdoor_origin" "cdn_frontdoor_origins" {
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.cdn_frontdoor_origin_groups[each.value.cdn_frontdoor_origin_group].id
   enabled                       = each.value.enabled
   certificate_name_check_enabled = each.value.certificate_name_check_enabled
+  # Host is either an 'lb', or a 'storage_blob', or an 'app_service'
   host_name = coalesce(
     try(
       data.azurerm_lb.lbs[each.key].private_ip_address,
@@ -129,10 +130,11 @@ resource "azurerm_cdn_frontdoor_origin" "cdn_frontdoor_origins" {
 
   dynamic "private_link" {
     for_each = each.value.private_link != null ? [1] : []
-    
+
     content {
       request_message = each.value.private_link.request_message
       location        = each.value.private_link.location
+      # Target is either a 'private_link_service', or an 'lb', or a 'storage_blob', or an 'app_service'
       private_link_target_id = coalesce(
         try(
           data.azurerm_private_link_service.private_link_services[each.value.key].id,
