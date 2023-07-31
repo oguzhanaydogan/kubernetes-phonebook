@@ -54,14 +54,27 @@ variable "ip_configuration" {
       new = optional(any, null) // Pass it directly to the 'public_ip_address' module
     }), null)
   })
-  # Either 'ip_configuration' is null, or exactly one of 'existing subnet' and 'new subnet' has a value
+  # Either 'ip_configuration' is null,
+  # or exactly one of 'existing subnet' and 'new subnet' has a value
   validation {
-    condition     = var.ip_configuration == null || ((try(var.ip_configuration.subnet.existing, null) != null && try(var.ip_configuration.subnet.new, null) == null) || (try(var.ip_configuration.subnet.existing, null) == null && try(var.ip_configuration.subnet.new, null) != null))
+    condition = (
+      var.ip_configuration == null ||
+      (
+        (try(var.ip_configuration.subnet.existing, null) != null && try(var.ip_configuration.subnet.new, null) == null) ||
+        (try(var.ip_configuration.subnet.existing, null) == null && try(var.ip_configuration.subnet.new, null) != null)
+      )
+    )
     error_message = "Exactly one of the 'existing' and 'new' variables in the 'subnet' variable should have a value."
   }
-  # Either 'ip_configuration' is null, or 'ip_configuration.public_ip_address' is null, or both of 'existing subnet' and 'new subnet' don't have values at the same time
+  # Either 'ip_configuration' is null,
+  # or 'ip_configuration.public_ip_address' is null,
+  # or not both of 'existing subnet' and 'new subnet' have values at the same time
   validation {
-    condition     = var.ip_configuration == null || try(var.ip_configuration.public_ip_address, null) == null || !(try(var.ip_configuration.public_ip_address.existing, null) != null && try(var.ip_configuration.public_ip_address.new, null) != null)
+    condition = (
+      var.ip_configuration == null ||
+      try(var.ip_configuration.public_ip_address, null) == null ||
+      !(try(var.ip_configuration.public_ip_address.existing, null) != null && try(var.ip_configuration.public_ip_address.new, null) != null)
+    )
     error_message = "At most one of the 'existing' and 'new' variables in the 'public_ip_address' variable can have a value."
   }
 }
@@ -87,14 +100,28 @@ variable "management_ip_configuration" {
       new = optional(any, null) // Pass it directly to the 'public_ip_address' module
     })
   })
-  # Either 'management_ip_configuration' is null, or exactly one of 'existing subnet' and 'new subnet' has a value
+  # Either 'management_ip_configuration' is null,
+  # or exactly one of 'existing subnet' and 'new subnet' has a value
   validation {
-    condition     = var.management_ip_configuration == null || ((try(var.management_ip_configuration.subnet.existing, null) != null && try(var.management_ip_configuration.subnet.new, null) == null) || (try(var.management_ip_configuration.subnet.existing, null) == null && try(var.management_ip_configuration.subnet.new, null) != null))
+    condition = (
+      var.management_ip_configuration == null ||
+      (
+        (try(var.management_ip_configuration.subnet.existing, null) != null && try(var.management_ip_configuration.subnet.new, null) == null) ||
+        (try(var.management_ip_configuration.subnet.existing, null) == null && try(var.management_ip_configuration.subnet.new, null) != null)
+      )
+    )
     error_message = "Exactly one of the 'existing' and 'new' variables in the 'subnet' variable should have a value."
   }
-  # Either 'management_ip_configuration' is null, or exactly one of 'existing public IP address' and 'new public IP address' has a value
+  # Either 'management_ip_configuration' is null,
+  # or exactly one of 'existing public IP address' and 'new public IP address' has a value
   validation {
-    condition     = var.management_ip_configuration == null || ((try(var.management_ip_configuration.public_ip_address.existing, null) != null && try(var.management_ip_configuration.public_ip_address.new, null) == null) || (try(var.management_ip_configuration.public_ip_address.existing, null) == null && try(var.management_ip_configuration.public_ip_address.new, null) != null))
+    condition = (
+      var.management_ip_configuration == null ||
+      (
+        (try(var.management_ip_configuration.public_ip_address.existing, null) != null && try(var.management_ip_configuration.public_ip_address.new, null) == null) ||
+        (try(var.management_ip_configuration.public_ip_address.existing, null) == null && try(var.management_ip_configuration.public_ip_address.new, null) != null)
+      )
+    )
     error_message = "Exactly one of the 'existing' and 'new' variables in the 'public_ip_address' variable should have a value."
   }
 }
