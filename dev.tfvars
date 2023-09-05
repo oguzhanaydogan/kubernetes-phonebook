@@ -1,7 +1,9 @@
 afd_project102_prod_global_001 = { // Phonebook
   name                = "afd-project102-prod-global-001"
-  resource_group_name = "rg-project102-prod-eastus-001"
+	# resource_group_name is provided by root 'main.tf'.
   sku_name            = "Premium_AzureFrontDoor"
+}
+
   endpoints = {
     afde_project102_prod_global_001 = { // Phonebook
       name = "AFDEProject102ProdGlobal001"
@@ -91,7 +93,6 @@ afd_project102_prod_global_001 = { // Phonebook
       }
     }
   }
-}
 
 aks_project102_prod_eastus_001 = { // Phonebook US
   name                          = "aks-project102-prod-eastus-001"
@@ -511,16 +512,6 @@ privatelink_database_windows_net_project102_prod_global_001 = {
   }
 }
 
-rg_project102_prod_eastus_001 = {
-  name     = "rg-project102-prod-eastus-001"
-  location = "East US"
-}
-
-rg_project102_prod_westeurope_001 = {
-  name     = "rg-project102-prod-westeurope-001"
-  location = "West Europe"
-}
-
 sql_project102_prod_eastus_001 = {
   name                = "sql-project102-prod-eastus-001"
   resource_group_name = "rg-project102-prod-eastus-001"
@@ -652,7 +643,7 @@ vm_project102_prod_eastus_001 = { // ci/cd agent
       }
     }
   }
-  size                             = "Standard_B1s"
+  vm_size                          = "Standard_B1s"
   delete_data_disks_on_termination = true
   delete_os_disk_on_termination    = true
   identity = {
@@ -742,113 +733,6 @@ vmss_project102_prod_westeurope_001 = { // Phonebook EU
     max_unhealthy_instance_percent          = 20
     max_unhealthy_upgraded_instance_percent = 5
     pause_time_between_batches              = "PT0S"
-  }
-}
-
-vnet_project102_prod_eastus_001 = { // app
-  name                = "vnet-project102-prod-eastus-001"
-  resource_group_name = "rg-project102-prod-eastus-001"
-  location            = "East US"
-  address_space       = ["10.1.0.0/16"]
-  subnets = {
-    snet_project102_prod_eastus_001 = { // aks
-      name             = "snet-project102-prod-eastus-001"
-      address_prefixes = ["10.1.1.0/24"]
-    }
-    snet_project102_prod_eastus_002 = { // agw
-      name             = "snet-project102-prod-eastus-002"
-      address_prefixes = ["10.1.2.0/24"]
-    }
-  }
-}
-
-vnet_project102_prod_eastus_002 = { // acr
-  name                = "vnet-project102-prod-eastus-002"
-  resource_group_name = "rg-project102-prod-eastus-001"
-  location            = "East US"
-  address_space       = ["10.2.0.0/16"]
-  subnets = {
-    snet_project102_prod_eastus_003 = { // acr
-      name             = "snet-project102-prod-eastus-004"
-      address_prefixes = ["10.2.1.0/24"]
-    }
-  }
-}
-
-vnet_project102_prod_eastus_003 = { // sql-us
-  name                = "vnet-project102-prod-eastus-003"
-  resource_group_name = "rg-project102-prod-eastus-001"
-  location            = "East US"
-  address_space       = ["10.3.0.0/16"]
-  subnets = {
-    snet_project102_prod_eastus_004 = { // sql-us
-      name             = "snet-project102-prod-eastus-005"
-      address_prefixes = ["10.3.1.0/24"]
-    }
-    snet_project102_prod_eastus_005 = { // sql-us-pep
-      name             = "snet-project102-prod-eastus-006"
-      address_prefixes = ["10.3.2.0/24"]
-    }
-  }
-}
-
-vnet_project102_prod_eastus_004 = { // ci/cd agent
-  name                = "vnet-project102-prod-eastus-004"
-  resource_group_name = "rg-project102-prod-eastus-001"
-  location            = "East US"
-  address_space       = ["10.4.0.0/16"]
-  subnets = {
-    snet_project102_prod_eastus_006 = { // ci/cd agent
-      name             = "snet-project102-prod-eastus-007"
-      address_prefixes = ["10.4.1.0/24"]
-    }
-  }
-}
-
-vnet_project102_prod_westeurope_001 = { // app
-  name                = "vnet-project102-prod-westeurope-001"
-  resource_group_name = "rg-project102-prod-westeurope-001"
-  location            = "West Europe"
-  address_space       = ["10.11.0.0/16"]
-  subnets = {
-    snet_project102_prod_westeurope_001 = { // app
-      name             = "snet-project102-prod-westeurope-001"
-      address_prefixes = ["10.11.1.0/24"]
-    }
-    snet_project102_prod_westeurope_002 = { // lb
-      name             = "snet-project102-prod-westeurope-002"
-      address_prefixes = ["10.11.2.0/24"]
-    }
-    snet_project102_prod_westeurope_003 = { // lb-pls
-      name                                          = "snet-project102-prod-westeurope-003"
-      address_prefixes                              = ["10.11.3.0/24"]
-      private_link_service_network_policies_enabled = false
-    }
-    snet_project102_prod_westeurope_004 = { // lb-pls-pep
-      name             = "snet-project102-prod-westeurope-004"
-      address_prefixes = ["10.11.4.0/24"]
-    }
-    snet_project102_prod_westeurope_005 = { // bastion
-      name             = "AzureBastionSubnet"
-      address_prefixes = ["10.11.5.0/24"]
-    }
-  }
-}
-
-vnet_project102_prod_westeurope_002 = { // sql-eu
-  name                = "vnet-project102-prod-westeurope-002"
-  resource_group_name = "rg-project102-prod-westeurope-001"
-  location            = "West Europe"
-  address_space       = ["10.12.0.0/16"]
-  subnets = {
-    snet_project102_prod_westeurope_006 = { // sql-eu
-      name             = "snet-project102-prod-westeurope-006"
-      address_prefixes = ["10.12.1.0/24"]
-    }
-    snet_project102_prod_westeurope_007 = { // sql-eu-pep
-      name             = "snet-project102-prod-westeurope-007"
-      address_prefixes = ["10.12.2.0/24"]
-    }
   }
 }
 

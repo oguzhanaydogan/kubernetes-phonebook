@@ -1,47 +1,224 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source = "hashicorp/azurerm"
-    }
-  }
+module "rg_project102_prod_global_001" {
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/resource_group"
 
-  backend "azurerm" {
-    resource_group_name  = "ssh-key"
-    storage_account_name = "coyhubstorage"
-    container_name       = "terraformstate"
-    key                  = "terraform.tfstate"
-  }
+  name     = var.rg_project102_prod_global_001.name
+  location = var.rg_project102_prod_global_001.location
 }
 
-provider "azurerm" {
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
-    }
-  }
+module "rg_project102_prod_eastus_001" {
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/resource_group"
+
+  name     = var.rg_project102_prod_eastus_001.name
+  location = var.rg_project102_prod_eastus_001.location
 }
 
-# module "afd_project102_prod_global_001" { // Phonebook Front Door
-#   source = "./modules/front_door"
+module "rg_project102_prod_westeurope_001" {
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/resource_group"
 
-#   name                = var.afd_project102_prod_global_001.name
-#   resource_group_name = var.afd_project102_prod_global_001.resource_group_name
-#   sku_name            = var.afd_project102_prod_global_001.sku_name
-#   endpoints           = var.afd_project102_prod_global_001.endpoints
-#   origin_groups       = var.afd_project102_prod_global_001.origin_groups
-#   origins             = var.afd_project102_prod_global_001.origins
-#   routes              = var.afd_project102_prod_global_001.routes
-#   rule_sets           = var.afd_project102_prod_global_001.rule_sets
-#   rules               = var.afd_project102_prod_global_001.rules
+  name     = var.rg_project102_prod_westeurope_001.name
+  location = var.rg_project102_prod_westeurope_001.location
+}
 
-#   depends_on = [
-#     module.lb_project102_prod_westeurope_001
-#     # module.aks_project102_prod_eastus_001
-#   ]
-# }
+module "vnet_project102_prod_eastus_001" { // app
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/virtual_network"
+
+  name                = var.vnet_project102_prod_eastus_001.name
+  resource_group_name = module.rg_project102_prod_eastus_001.name
+  location            = var.vnet_project102_prod_eastus_001.location
+  address_space       = var.vnet_project102_prod_eastus_001.address_space
+}
+
+module "snet_project102_prod_eastus_001" { // aks
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/subnet"
+
+  name                 = var.snet_project102_prod_eastus_001.name
+  resource_group_name  = module.vnet_project102_prod_eastus_001.resource_group_name
+  virtual_network_name = module.vnet_project102_prod_eastus_001.name
+  address_prefixes     = var.snet_project102_prod_eastus_001.address_prefixes
+}
+
+module "snet_project102_prod_eastus_002" { // agw
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/subnet"
+
+  name                 = var.snet_project102_prod_eastus_002.name
+  resource_group_name  = module.vnet_project102_prod_eastus_001.resource_group_name
+  virtual_network_name = module.vnet_project102_prod_eastus_001.name
+  address_prefixes     = var.snet_project102_prod_eastus_002.address_prefixes
+}
+
+module "vnet_project102_prod_eastus_002" { // acr
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/virtual_network"
+
+  name                = var.vnet_project102_prod_eastus_002.name
+  resource_group_name = module.rg_project102_prod_eastus_001.name
+  location            = var.vnet_project102_prod_eastus_002.location
+  address_space       = var.vnet_project102_prod_eastus_002.address_space
+}
+
+module "snet_project102_prod_eastus_003" { // acr
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/subnet"
+
+  name                 = var.snet_project102_prod_eastus_003.name
+  resource_group_name  = module.vnet_project102_prod_eastus_002.resource_group_name
+  virtual_network_name = module.vnet_project102_prod_eastus_002.name
+  address_prefixes     = var.snet_project102_prod_eastus_003.address_prefixes
+}
+
+module "vnet_project102_prod_eastus_003" { // sql-us
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/virtual_network"
+
+  name                = var.vnet_project102_prod_eastus_003.name
+  resource_group_name = module.rg_project102_prod_eastus_001.name
+  location            = var.vnet_project102_prod_eastus_003.location
+  address_space       = var.vnet_project102_prod_eastus_003.address_space
+}
+
+module "snet_project102_prod_eastus_004" { // sql-us
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/subnet"
+
+  name                 = var.snet_project102_prod_eastus_004.name
+  resource_group_name  = module.vnet_project102_prod_eastus_003.resource_group_name
+  virtual_network_name = module.vnet_project102_prod_eastus_003.name
+  address_prefixes     = var.snet_project102_prod_eastus_004.address_prefixes
+}
+
+module "snet_project102_prod_eastus_005" { // sql-us-pep
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/subnet"
+
+  name                 = var.snet_project102_prod_eastus_005.name
+  resource_group_name  = module.vnet_project102_prod_eastus_003.resource_group_name
+  virtual_network_name = module.vnet_project102_prod_eastus_003.name
+  address_prefixes     = var.snet_project102_prod_eastus_005.address_prefixes
+}
+
+module "vnet_project102_prod_eastus_004" { // ci/cd agent
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/virtual_network"
+
+  name                = var.vnet_project102_prod_eastus_004.name
+  resource_group_name = module.rg_project102_prod_eastus_001.name
+  location            = var.vnet_project102_prod_eastus_004.location
+  address_space       = var.vnet_project102_prod_eastus_004.address_space
+}
+
+module "snet_project102_prod_eastus_006" { // ci/cd agent
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/subnet"
+
+  name                 = var.snet_project102_prod_eastus_006.name
+  resource_group_name  = module.vnet_project102_prod_eastus_004.resource_group_name
+  virtual_network_name = module.vnet_project102_prod_eastus_004.name
+  address_prefixes     = var.snet_project102_prod_eastus_006.address_prefixes
+}
+
+module "vnet_project102_prod_westeurope_001" { // app
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/virtual_network"
+
+  name                = var.vnet_project102_prod_westeurope_001.name
+  resource_group_name = module.rg_project102_prod_westeurope_001.name
+  location            = var.vnet_project102_prod_westeurope_001.location
+  address_space       = var.vnet_project102_prod_westeurope_001.address_space
+}
+
+module "snet_project102_prod_westeurope_001" { // app
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/subnet"
+
+  name                 = var.snet_project102_prod_westeurope_001.name
+  resource_group_name  = module.vnet_project102_prod_westeurope_001.resource_group_name
+  virtual_network_name = module.vnet_project102_prod_westeurope_001.name
+  address_prefixes     = var.snet_project102_prod_westeurope_001.address_prefixes
+}
+
+module "snet_project102_prod_westeurope_002" { // lb
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/subnet"
+
+  name                 = var.snet_project102_prod_westeurope_002.name
+  resource_group_name  = module.vnet_project102_prod_westeurope_001.resource_group_name
+  virtual_network_name = module.vnet_project102_prod_westeurope_001.name
+  address_prefixes     = var.snet_project102_prod_westeurope_002.address_prefixes
+}
+
+module "snet_project102_prod_westeurope_003" { // lb-pls
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/subnet"
+
+  name                 = var.snet_project102_prod_westeurope_003.name
+  resource_group_name  = module.vnet_project102_prod_westeurope_001.resource_group_name
+  virtual_network_name = module.vnet_project102_prod_westeurope_001.name
+  address_prefixes     = var.snet_project102_prod_westeurope_003.address_prefixes
+}
+
+module "snet_project102_prod_westeurope_004" { // lb-pls-pep
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/subnet"
+
+  name                 = var.snet_project102_prod_westeurope_004.name
+  resource_group_name  = module.vnet_project102_prod_westeurope_001.resource_group_name
+  virtual_network_name = module.vnet_project102_prod_westeurope_001.name
+  address_prefixes     = var.snet_project102_prod_westeurope_004.address_prefixes
+}
+
+module "snet_project102_prod_westeurope_005" { // bastion
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/subnet"
+
+  name                 = var.snet_project102_prod_westeurope_005.name
+  resource_group_name  = module.vnet_project102_prod_westeurope_001.resource_group_name
+  virtual_network_name = module.vnet_project102_prod_westeurope_001.name
+  address_prefixes     = var.snet_project102_prod_westeurope_005.address_prefixes
+}
+
+module "vnet_project102_prod_westeurope_002" { // sql-eu
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/virtual_network"
+
+  name                = var.vnet_project102_prod_westeurope_002.name
+  resource_group_name = module.rg_project102_prod_westeurope_001.name
+  location            = var.vnet_project102_prod_westeurope_002.location
+  address_space       = var.vnet_project102_prod_westeurope_002.address_space
+}
+
+module "snet_project102_prod_westeurope_006" { // sql-eu
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/subnet"
+
+  name                 = var.snet_project102_prod_westeurope_006.name
+  resource_group_name  = module.vnet_project102_prod_westeurope_002.resource_group_name
+  virtual_network_name = module.vnet_project102_prod_westeurope_002.name
+  address_prefixes     = var.snet_project102_prod_westeurope_006.address_prefixes
+}
+
+module "snet_project102_prod_westeurope_007" { // sql-eu-pep
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/subnet"
+
+  name                 = var.snet_project102_prod_westeurope_007.name
+  resource_group_name  = module.vnet_project102_prod_westeurope_002.resource_group_name
+  virtual_network_name = module.vnet_project102_prod_westeurope_002.name
+  address_prefixes     = var.snet_project102_prod_westeurope_007.address_prefixes
+}
+
+module "afd_project102_prod_global_001" { // Phonebook Front Door Profile
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/cdn_frontdoor_profile"
+
+  name                = var.afd_project102_prod_global_001.name
+  resource_group_name = module.rg_project102_prod_global_001.name
+  sku_name            = var.afd_project102_prod_global_001.sku_name
+}
+
+module "afd_project102_prod_global_001" { // Phonebook Front Door
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/front_door"
+
+  name                = var.afd_project102_prod_global_001.name
+  resource_group_name = var.afd_project102_prod_global_001.resource_group_name
+  sku_name            = var.afd_project102_prod_global_001.sku_name
+  endpoints           = var.afd_project102_prod_global_001.endpoints
+  origin_groups       = var.afd_project102_prod_global_001.origin_groups
+  origins             = var.afd_project102_prod_global_001.origins
+  routes              = var.afd_project102_prod_global_001.routes
+  rule_sets           = var.afd_project102_prod_global_001.rule_sets
+  rules               = var.afd_project102_prod_global_001.rules
+
+  depends_on = [
+    module.lb_project102_prod_westeurope_001
+    # module.aks_project102_prod_eastus_001
+  ]
+}
 
 # module "aks_project102_prod_eastus_001" { // Phonebook US
-#   source   = "./modules/kubernetes_cluster"
+#   source   = "github.com/ycetindil/terraform/tree/main/modules/azure/kubernetes_cluster"
 
 #   name                          = var.aks_project102_prod_eastus_001.name
 #   resource_group_name           = var.aks_project102_prod_eastus_001.resource_group_name
@@ -63,7 +240,7 @@ provider "azurerm" {
 # }
 
 # module "bas_project102_prod_westeurope_001" { // West Europe Bastion
-#   source = "./modules/bastion_host"
+#   source = "github.com/ycetindil/terraform/tree/main/modules/azure/bastion_host"
 
 #   name                = var.bas_project102_prod_westeurope_001.name
 #   resource_group_name = var.bas_project102_prod_westeurope_001.resource_group_name
@@ -77,7 +254,7 @@ provider "azurerm" {
 # }
 
 module "fwp_project102_prod_eastus_001" {
-  source = "./modules/firewall_policy"
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/firewall_policy"
 
   name                   = var.fwp_project102_prod_eastus_001.name
   resource_group_name    = var.fwp_project102_prod_eastus_001.resource_group_name
@@ -91,7 +268,7 @@ module "fwp_project102_prod_eastus_001" {
 }
 
 module "kvap_project102_prod_global_001" { // For Terraform
-  source = "./modules/key_vault_access_policy"
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/key_vault_access_policy"
 
   key_vault          = var.kvap_project102_prod_global_001.key_vault
   object             = var.kvap_project102_prod_global_001.object
@@ -100,7 +277,7 @@ module "kvap_project102_prod_global_001" { // For Terraform
 }
 
 module "kvs_project102_prod_global_001" { // MSSQLPASSWORD
-  source = "./modules/key_vault_secret"
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/key_vault_secret"
 
   name      = var.kvs_project102_prod_global_001.name
   key_vault = var.kvs_project102_prod_global_001.key_vault
@@ -111,7 +288,7 @@ module "kvs_project102_prod_global_001" { // MSSQLPASSWORD
 }
 
 # module "lb_project102_prod_westeurope_001" { // Phonebook ILB EU
-#   source = "./modules/load_balancer"
+#   source = "github.com/ycetindil/terraform/tree/main/modules/azure/load_balancer"
 
 #   name                       = var.lb_project102_prod_westeurope_001.name
 #   resource_group_name        = var.lb_project102_prod_westeurope_001.resource_group_name
@@ -129,7 +306,7 @@ module "kvs_project102_prod_global_001" { // MSSQLPASSWORD
 # }
 
 # module "nm_project102_prod_westeurope_001" {
-#   source = "./modules/network_manager"
+#   source = "github.com/ycetindil/terraform/tree/main/modules/azure/network_manager"
 
 #   name                = var.nm_project102_prod_westeurope_001.name
 #   location            = var.nm_project102_prod_westeurope_001.location
@@ -144,7 +321,7 @@ module "kvs_project102_prod_global_001" { // MSSQLPASSWORD
 # }
 
 module "nsg_project102_prod_eastus_001" { // ssh
-  source = "./modules/network_security_group"
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/network_security_group"
 
   name                = var.nsg_project102_prod_eastus_001.name
   resource_group_name = var.nsg_project102_prod_eastus_001.resource_group_name
@@ -157,7 +334,7 @@ module "nsg_project102_prod_eastus_001" { // ssh
 }
 
 # module "nsg_project102_prod_westeurope_001" { // ssh and http
-#   source = "./modules/network_security_group"
+#   source = "github.com/ycetindil/terraform/tree/main/modules/azure/network_security_group"
 
 #   name                = var.nsg_project102_prod_westeurope_001.name
 #   resource_group_name = var.nsg_project102_prod_westeurope_001.resource_group_name
@@ -170,7 +347,7 @@ module "nsg_project102_prod_eastus_001" { // ssh
 # }
 
 module "peer_project102_prod_global_001" { // SQL-US_SQL-EU
-  source = "./modules/virtual_network_peering"
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/virtual_network_peering"
 
   name                    = var.peer_project102_prod_global_001.name
   resource_group_name     = var.peer_project102_prod_global_001.resource_group_name
@@ -185,7 +362,7 @@ module "peer_project102_prod_global_001" { // SQL-US_SQL-EU
 }
 
 module "peer_project102_prod_global_002" { // SQL-EU_SQL-US
-  source = "./modules/virtual_network_peering"
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/virtual_network_peering"
 
   name                    = var.peer_project102_prod_global_002.name
   resource_group_name     = var.peer_project102_prod_global_002.resource_group_name
@@ -200,7 +377,7 @@ module "peer_project102_prod_global_002" { // SQL-EU_SQL-US
 }
 
 module "pep_project102_prod_eastus_001" { // sql-us
-  source = "./modules/private_endpoint"
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/private_endpoint"
 
   name                       = var.pep_project102_prod_eastus_001.name
   resource_group_name        = var.pep_project102_prod_eastus_001.resource_group_name
@@ -217,7 +394,7 @@ module "pep_project102_prod_eastus_001" { // sql-us
 }
 
 # module "pep_project102_prod_westeurope_001" { // sql-eu
-#   source = "./modules/private_endpoint"
+#   source = "github.com/ycetindil/terraform/tree/main/modules/azure/private_endpoint"
 
 #   name                       = var.pep_project102_prod_westeurope_001.name
 #   resource_group_name        = var.pep_project102_prod_westeurope_001.resource_group_name
@@ -234,7 +411,7 @@ module "pep_project102_prod_eastus_001" { // sql-us
 # }
 
 module "pip_project102_prod_eastus_001" { // CI/CD agent
-  source = "./modules/public_ip_address"
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/public_ip_address"
 
   name                = var.pip_project102_prod_eastus_001.name
   resource_group_name = var.pip_project102_prod_eastus_001.resource_group_name
@@ -248,7 +425,7 @@ module "pip_project102_prod_eastus_001" { // CI/CD agent
 }
 
 # module "pip_project102_prod_westeurope_001" { // bastion
-#   source = "./modules/public_ip_address"
+#   source = "github.com/ycetindil/terraform/tree/main/modules/azure/public_ip_address"
 
 #   name                = var.pip_project102_prod_westeurope_001.name
 #   resource_group_name = var.pip_project102_prod_westeurope_001.resource_group_name
@@ -262,7 +439,7 @@ module "pip_project102_prod_eastus_001" { // CI/CD agent
 # }
 
 module "privatelink_database_windows_net_project102_prod_global_001" {
-  source = "./modules/private_dns_zone"
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/private_dns_zone"
 
   name                  = var.privatelink_database_windows_net_project102_prod_global_001.name
   resource_group_name   = var.privatelink_database_windows_net_project102_prod_global_001.resource_group_name
@@ -276,22 +453,8 @@ module "privatelink_database_windows_net_project102_prod_global_001" {
   ]
 }
 
-module "rg_project102_prod_eastus_001" {
-  source = "./modules/resource_group"
-
-  name     = var.rg_project102_prod_eastus_001.name
-  location = var.rg_project102_prod_eastus_001.location
-}
-
-module "rg_project102_prod_westeurope_001" {
-  source = "./modules/resource_group"
-
-  name     = var.rg_project102_prod_westeurope_001.name
-  location = var.rg_project102_prod_westeurope_001.location
-}
-
 module "sql_project102_prod_eastus_001" {
-  source = "./modules/mssql_server"
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/mssql_server"
 
   name                = var.sql_project102_prod_eastus_001.name
   resource_group_name = var.sql_project102_prod_eastus_001.resource_group_name
@@ -308,7 +471,7 @@ module "sql_project102_prod_eastus_001" {
 }
 
 # module "sql_project102_prod_westeurope_001" {
-#   source = "./modules/mssql_server"
+#   source = "github.com/ycetindil/terraform/tree/main/modules/azure/mssql_server"
 
 #   name                = var.sql_project102_prod_westeurope_001.name
 #   resource_group_name = var.sql_project102_prod_westeurope_001.resource_group_name
@@ -326,13 +489,13 @@ module "sql_project102_prod_eastus_001" {
 # }
 
 module "vm_project102_prod_eastus_001" { // CI/CD Agent
-  source = "./modules/linux_virtual_machine"
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/linux_virtual_machine"
 
   name                               = var.vm_project102_prod_eastus_001.name
   resource_group_name                = var.vm_project102_prod_eastus_001.resource_group_name
   location                           = var.vm_project102_prod_eastus_001.location
   network_interface                  = var.vm_project102_prod_eastus_001.network_interface
-  size                               = var.vm_project102_prod_eastus_001.size
+  vm_size                            = var.vm_project102_prod_eastus_001.size
   delete_os_disk_on_termination      = var.vm_project102_prod_eastus_001.delete_os_disk_on_termination
   delete_data_disks_on_termination   = var.vm_project102_prod_eastus_001.delete_data_disks_on_termination
   identity                           = var.vm_project102_prod_eastus_001.identity
@@ -351,7 +514,7 @@ module "vm_project102_prod_eastus_001" { // CI/CD Agent
 }
 
 # module "vmss_project102_prod_westeurope_001" { // Phonebook EU
-#   source = "./modules/linux_virtual_machine_scale_set"
+#   source = "github.com/ycetindil/terraform/tree/main/modules/azure/linux_virtual_machine_scale_set"
 
 #   name                   = var.vmss_project102_prod_westeurope_001.name
 #   resource_group_name    = var.vmss_project102_prod_westeurope_001.resource_group_name
@@ -375,92 +538,8 @@ module "vm_project102_prod_eastus_001" { // CI/CD Agent
 #   ]
 # }
 
-module "vnet_project102_prod_eastus_001" { // app
-  source = "./modules/virtual_network"
-
-  name                = var.vnet_project102_prod_eastus_001.name
-  resource_group_name = var.vnet_project102_prod_eastus_001.resource_group_name
-  location            = var.vnet_project102_prod_eastus_001.location
-  address_space       = var.vnet_project102_prod_eastus_001.address_space
-  subnets             = var.vnet_project102_prod_eastus_001.subnets
-
-  depends_on = [
-    module.rg_project102_prod_eastus_001
-  ]
-}
-
-module "vnet_project102_prod_eastus_002" { // acr
-  source = "./modules/virtual_network"
-
-  name                = var.vnet_project102_prod_eastus_002.name
-  resource_group_name = var.vnet_project102_prod_eastus_002.resource_group_name
-  location            = var.vnet_project102_prod_eastus_002.location
-  address_space       = var.vnet_project102_prod_eastus_002.address_space
-  subnets             = var.vnet_project102_prod_eastus_002.subnets
-
-  depends_on = [
-    module.rg_project102_prod_eastus_001
-  ]
-}
-
-module "vnet_project102_prod_eastus_003" { // SQL-US
-  source = "./modules/virtual_network"
-
-  name                = var.vnet_project102_prod_eastus_003.name
-  resource_group_name = var.vnet_project102_prod_eastus_003.resource_group_name
-  location            = var.vnet_project102_prod_eastus_003.location
-  address_space       = var.vnet_project102_prod_eastus_003.address_space
-  subnets             = var.vnet_project102_prod_eastus_003.subnets
-
-  depends_on = [
-    module.rg_project102_prod_eastus_001
-  ]
-}
-
-module "vnet_project102_prod_eastus_004" { // CI/CD Agent
-  source = "./modules/virtual_network"
-
-  name                = var.vnet_project102_prod_eastus_004.name
-  resource_group_name = var.vnet_project102_prod_eastus_004.resource_group_name
-  location            = var.vnet_project102_prod_eastus_004.location
-  address_space       = var.vnet_project102_prod_eastus_004.address_space
-  subnets             = var.vnet_project102_prod_eastus_004.subnets
-
-  depends_on = [
-    module.rg_project102_prod_eastus_001
-  ]
-}
-
-module "vnet_project102_prod_westeurope_001" { // App
-  source = "./modules/virtual_network"
-
-  name                = var.vnet_project102_prod_westeurope_001.name
-  resource_group_name = var.vnet_project102_prod_westeurope_001.resource_group_name
-  location            = var.vnet_project102_prod_westeurope_001.location
-  address_space       = var.vnet_project102_prod_westeurope_001.address_space
-  subnets             = var.vnet_project102_prod_westeurope_001.subnets
-
-  depends_on = [
-    module.rg_project102_prod_westeurope_001
-  ]
-}
-
-module "vnet_project102_prod_westeurope_002" { // SQL-EU
-  source = "./modules/virtual_network"
-
-  name                = var.vnet_project102_prod_westeurope_002.name
-  resource_group_name = var.vnet_project102_prod_westeurope_002.resource_group_name
-  location            = var.vnet_project102_prod_westeurope_002.location
-  address_space       = var.vnet_project102_prod_westeurope_002.address_space
-  subnets             = var.vnet_project102_prod_westeurope_002.subnets
-
-  depends_on = [
-    module.rg_project102_prod_westeurope_001
-  ]
-}
-
 module "vwan_project102_prod_eastus_001" {
-  source = "./modules/virtual_wan"
+  source = "github.com/ycetindil/terraform/tree/main/modules/azure/virtual_wan"
 
   name                = var.vwan_project102_prod_eastus_001.name
   resource_group_name = var.vwan_project102_prod_eastus_001.resource_group_name
